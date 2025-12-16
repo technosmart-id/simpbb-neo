@@ -1,4 +1,5 @@
 import { objekPajakRouter } from "./routers/objek-pajak";
+import { spptRouter } from "./routers/sppt";
 import { protectedProcedure, publicProcedure } from "./server";
 
 export const router = {
@@ -15,6 +16,7 @@ export const router = {
   })),
 
   objekPajak: objekPajakRouter,
+  sppt: spptRouter,
 };
 
 export type Router = typeof router;
