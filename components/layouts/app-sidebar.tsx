@@ -1,23 +1,20 @@
 "use client";
 
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map as MapIcon,
-  PieChart,
-  Settings2,
-  SquareTerminal,
+  BarChart3,
+  CreditCard,
+  Database,
+  FileText,
+  Home,
+  Landmark,
+  Search,
+  Settings,
 } from "lucide-react";
 import type * as React from "react";
 
+import { AppSwitcher } from "@/components/layouts/app-switcher";
 import { NavMain } from "@/components/layouts/nav-main";
-import { NavProjects } from "@/components/layouts/nav-projects";
 import { NavUser } from "@/components/layouts/nav-user";
-import { TeamSwitcher } from "@/components/layouts/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -26,148 +23,99 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+// PBB Navigation Data
+const navMain = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
   },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: MapIcon,
-    },
-  ],
+  {
+    title: "Objek Pajak",
+    url: "/objek-pajak",
+    icon: Search,
+    items: [
+      { title: "Cari NOP", url: "/objek-pajak" },
+      { title: "Pendataan", url: "/objek-pajak/pendataan" },
+      { title: "Mutasi", url: "/objek-pajak/mutasi" },
+    ],
+  },
+  {
+    title: "SPPT",
+    url: "/sppt",
+    icon: FileText,
+    items: [
+      { title: "Cetak SPPT", url: "/sppt/cetak" },
+      { title: "DHKP", url: "/sppt/dhkp" },
+      { title: "Rekap SPPT", url: "/sppt/rekap" },
+    ],
+  },
+  {
+    title: "Pembayaran",
+    url: "/pembayaran",
+    icon: CreditCard,
+    items: [
+      { title: "Input Pembayaran", url: "/pembayaran/input" },
+      { title: "Validasi", url: "/pembayaran/validasi" },
+      { title: "Laporan", url: "/pembayaran/laporan" },
+    ],
+  },
+  {
+    title: "Piutang",
+    url: "/piutang",
+    icon: Landmark,
+  },
+  {
+    title: "Laporan",
+    url: "/laporan",
+    icon: BarChart3,
+    items: [
+      { title: "Penerimaan", url: "/laporan/penerimaan" },
+      { title: "Piutang", url: "/laporan/piutang" },
+      { title: "Statistik", url: "/laporan/statistik" },
+    ],
+  },
+  {
+    title: "Master Data",
+    url: "/master",
+    icon: Database,
+    items: [
+      { title: "Wilayah", url: "/master/wilayah" },
+      { title: "Kelas Tanah", url: "/master/kelas-tanah" },
+      { title: "Kelas Bangunan", url: "/master/kelas-bangunan" },
+      { title: "NJOP", url: "/master/njop" },
+    ],
+  },
+  {
+    title: "Pengaturan",
+    url: "/settings",
+    icon: Settings,
+    items: [
+      { title: "Profil", url: "/settings/profile" },
+      { title: "Pengguna", url: "/settings/users" },
+      { title: "Sistem", url: "/settings/system" },
+    ],
+  },
+];
+
+// TODO: Replace with real user data from auth
+const userData = {
+  name: "Admin PBB",
+  email: "admin@pbb.go.id",
+  avatar: "",
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <AppSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
