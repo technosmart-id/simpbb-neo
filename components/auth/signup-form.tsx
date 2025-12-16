@@ -1,21 +1,20 @@
-import Link from "next/link"
-
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 export function SignupForm({
   className,
@@ -35,28 +34,28 @@ export function SignupForm({
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                <Input id="name" type="text" placeholder="John Doe" required />
+                <Input id="name" placeholder="John Doe" required type="text" />
               </Field>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
-                  type="email"
                   placeholder="m@example.com"
                   required
+                  type="email"
                 />
               </Field>
               <Field>
                 <Field className="grid grid-cols-2 gap-4">
                   <Field>
                     <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <Input id="password" type="password" required />
+                    <Input id="password" required type="password" />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="confirm-password">
                       Confirm Password
                     </FieldLabel>
-                    <Input id="confirm-password" type="password" required />
+                    <Input id="confirm-password" required type="password" />
                   </Field>
                 </Field>
                 <FieldDescription>
@@ -67,7 +66,7 @@ export function SignupForm({
                 <Button type="submit">Create Account</Button>
                 <FieldDescription className="text-center">
                   Already have an account?{" "}
-                  <Link href="/login" className="underline underline-offset-4">
+                  <Link className="underline underline-offset-4" href="/login">
                     Sign in
                   </Link>
                 </FieldDescription>
@@ -78,15 +77,15 @@ export function SignupForm({
       </Card>
       <FieldDescription className="px-6 text-center">
         By clicking continue, you agree to our{" "}
-        <Link href="/terms" className="underline underline-offset-4">
+        <Link className="underline underline-offset-4" href="/terms">
           Terms of Service
         </Link>{" "}
         and{" "}
-        <Link href="/privacy" className="underline underline-offset-4">
+        <Link className="underline underline-offset-4" href="/privacy">
           Privacy Policy
         </Link>
         .
       </FieldDescription>
     </div>
-  )
+  );
 }
