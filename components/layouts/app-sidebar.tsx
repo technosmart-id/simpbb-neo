@@ -7,6 +7,7 @@ import {
   FileText,
   Home,
   Landmark,
+  MapIcon,
   Search,
   Settings,
 } from "lucide-react";
@@ -31,11 +32,17 @@ const navMain = [
     icon: Home,
   },
   {
+    title: "Peta",
+    url: "/peta",
+    icon: MapIcon,
+  },
+  {
     title: "Objek Pajak",
     url: "/objek-pajak",
     icon: Search,
     items: [
       { title: "Cari NOP", url: "/objek-pajak" },
+      { title: "Peta Lokasi", url: "/objek-pajak/peta" },
       { title: "Pendataan", url: "/objek-pajak/pendataan" },
       { title: "Mutasi", url: "/objek-pajak/mutasi" },
     ],
