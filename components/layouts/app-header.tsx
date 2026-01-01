@@ -1,6 +1,8 @@
 "use client";
 
-import { Bell, Search } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { id } from "date-fns/locale";
+import { Bell, Check, Search } from "lucide-react";
 import { useEffect } from "react";
 import { AutoBreadcrumbs } from "@/components/layouts/auto-breadcrumbs";
 import { ModeToggle } from "@/components/layouts/mode-toggle";
@@ -18,36 +20,12 @@ import {
 import { Kbd } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-
-type Notification = {
-  id: string;
-  title: string;
-  description: string;
-  read: boolean;
-  createdAt: Date;
-};
-
-// TODO: Replace with real notifications from API/state
-const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    title: "New reply to your thread",
-    description: "John commented on your post",
-    read: false,
-    createdAt: new Date(),
-  },
-  {
-    id: "2",
-    title: "Welcome to SimpBB",
-    description: "Get started by creating your first post",
-    read: true,
-    createdAt: new Date(Date.now() - 86_400_000),
-  },
-];
+import { useNotifications } from "@/lib/hooks/use-notifications";
 
 export function AppHeader() {
   const { setOpen } = useCommand();
-  const unreadCount = mockNotifications.filter((n) => !n.read).length;
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } =
+    useNotifications();
 
   // Keyboard shortcut ⌘K / Ctrl+K
   useEffect(() => {
@@ -120,21 +98,43 @@ export function AppHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
               <DropdownMenuLabel className="flex items-center justify-between">
-                <span>Notifications</span>
+                <span>Notifikasi</span>
                 {unreadCount > 0 && (
-                  <Badge variant="secondary">{unreadCount} new</Badge>
+                  <Button
+                    className="h-auto p-0 text-xs"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      markAllAsRead();
+                    }}
+                    variant="link"
+                  >
+                    <Check className="mr-1 size-3" />
+                    Tandai semua dibaca
+                  </Button>
                 )}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {mockNotifications.length === 0 ? (
+              {isLoading === true && (
                 <div className="py-4 text-center text-muted-foreground text-sm">
-                  No notifications
+                  Memuat...
                 </div>
-              ) : (
-                mockNotifications.map((notification) => (
+              )}
+              {isLoading === false && notifications.length === 0 && (
+                <div className="py-4 text-center text-muted-foreground text-sm">
+                  Tidak ada notifikasi
+                </div>
+              )}
+              {isLoading === false &&
+                notifications.length > 0 &&
+                notifications.slice(0, 5).map((notification) => (
                   <DropdownMenuItem
-                    className="flex flex-col items-start gap-1 p-3"
+                    className="flex cursor-pointer flex-col items-start gap-1 p-3"
                     key={notification.id}
+                    onClick={() => {
+                      if (!notification.read) {
+                        markAsRead(notification.id);
+                      }
+                    }}
                   >
                     <div className="flex w-full items-start justify-between gap-2">
                       <span className="font-medium">{notification.title}</span>
@@ -142,16 +142,27 @@ export function AppHeader() {
                         <span className="size-2 shrink-0 rounded-full bg-primary" />
                       )}
                     </div>
-                    <span className="text-muted-foreground text-xs">
-                      {notification.description}
+                    {Boolean(notification.description) && (
+                      <span className="text-muted-foreground text-xs">
+                        {notification.description}
+                      </span>
+                    )}
+                    <span className="text-[10px] text-muted-foreground/60">
+                      {formatDistanceToNow(new Date(notification.createdAt), {
+                        addSuffix: true,
+                        locale: id,
+                      })}
                     </span>
                   </DropdownMenuItem>
-                ))
+                ))}
+              {notifications.length > 5 && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="justify-center text-sm">
+                    Lihat semua notifikasi
+                  </DropdownMenuItem>
+                </>
               )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="justify-center text-sm">
-                View all notifications
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

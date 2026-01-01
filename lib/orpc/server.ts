@@ -1,7 +1,7 @@
 import { os } from "@orpc/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import type { Session, User } from "@/lib/db/schema";
+import type { Session, User } from "@/lib/db/schema/auth";
 
 export type Context = {
   user: User | null;
