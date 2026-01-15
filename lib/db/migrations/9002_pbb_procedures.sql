@@ -1,11 +1,19 @@
 -- ============================================================================
+-- PBB PROCEDURES - Consolidated Procedures for PBB Tax Assessment
+-- Migration: 9002
+-- Generated: 2026-01-01
+-- Source: Consolidated from 0002_penetapan_massal_procedures.sql and
+--          0003_jpb_valuation_procedures.sql
+-- ============================================================================
+
+-- ============================================================================
 -- PENETAPAN MASSAL - Stored Procedures for PBB Tax Assessment
 -- Fresh implementation based on SISMIOP reference
 -- ============================================================================
 
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 -- 1. PENENTUAN_KELAS - Determine property class from NJOP per m2
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE penentuan_kelas(
   IN p_flag_jenis BIGINT,         -- 1 = land (tanah), 2 = building (bangunan)
   IN p_thn_pajak TEXT,            -- Tax year (e.g., '2024')
@@ -67,9 +75,9 @@ BEGIN
 END;
 $$;
 
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 -- 2. PENILAIAN_BUMI - Calculate land value for a single land component
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE penilaian_bumi(
   IN p_kd_propinsi CHAR(2),
   IN p_kd_dati2 CHAR(2),
@@ -135,9 +143,9 @@ BEGIN
 END;
 $$;
 
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 -- 3. PENILAIAN_BNG - Calculate building value for a single building
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE penilaian_bng(
   IN p_kd_propinsi CHAR(2),
   IN p_kd_dati2 CHAR(2),
@@ -155,6 +163,9 @@ LANGUAGE plpgsql AS $$
 DECLARE
   v_nilai_individu BIGINT := 0;
   v_nilai_sistem BIGINT := 0;
+  v_kd_jpb CHAR(2);
+  v_luas_bng BIGINT;
+  v_jml_lantai SMALLINT;
 BEGIN
   -- Check for individual valuation first
   BEGIN
@@ -173,23 +184,62 @@ BEGIN
     WHEN OTHERS THEN v_nilai_individu := 0;
   END;
 
-  -- If individual valuation exists, use it
   IF v_nilai_individu > 0 THEN
     p_nilai_bng := v_nilai_individu;
+    RETURN;
+  END IF;
+
+  BEGIN
+    SELECT kd_jpb, COALESCE(luas_bng, 0), COALESCE(jml_lantai_bng, 1)
+    INTO STRICT v_kd_jpb, v_luas_bng, v_jml_lantai
+    FROM dat_op_bangunan
+    WHERE kd_propinsi = p_kd_propinsi
+      AND kd_dati2 = p_kd_dati2
+      AND kd_kecamatan = p_kd_kecamatan
+      AND kd_kelurahan = p_kd_kelurahan
+      AND kd_blok = p_kd_blok
+      AND no_urut = p_no_urut
+      AND kd_jns_op = p_kd_jns_op
+      AND no_bng = p_no_bng;
+  EXCEPTION
+    WHEN OTHERS THEN
+      p_nilai_bng := 0;
+      RETURN;
+  END;
+
+  IF v_kd_jpb IN ('02', '04', '05', '07', '09') AND (v_luas_bng > 1000 OR v_jml_lantai > 4) THEN
+    CASE v_kd_jpb
+      WHEN '02' THEN CALL penilaian_jpb2(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      WHEN '04' THEN CALL penilaian_jpb4(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      WHEN '05' THEN CALL penilaian_jpb5(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      WHEN '07' THEN CALL penilaian_jpb7(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      WHEN '09' THEN CALL penilaian_jpb9(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      ELSE NULL;
+    END CASE;
+  ELSIF v_kd_jpb = '03' THEN
+    CALL penilaian_jpb3(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng::BIGINT, p_tahun, p_nilai_bng);
+  ELSIF v_kd_jpb IN ('06', '08') AND (v_luas_bng > 1000 OR v_jml_lantai > 4) THEN
+    CASE v_kd_jpb
+      WHEN '06' THEN CALL penilaian_jpb6(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      WHEN '08' THEN CALL penilaian_jpb8(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      ELSE NULL;
+    END CASE;
+  ELSIF v_kd_jpb IN ('12', '13', '14', '15', '16') THEN
+    CASE v_kd_jpb
+      WHEN '12' THEN CALL penilaian_jpb12(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng::BIGINT, p_tahun, p_nilai_bng);
+      WHEN '13' THEN CALL penilaian_jpb13(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      WHEN '14' THEN CALL penilaian_jpb14(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      WHEN '15' THEN CALL penilaian_jpb15(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      WHEN '16' THEN CALL penilaian_jpb16(p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan, p_kd_blok, p_no_urut, p_kd_jns_op, p_no_bng, p_tahun, p_nilai_bng);
+      ELSE NULL;
+    END CASE;
   ELSE
-    -- Use system value from dat_op_bangunan
     BEGIN
-      SELECT COALESCE(nilai_sistem_bng, 0)
-      INTO STRICT v_nilai_sistem
+      SELECT COALESCE(nilai_sistem_bng, 0) INTO STRICT v_nilai_sistem
       FROM dat_op_bangunan
-      WHERE kd_propinsi = p_kd_propinsi
-        AND kd_dati2 = p_kd_dati2
-        AND kd_kecamatan = p_kd_kecamatan
-        AND kd_kelurahan = p_kd_kelurahan
-        AND kd_blok = p_kd_blok
-        AND no_urut = p_no_urut
-        AND kd_jns_op = p_kd_jns_op
-        AND no_bng = p_no_bng;
+      WHERE kd_propinsi = p_kd_propinsi AND kd_dati2 = p_kd_dati2 AND kd_kecamatan = p_kd_kecamatan
+        AND kd_kelurahan = p_kd_kelurahan AND kd_blok = p_kd_blok AND no_urut = p_no_urut
+        AND kd_jns_op = p_kd_jns_op AND no_bng = p_no_bng;
     EXCEPTION
       WHEN OTHERS THEN v_nilai_sistem := 0;
     END;
@@ -198,9 +248,9 @@ BEGIN
 END;
 $$;
 
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 -- 4. PENENTUAN_NJOP_BUMI - Calculate total land NJOP for a property
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE penentuan_njop_bumi(
   IN p_kd_propinsi CHAR(2),
   IN p_kd_dati2 CHAR(2),
@@ -264,9 +314,9 @@ BEGIN
 END;
 $$;
 
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 -- 5. PENENTUAN_NJOP_BNG - Calculate total building NJOP for a property
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE penentuan_njop_bng(
   IN p_kd_propinsi CHAR(2),
   IN p_kd_dati2 CHAR(2),
@@ -330,86 +380,9 @@ BEGIN
 END;
 $$;
 
--- ----------------------------------------------------------------------------
--- 6. GET_PENGURANGAN - Get total reduction percentage for a property
--- ----------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION get_pengurangan(
-  p_kd_propinsi CHAR(2),
-  p_kd_dati2 CHAR(2),
-  p_kd_kecamatan CHAR(3),
-  p_kd_kelurahan CHAR(3),
-  p_kd_blok CHAR(3),
-  p_no_urut CHAR(4),
-  p_kd_jns_op CHAR(1),
-  p_thn_pajak CHAR(4)
-) RETURNS DECIMAL(5,2) AS $$
-DECLARE
-  v_pct_pst DECIMAL(5,2) := 0;
-  v_pct_permanen DECIMAL(5,2) := 0;
-  v_pct_jpb DECIMAL(5,2) := 0;
-BEGIN
-  -- Get PST reduction
-  BEGIN
-    SELECT COALESCE(MAX(pct_pengurangan_pst), 0)
-    INTO v_pct_pst
-    FROM pengurangan_pst
-    WHERE kd_propinsi_pemohon = p_kd_propinsi
-      AND kd_dati2_pemohon = p_kd_dati2
-      AND kd_kecamatan_pemohon = p_kd_kecamatan
-      AND kd_kelurahan_pemohon = p_kd_kelurahan
-      AND kd_blok_pemohon = p_kd_blok
-      AND no_urut_pemohon = p_no_urut
-      AND kd_jns_op_pemohon = p_kd_jns_op
-      AND thn_peng_pst = p_thn_pajak
-      AND status_sk_peng_pst = '1';
-  EXCEPTION
-    WHEN OTHERS THEN v_pct_pst := 0;
-  END;
-
-  -- Get permanent reduction
-  BEGIN
-    SELECT COALESCE(MAX(pct_pengurangan_permanen), 0)
-    INTO v_pct_permanen
-    FROM pengurangan_permanen
-    WHERE kd_propinsi_pemohon = p_kd_propinsi
-      AND kd_dati2_pemohon = p_kd_dati2
-      AND kd_kecamatan_pemohon = p_kd_kecamatan
-      AND kd_kelurahan_pemohon = p_kd_kelurahan
-      AND kd_blok_pemohon = p_kd_blok
-      AND no_urut_pemohon = p_no_urut
-      AND kd_jns_op_pemohon = p_kd_jns_op
-      AND thn_peng_permanen_awal <= p_thn_pajak
-      AND thn_peng_permanen_akhir >= p_thn_pajak
-      AND status_sk_peng_permanen = '1';
-  EXCEPTION
-    WHEN OTHERS THEN v_pct_permanen := 0;
-  END;
-
-  -- Get JPB reduction
-  BEGIN
-    SELECT COALESCE(MAX(pct_pengurangan_jpb), 0)
-    INTO v_pct_jpb
-    FROM pengurangan_pengenaan_jpb
-    WHERE kd_propinsi_pemohon = p_kd_propinsi
-      AND kd_dati2_pemohon = p_kd_dati2
-      AND kd_kecamatan_pemohon = p_kd_kecamatan
-      AND kd_kelurahan_pemohon = p_kd_kelurahan
-      AND kd_blok_pemohon = p_kd_blok
-      AND no_urut_pemohon = p_no_urut
-      AND kd_jns_op_pemohon = p_kd_jns_op
-      AND thn_pengenaan_jpb = p_thn_pajak;
-  EXCEPTION
-    WHEN OTHERS THEN v_pct_jpb := 0;
-  END;
-
-  -- Return highest reduction (they don't stack)
-  RETURN GREATEST(v_pct_pst, v_pct_permanen, v_pct_jpb);
-END;
-$$ LANGUAGE plpgsql;
-
--- ----------------------------------------------------------------------------
--- 7. PENETAPAN_MASSAL - Main tax assessment procedure
--- ----------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
+-- 6. PENETAPAN_MASSAL - Main tax assessment procedure
+-- ------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE penetapan_massal(
   -- NOP parameters
   IN p_kd_propinsi CHAR(2),
@@ -507,7 +480,7 @@ BEGIN
       AND o.kd_jns_op = p_kd_jns_op;
   EXCEPTION
     WHEN OTHERS THEN
-      RAISE EXCEPTION 'NOP not found: %.%.%.%.%.%.%',
+      RAISE EXCEPTION 'NOP not found: %.%.%.%.%.%.%.%',
         p_kd_propinsi, p_kd_dati2, p_kd_kecamatan, p_kd_kelurahan,
         p_kd_blok, p_no_urut, p_kd_jns_op;
   END;
@@ -667,5 +640,295 @@ END;
 $$;
 
 -- ============================================================================
--- END OF PENETAPAN MASSAL PROCEDURES
+-- JPB VALUATION PROCEDURES (JPB2 - JPB16)
+-- ============================================================================
+
+-- Helper procedures for JPB valuation
+
+-- ------------------------------------------------------------------------------
+-- FASILITAS_SUSUT - Calculate facility value with depreciation
+-- ------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE fasilitas_susut(
+  IN vlc_kd_propinsi CHARACTER,
+  IN vlc_kd_dati2 CHARACTER,
+  IN vlc_kd_kecamatan CHARACTER,
+  IN vlc_kd_kelurahan CHARACTER,
+  IN vlc_kd_blok CHARACTER,
+  IN vlc_no_urut CHARACTER,
+  IN vlc_kd_jns_op CHARACTER,
+  IN vln_no_bng SMALLINT,
+  IN vln_jml_lantai_bng SMALLINT,
+  IN vlc_tahun TEXT,
+  INOUT vln_nilai_fasilitas BIGINT
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $procedure$
+DECLARE
+  vln_jml_satuan       dat_fasilitas_bangunan.jml_satuan%type := 0;
+  vlc_kd_fasilitas     fasilitas.kd_fasilitas%type;
+  vlc_ketergantungan   fasilitas.ketergantungan%type;
+  vln_nilai_satuan     fas_non_dep.nilai_non_dep%type := 0;
+
+  cur_biaya_fasilitas CURSOR FOR
+     SELECT kd_fasilitas, ketergantungan
+     FROM   fasilitas
+     WHERE  status_fasilitas = '4';
+
+BEGIN
+  vln_nilai_fasilitas := 0;
+  OPEN cur_biaya_fasilitas;
+  LOOP
+    FETCH cur_biaya_fasilitas INTO vlc_kd_fasilitas, vlc_ketergantungan;
+    EXIT WHEN NOT FOUND;
+
+    BEGIN
+      SELECT coalesce(jml_satuan, 0) INTO STRICT vln_jml_satuan
+      FROM   dat_fasilitas_bangunan
+      WHERE  kd_propinsi  = vlc_kd_propinsi
+        AND kd_dati2     = vlc_kd_dati2
+        AND kd_kecamatan = vlc_kd_kecamatan
+        AND kd_kelurahan = vlc_kd_kelurahan
+        AND kd_blok      = vlc_kd_blok
+        AND no_urut      = vlc_no_urut
+        AND kd_jns_op    = vlc_kd_jns_op
+        AND no_bng       = vln_no_bng
+        AND kd_fasilitas = vlc_kd_fasilitas;
+    EXCEPTION
+      WHEN no_data_found THEN vln_jml_satuan := 0;
+    END;
+
+    IF vlc_ketergantungan = '0' THEN
+      BEGIN
+        SELECT coalesce(nilai_non_dep, 0) INTO STRICT vln_nilai_satuan
+        FROM   fas_non_dep
+        WHERE  kd_propinsi  = vlc_kd_propinsi
+          AND kd_dati2     = vlc_kd_dati2
+          AND thn_non_dep  = vlc_tahun
+          AND kd_fasilitas = vlc_kd_fasilitas;
+      EXCEPTION
+        WHEN no_data_found THEN vln_nilai_satuan := 0;
+      END;
+    ELSIF vlc_ketergantungan = '1' THEN
+      BEGIN
+        IF vlc_kd_fasilitas IN ('30','31','32') THEN
+          BEGIN
+            SELECT coalesce(nilai_dep_min_max, 0) INTO STRICT vln_nilai_satuan
+            FROM   fas_dep_min_max
+            WHERE  kd_propinsi     = vlc_kd_propinsi
+              AND kd_dati2        = vlc_kd_dati2
+              AND thn_dep_min_max = vlc_tahun
+              AND kd_fasilitas    = vlc_kd_fasilitas
+              AND kls_dep_min    <= coalesce(vln_jml_lantai_bng,0)
+              AND kls_dep_max    >= coalesce(vln_jml_lantai_bng,0);
+          EXCEPTION
+            WHEN no_data_found THEN vln_nilai_satuan := 0;
+          END;
+        ELSE
+          BEGIN
+            SELECT coalesce(nilai_dep_min_max, 0) INTO STRICT vln_nilai_satuan
+            FROM   fas_dep_min_max
+            WHERE  kd_propinsi     = vlc_kd_propinsi
+              AND kd_dati2        = vlc_kd_dati2
+              AND thn_dep_min_max = vlc_tahun
+              AND kd_fasilitas    = vlc_kd_fasilitas
+              AND kls_dep_min    <= vln_jml_satuan
+              AND kls_dep_max    >= vln_jml_satuan;
+          EXCEPTION
+            WHEN no_data_found THEN vln_nilai_satuan := 0;
+          END;
+        END IF;
+      END;
+    ELSE vln_nilai_satuan := 0;
+    END IF;
+
+    vln_nilai_fasilitas := vln_nilai_fasilitas + (vln_nilai_satuan * vln_jml_satuan);
+  END LOOP;
+  CLOSE cur_biaya_fasilitas;
+END;
+$$;
+
+-- ------------------------------------------------------------------------------
+-- FASILITAS_SUSUT_X_LUAS - Calculate facility value multiplied by area
+-- ------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE fasilitas_susut_x_luas(
+  IN vlc_kd_prop CHARACTER,
+  IN vlc_kd_dati2 CHARACTER,
+  IN vlc_kd_kec CHARACTER,
+  IN vlc_kd_kel CHARACTER,
+  IN vlc_kd_blok CHARACTER,
+  IN vlc_no_urut CHARACTER,
+  IN vlc_kd_jns_op CHARACTER,
+  IN vlc_no_bng SMALLINT,
+  IN vlc_kd_jpb CHARACTER,
+  IN vlc_kls_bintang CHARACTER,
+  IN vlc_tahun CHARACTER,
+  INOUT vln_fasilitas BIGINT
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $procedure$
+DECLARE
+  vlc_kd_fasilitas    dat_fasilitas_bangunan.kd_fasilitas%type;
+  vln_jml_satuan      dat_fasilitas_bangunan.jml_satuan%type;
+  vlc_kd_status       fasilitas.status_fasilitas%type;
+  vlc_ketergantungan  fasilitas.ketergantungan%type;
+  vln_nilai           fas_non_dep.nilai_non_dep%type;
+  vln_nilai_fas    dat_op_bangunan.nilai_sistem_bng%type;
+
+  c_fas1 CURSOR FOR
+    SELECT a.kd_fasilitas     kd_fasilitas,
+           a.jml_satuan      jml_satuan,
+           b.status_fasilitas status_fasilitas,
+           b.ketergantungan ketergantungan
+    from      dat_fasilitas_bangunan a,
+           fasilitas b
+    where     a.kd_propinsi   = vlc_kd_prop
+      AND a.kd_dati2      = vlc_kd_dati2
+      AND a.kd_kecamatan   = vlc_kd_kec
+      AND a.kd_kelurahan   = vlc_kd_kel
+      AND a.kd_blok       = vlc_kd_blok
+      AND a.no_urut       = vlc_no_urut
+      AND a.kd_jns_op     = vlc_kd_jns_op
+      AND a.no_bng        = vlc_no_bng
+      AND b.kd_fasilitas  = a.kd_fasilitas
+      AND b.status_fasilitas  = '0';
+
+BEGIN
+  vln_nilai_fas := 0;
+  FOR rec_c_fas1 in c_fas1 LOOP
+    IF rec_c_fas1.ketergantungan = '0' THEN
+      BEGIN
+        SELECT nilai_non_dep
+        INTO STRICT    vln_nilai
+        FROM   fas_non_dep
+        WHERE  kd_propinsi  = vlc_kd_prop
+          AND kd_dati2    = vlc_kd_dati2
+          AND thn_non_dep  = vlc_tahun
+          AND kd_fasilitas = rec_c_fas1.kd_fasilitas;
+
+        vln_nilai_fas := vln_nilai_fas + (vln_nilai * rec_c_fas1.jml_satuan);
+      EXCEPTION
+        WHEN no_data_found THEN
+          vln_nilai_fas := vln_nilai_fas;
+      END;
+    ELSIF rec_c_fas1.ketergantungan = '1' THEN
+      BEGIN
+        SELECT nilai_dep_min_max
+        INTO STRICT    vln_nilai
+        FROM   fas_dep_min_max
+        WHERE  kd_propinsi     = vlc_kd_prop
+          AND kd_dati2        = vlc_kd_dati2
+          AND thn_dep_min_max = vlc_tahun
+          AND kd_fasilitas    = rec_c_fas1.kd_fasilitas
+          AND kls_dep_min    <= rec_c_fas1.jml_satuan
+          AND kls_dep_max    >= rec_c_fas1.jml_satuan;
+
+        vln_nilai_fas := vln_nilai_fas + (vln_nilai * rec_c_fas1.jml_satuan);
+      EXCEPTION
+        WHEN no_data_found THEN
+          vln_nilai_fas := vln_nilai_fas;
+      END;
+    ELSIF rec_c_fas1.ketergantungan = '2' THEN
+      BEGIN
+        SELECT nilai_fasilitas_kls_bintang
+        INTO STRICT    vln_nilai
+        FROM   fas_dep_jpb_kls_bintang
+        WHERE  kd_propinsi             = vlc_kd_prop
+          AND kd_dati2                = vlc_kd_dati2
+          AND thn_dep_jpb_kls_bintang = vlc_tahun
+          AND kd_fasilitas            = rec_c_fas1.kd_fasilitas
+          AND kd_jpb                  = vlc_kd_jpb
+          AND kls_bintang             = vlc_kls_bintang;
+
+        vln_nilai_fas := vln_nilai_fas + (vln_nilai * rec_c_fas1.jml_satuan);
+      EXCEPTION
+        WHEN no_data_found THEN
+          vln_nilai_fas := vln_nilai_fas;
+      END;
+    END IF;
+  END LOOP;
+
+  vln_fasilitas := vln_nilai_fas;
+END;
+$$;
+
+-- ------------------------------------------------------------------------------
+-- FASILITAS_TDK_SUSUT - Calculate facility value without depreciation
+-- ------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE fasilitas_tdk_susut(
+  IN vlc_kd_propinsi CHARACTER,
+  IN vlc_kd_dati2 CHARACTER,
+  IN vlc_kd_kecamatan CHARACTER,
+  IN vlc_kd_kelurahan CHARACTER,
+  IN vlc_kd_blok CHARACTER,
+  IN vlc_no_urut CHARACTER,
+  IN vlc_kd_jns_op CHARACTER,
+  IN vln_no_bng SMALLINT,
+  IN vlc_tahun TEXT,
+  INOUT vln_nilai_fasilitas BIGINT
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $procedure$
+DECLARE
+  vln_jml_satuan       dat_fasilitas_bangunan.jml_satuan%type := 0;
+  vlc_kd_fasilitas     fasilitas.kd_fasilitas%type;
+  vlc_ketergantungan   fasilitas.ketergantungan%type;
+  vln_nilai_satuan     fas_non_dep.nilai_non_dep%type := 0;
+
+  cur_fas_tdk_susut CURSOR FOR
+    SELECT kd_fasilitas, ketergantungan
+    FROM   fasilitas
+    WHERE  status_fasilitas = '5';
+
+BEGIN
+  vln_nilai_fasilitas := 0;
+
+  OPEN cur_fas_tdk_susut;
+  LOOP
+    FETCH cur_fas_tdk_susut INTO vlc_kd_fasilitas, vlc_ketergantungan;
+    EXIT WHEN NOT FOUND;
+
+    BEGIN
+      SELECT coalesce(nilai_non_dep, 0) INTO STRICT vln_nilai_satuan
+      FROM   fas_non_dep
+      WHERE  kd_propinsi  = vlc_kd_propinsi
+        AND kd_dati2     = vlc_kd_dati2
+        AND thn_non_dep  = vlc_tahun
+        AND kd_fasilitas = vlc_kd_fasilitas;
+    EXCEPTION
+      WHEN no_data_found THEN vln_nilai_satuan := 0;
+    END;
+
+    BEGIN
+      SELECT coalesce(jml_satuan, 0) INTO STRICT vln_jml_satuan
+      FROM   dat_fasilitas_bangunan
+      WHERE  kd_propinsi  = vlc_kd_propinsi
+        AND kd_dati2     = vlc_kd_dati2
+        AND kd_kecamatan = vlc_kd_kecamatan
+        AND kd_kelurahan = vlc_kd_kelurahan
+        AND kd_blok      = vlc_kd_blok
+        AND no_urut      = vlc_no_urut
+        AND kd_jns_op    = vlc_kd_jns_op
+        AND no_bng       = vln_no_bng
+        AND kd_fasilitas = vlc_kd_fasilitas;
+    EXCEPTION
+      WHEN no_data_found THEN vln_jml_satuan := 0;
+    END;
+
+    -- jika kode fasilitas = '44' [listrik] maka biaya fasilitas listrik / 1000
+    IF vlc_kd_fasilitas = '44' THEN
+      vln_nilai_fasilitas := vln_nilai_fasilitas + ((vln_nilai_satuan * vln_jml_satuan)/1000);
+    ELSE
+      vln_nilai_fasilitas := vln_nilai_fasilitas + (vln_nilai_satuan * vln_jml_satuan);
+    END IF;
+
+  END LOOP;
+  CLOSE cur_fas_tdk_susut;
+END;
+$$;
+
+-- ============================================================================
+-- END OF PBB PROCEDURES
 -- ============================================================================

@@ -104,7 +104,7 @@ CREATE TABLE "dat_jpb12" (
 	"no_urut" char(4) NOT NULL,
 	"kd_jns_op" char(1) NOT NULL,
 	"no_bng" smallint NOT NULL,
-	"kls_jpb12" char(1) NOT NULL,
+	"type_jpb12" char(1) NOT NULL,
 	CONSTRAINT "dat_jpb12_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
 );
 --> statement-breakpoint
@@ -118,6 +118,9 @@ CREATE TABLE "dat_jpb13" (
 	"kd_jns_op" char(1) NOT NULL,
 	"no_bng" smallint NOT NULL,
 	"kls_jpb13" char(1) NOT NULL,
+	"jml_jpb13" smallint,
+	"luas_jpb13_dgn_ac_sent" bigint,
+	"luas_jpb13_lain_dgn_ac_sent" bigint,
 	CONSTRAINT "dat_jpb13_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
 );
 --> statement-breakpoint
@@ -130,7 +133,7 @@ CREATE TABLE "dat_jpb14" (
 	"no_urut" char(4) NOT NULL,
 	"kd_jns_op" char(1) NOT NULL,
 	"no_bng" smallint NOT NULL,
-	"kls_jpb14" char(1) NOT NULL,
+	"luas_kanopi_jpb14" bigint NOT NULL,
 	CONSTRAINT "dat_jpb14_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
 );
 --> statement-breakpoint
@@ -143,7 +146,8 @@ CREATE TABLE "dat_jpb15" (
 	"no_urut" char(4) NOT NULL,
 	"kd_jns_op" char(1) NOT NULL,
 	"no_bng" smallint NOT NULL,
-	"kls_jpb15" char(1) NOT NULL,
+	"letak_tangki_jpb15" char(1) NOT NULL,
+	"kapasitas_tangki_jpb15" bigint NOT NULL,
 	CONSTRAINT "dat_jpb15_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
 );
 --> statement-breakpoint
@@ -182,7 +186,12 @@ CREATE TABLE "dat_jpb3" (
 	"no_urut" char(4) NOT NULL,
 	"kd_jns_op" char(1) NOT NULL,
 	"no_bng" smallint NOT NULL,
-	"kls_jpb3" char(1) NOT NULL,
+	"type_konstruksi" char(1) NOT NULL,
+	"ting_kolom_jpb3" smallint NOT NULL,
+	"lbr_bent_jpb3" smallint NOT NULL,
+	"luas_mezzanine_jpb3" smallint,
+	"keliling_dinding_jpb3" smallint,
+	"daya_dukung_lantai_jpb3" bigint NOT NULL,
 	CONSTRAINT "dat_jpb3_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
 );
 --> statement-breakpoint
@@ -209,6 +218,8 @@ CREATE TABLE "dat_jpb5" (
 	"kd_jns_op" char(1) NOT NULL,
 	"no_bng" smallint NOT NULL,
 	"kls_jpb5" char(1) NOT NULL,
+	"luas_kmr_jpb5_dgn_ac_sent" bigint,
+	"luas_rng_lain_jpb5_dgn_ac_sent" bigint,
 	CONSTRAINT "dat_jpb5_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
 );
 --> statement-breakpoint
@@ -234,7 +245,11 @@ CREATE TABLE "dat_jpb7" (
 	"no_urut" char(4) NOT NULL,
 	"kd_jns_op" char(1) NOT NULL,
 	"no_bng" smallint NOT NULL,
-	"kls_jpb7" char(1) NOT NULL,
+	"jns_jpb7" char(1) NOT NULL,
+	"bintang_jpb7" char(1) NOT NULL,
+	"jml_kmr_jpb7" smallint NOT NULL,
+	"luas_kmr_jpb7_dgn_ac_sent" bigint,
+	"luas_kmr_lain_jpb7_dgn_ac_sent" bigint,
 	CONSTRAINT "dat_jpb7_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
 );
 --> statement-breakpoint
@@ -247,7 +262,12 @@ CREATE TABLE "dat_jpb8" (
 	"no_urut" char(4) NOT NULL,
 	"kd_jns_op" char(1) NOT NULL,
 	"no_bng" smallint NOT NULL,
-	"kls_jpb8" char(1) NOT NULL,
+	"type_konstruksi" char(1) NOT NULL,
+	"ting_kolom_jpb8" smallint NOT NULL,
+	"lbr_bent_jpb8" smallint NOT NULL,
+	"luas_mezzanine_jpb8" smallint,
+	"keliling_dinding_jpb8" smallint,
+	"daya_dukung_lantai_jpb8" bigint NOT NULL,
 	CONSTRAINT "dat_jpb8_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
 );
 --> statement-breakpoint
@@ -262,6 +282,26 @@ CREATE TABLE "dat_jpb9" (
 	"no_bng" smallint NOT NULL,
 	"kls_jpb9" char(1) NOT NULL,
 	CONSTRAINT "dat_jpb9_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
+);
+--> statement-breakpoint
+CREATE TABLE "dat_nilai_individu" (
+	"kd_propinsi" char(2) NOT NULL,
+	"kd_dati2" char(2) NOT NULL,
+	"kd_kecamatan" char(3) NOT NULL,
+	"kd_kelurahan" char(3) NOT NULL,
+	"kd_blok" char(3) NOT NULL,
+	"no_urut" char(4) NOT NULL,
+	"kd_jns_op" char(1) NOT NULL,
+	"no_bng" smallint NOT NULL,
+	"no_formulir_individu" char(11) NOT NULL,
+	"nilai_individu" bigint NOT NULL,
+	"tgl_penilaian_individu" timestamp (0) NOT NULL,
+	"nip_penilai_individu" char(18) NOT NULL,
+	"tgl_pemeriksaan_individu" timestamp (0) NOT NULL,
+	"nip_pemeriksa_individu" char(18) NOT NULL,
+	"tgl_rekam_nilai_individu" timestamp (0) DEFAULT now() NOT NULL,
+	"nip_perekam_individu" char(18) NOT NULL,
+	CONSTRAINT "dat_nilai_individu_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng")
 );
 --> statement-breakpoint
 CREATE TABLE "dat_nir" (
@@ -410,6 +450,18 @@ CREATE TABLE "dat_subjek_pajak" (
 	"npwp" varchar(16),
 	"status_pekerjaan_wp" char(1) DEFAULT '0' NOT NULL,
 	"metadata" jsonb
+);
+--> statement-breakpoint
+CREATE TABLE "dat_subjek_pajak_njoptkp" (
+	"subjek_pajak_id" char(30) PRIMARY KEY NOT NULL,
+	"kd_propinsi" char(2) NOT NULL,
+	"kd_dati2" char(2) NOT NULL,
+	"kd_kecamatan" char(3) NOT NULL,
+	"kd_kelurahan" char(3) NOT NULL,
+	"kd_blok" char(3) NOT NULL,
+	"no_urut" char(4) NOT NULL,
+	"kd_jns_op" char(1) NOT NULL,
+	"thn_njoptkp" char(4) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "dat_znt" (
@@ -602,6 +654,15 @@ CREATE TABLE "dbkb_standard" (
 	CONSTRAINT "dbkb_standard_kd_propinsi_kd_dati2_thn_dbkb_standard_kd_jpb_tipe_bng_kd_bng_lantai_pk" PRIMARY KEY("kd_propinsi","kd_dati2","thn_dbkb_standard","kd_jpb","tipe_bng","kd_bng_lantai")
 );
 --> statement-breakpoint
+CREATE TABLE "fas_non_dep" (
+	"kd_propinsi" char(2) NOT NULL,
+	"kd_dati2" char(2) NOT NULL,
+	"thn_non_dep" char(4) NOT NULL,
+	"kd_fasilitas" char(2) NOT NULL,
+	"nilai_non_dep" numeric(10, 2) NOT NULL,
+	CONSTRAINT "fas_non_dep_kd_propinsi_kd_dati2_thn_non_dep_kd_fasilitas_pk" PRIMARY KEY("kd_propinsi","kd_dati2","thn_non_dep","kd_fasilitas")
+);
+--> statement-breakpoint
 CREATE TABLE "fasilitas" (
 	"kd_fasilitas" char(2) PRIMARY KEY NOT NULL,
 	"nm_fasilitas" varchar(50) NOT NULL,
@@ -654,6 +715,69 @@ CREATE TABLE "pembayaran_sppt" (
 	CONSTRAINT "pembayaran_sppt_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_thn_pajak_sppt_pembayaran_sppt_ke_kd_kanwil_bank_kd_kppbb_bank_kd_bank_tunggal_kd_bank_persepsi_kd_tp_pk" PRIMARY KEY("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","thn_pajak_sppt","pembayaran_sppt_ke","kd_kanwil_bank","kd_kppbb_bank","kd_bank_tunggal","kd_bank_persepsi","kd_tp")
 );
 --> statement-breakpoint
+CREATE TABLE "pengurangan_pengenaan_jpb" (
+	"kd_kanwil" char(2) NOT NULL,
+	"kd_kppbb" char(2) NOT NULL,
+	"thn_pelayanan" char(4) NOT NULL,
+	"bundel_pelayanan" char(4) NOT NULL,
+	"no_urut_pelayanan" char(3) NOT NULL,
+	"kd_propinsi_pemohon" char(2) NOT NULL,
+	"kd_dati2_pemohon" char(2) NOT NULL,
+	"kd_kecamatan_pemohon" char(3) NOT NULL,
+	"kd_kelurahan_pemohon" char(3) NOT NULL,
+	"kd_blok_pemohon" char(3) NOT NULL,
+	"no_urut_pemohon" char(4) NOT NULL,
+	"kd_jns_op_pemohon" char(1) NOT NULL,
+	"thn_pengenaan_jpb" char(4) NOT NULL,
+	"jns_sk" char(1) NOT NULL,
+	"no_sk" char(30) NOT NULL,
+	"pct_pengurangan_jpb" numeric(5, 2) NOT NULL,
+	CONSTRAINT "pengurangan_pengenaan_jpb_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk" PRIMARY KEY("kd_kanwil","kd_kppbb","thn_pelayanan","bundel_pelayanan","no_urut_pelayanan","kd_propinsi_pemohon","kd_dati2_pemohon","kd_kecamatan_pemohon","kd_kelurahan_pemohon","kd_blok_pemohon","no_urut_pemohon","kd_jns_op_pemohon")
+);
+--> statement-breakpoint
+CREATE TABLE "pengurangan_permanen" (
+	"kd_kanwil" char(2) NOT NULL,
+	"kd_kppbb" char(2) NOT NULL,
+	"thn_pelayanan" char(4) NOT NULL,
+	"bundel_pelayanan" char(4) NOT NULL,
+	"no_urut_pelayanan" char(3) NOT NULL,
+	"kd_propinsi_pemohon" char(2) NOT NULL,
+	"kd_dati2_pemohon" char(2) NOT NULL,
+	"kd_kecamatan_pemohon" char(3) NOT NULL,
+	"kd_kelurahan_pemohon" char(3) NOT NULL,
+	"kd_blok_pemohon" char(3) NOT NULL,
+	"no_urut_pemohon" char(4) NOT NULL,
+	"kd_jns_op_pemohon" char(1) NOT NULL,
+	"thn_peng_permanen_awal" char(4) NOT NULL,
+	"thn_peng_permanen_akhir" char(4) DEFAULT '9999' NOT NULL,
+	"jns_sk" char(1) NOT NULL,
+	"no_sk" char(30) NOT NULL,
+	"status_sk_peng_permanen" char(1) NOT NULL,
+	"pct_pengurangan_permanen" numeric(5, 2) NOT NULL,
+	CONSTRAINT "pengurangan_permanen_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk" PRIMARY KEY("kd_kanwil","kd_kppbb","thn_pelayanan","bundel_pelayanan","no_urut_pelayanan","kd_propinsi_pemohon","kd_dati2_pemohon","kd_kecamatan_pemohon","kd_kelurahan_pemohon","kd_blok_pemohon","no_urut_pemohon","kd_jns_op_pemohon")
+);
+--> statement-breakpoint
+CREATE TABLE "pengurangan_pst" (
+	"kd_kanwil" char(2) NOT NULL,
+	"kd_kppbb" char(2) NOT NULL,
+	"thn_pelayanan" char(4) NOT NULL,
+	"bundel_pelayanan" char(4) NOT NULL,
+	"no_urut_pelayanan" char(3) NOT NULL,
+	"kd_propinsi_pemohon" char(2) NOT NULL,
+	"kd_dati2_pemohon" char(2) NOT NULL,
+	"kd_kecamatan_pemohon" char(3) NOT NULL,
+	"kd_kelurahan_pemohon" char(3) NOT NULL,
+	"kd_blok_pemohon" char(3) NOT NULL,
+	"no_urut_pemohon" char(4) NOT NULL,
+	"kd_jns_op_pemohon" char(1) NOT NULL,
+	"thn_peng_pst" char(4) NOT NULL,
+	"jns_sk" char(1) NOT NULL,
+	"no_sk" char(30) NOT NULL,
+	"status_sk_peng_pst" char(1) NOT NULL,
+	"pct_pengurangan_pst" numeric(5, 2) NOT NULL,
+	CONSTRAINT "pengurangan_pst_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk" PRIMARY KEY("kd_kanwil","kd_kppbb","thn_pelayanan","bundel_pelayanan","no_urut_pelayanan","kd_propinsi_pemohon","kd_dati2_pemohon","kd_kecamatan_pemohon","kd_kelurahan_pemohon","kd_blok_pemohon","no_urut_pemohon","kd_jns_op_pemohon")
+);
+--> statement-breakpoint
 CREATE TABLE "pst_data_op_baru" (
 	"kd_kanwil" char(2) NOT NULL,
 	"kd_kppbb" char(2) NOT NULL,
@@ -694,6 +818,7 @@ CREATE TABLE "pst_detail" (
 	"kd_seksi_berkas" char(2) NOT NULL,
 	"tgl_penyerahan" timestamp (0),
 	"nip_penyerah" char(18),
+	"metadata" jsonb,
 	CONSTRAINT "pst_detail_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk" PRIMARY KEY("kd_kanwil","kd_kppbb","thn_pelayanan","bundel_pelayanan","no_urut_pelayanan","kd_propinsi_pemohon","kd_dati2_pemohon","kd_kecamatan_pemohon","kd_kelurahan_pemohon","kd_blok_pemohon","no_urut_pemohon","kd_jns_op_pemohon")
 );
 --> statement-breakpoint
@@ -718,6 +843,7 @@ CREATE TABLE "pst_lampiran" (
 	"l_skkp_pbb" smallint DEFAULT 0,
 	"l_spmkp_pbb" smallint DEFAULT 0,
 	"l_lain_lain" smallint DEFAULT 0,
+	"metadata" jsonb,
 	CONSTRAINT "pst_lampiran_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_pk" PRIMARY KEY("kd_kanwil","kd_kppbb","thn_pelayanan","bundel_pelayanan","no_urut_pelayanan")
 );
 --> statement-breakpoint
@@ -737,6 +863,7 @@ CREATE TABLE "pst_permohonan" (
 	"tgl_terima_dokumen_wp" timestamp (0) DEFAULT now() NOT NULL,
 	"tgl_perkiraan_selesai" timestamp (0) NOT NULL,
 	"nip_penerima" char(18) NOT NULL,
+	"metadata" jsonb,
 	CONSTRAINT "pst_permohonan_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_pk" PRIMARY KEY("kd_kanwil","kd_kppbb","thn_pelayanan","bundel_pelayanan","no_urut_pelayanan")
 );
 --> statement-breakpoint
@@ -756,6 +883,12 @@ CREATE TABLE "pst_permohonan_pengurangan" (
 	"jns_pengurangan" char(1) NOT NULL,
 	"pct_permohonan_pengurangan" numeric(5, 2) NOT NULL,
 	CONSTRAINT "pst_permohonan_pengurangan_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk" PRIMARY KEY("kd_kanwil","kd_kppbb","thn_pelayanan","bundel_pelayanan","no_urut_pelayanan","kd_propinsi_pemohon","kd_dati2_pemohon","kd_kecamatan_pemohon","kd_kelurahan_pemohon","kd_blok_pemohon","no_urut_pemohon","kd_jns_op_pemohon")
+);
+--> statement-breakpoint
+CREATE TABLE "range_penyusutan" (
+	"kd_range_penyusutan" char(1) PRIMARY KEY NOT NULL,
+	"nilai_min_penyusutan" bigint,
+	"nilai_max_penyusutan" bigint
 );
 --> statement-breakpoint
 CREATE TABLE "ref_dati2" (
@@ -921,4 +1054,6 @@ CREATE TABLE "tipe_bangunan" (
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notification" ADD CONSTRAINT "notification_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "dat_objek_pajak" ADD CONSTRAINT "dat_objek_pajak_subjek_pajak_id_dat_subjek_pajak_subjek_pajak_id_fk" FOREIGN KEY ("subjek_pajak_id") REFERENCES "public"."dat_subjek_pajak"("subjek_pajak_id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "dat_objek_pajak" ADD CONSTRAINT "dat_objek_pajak_subjek_pajak_id_dat_subjek_pajak_subjek_pajak_id_fk" FOREIGN KEY ("subjek_pajak_id") REFERENCES "public"."dat_subjek_pajak"("subjek_pajak_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "dat_nilai_individu_formulir_idx" ON "dat_nilai_individu" USING btree ("no_formulir_individu","kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op","no_bng");--> statement-breakpoint
+CREATE INDEX "dat_subjek_pajak_njoptkp_nop_idx" ON "dat_subjek_pajak_njoptkp" USING btree ("kd_propinsi","kd_dati2","kd_kecamatan","kd_kelurahan","kd_blok","no_urut","kd_jns_op");
