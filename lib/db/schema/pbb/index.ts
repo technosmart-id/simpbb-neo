@@ -2,6 +2,7 @@
 // Based on SISMIOP (Sistem Manajemen Informasi Objek Pajak) structure
 
 // Bangunan (Building)
+// biome-ignore lint/performance/noBarrelFile: Barrel file is intentional
 export {
   type DatFasilitasBangunan,
   type DatOpBangunan,

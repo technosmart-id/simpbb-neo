@@ -702,6 +702,35 @@ function MapBoundsAdjuster({ data }: { data: AdminFeatureCollection }) {
   return null;
 }
 
+function getFeatureStyle(
+  feature: AdminFeature | undefined,
+  currentLevel: AdminLevel,
+  isHovered: boolean
+) {
+  const level = feature?.properties.level || currentLevel;
+  const baseColor = levelColors[level];
+
+  // For objek level, color based on payment status
+  if (level === "objek" && feature?.properties.stats) {
+    const isPaid = feature.properties.stats.lunas > 0;
+    return {
+      fillColor: isPaid ? "#22c55e" : "#ef4444",
+      weight: isHovered ? 3 : 2,
+      opacity: 1,
+      color: isHovered ? "#1e40af" : "#ffffff",
+      fillOpacity: isHovered ? 0.8 : 0.6,
+    };
+  }
+
+  return {
+    fillColor: baseColor,
+    weight: isHovered ? 3 : 2,
+    opacity: 1,
+    color: isHovered ? "#1e40af" : "#ffffff",
+    fillOpacity: isHovered ? 0.7 : 0.5,
+  };
+}
+
 export type BreadcrumbItem = {
   id: string;
   name: string;
@@ -785,28 +814,7 @@ export function DrillDownMap({
     (feature?: AdminFeature) => {
       const isHovered =
         hoveredFeature?.properties.id === feature?.properties.id;
-      const level = feature?.properties.level || currentLevel;
-      const baseColor = levelColors[level];
-
-      // For objek level, color based on payment status
-      if (level === "objek" && feature?.properties.stats) {
-        const isPaid = feature.properties.stats.lunas > 0;
-        return {
-          fillColor: isPaid ? "#22c55e" : "#ef4444",
-          weight: isHovered ? 3 : 2,
-          opacity: 1,
-          color: isHovered ? "#1e40af" : "#ffffff",
-          fillOpacity: isHovered ? 0.8 : 0.6,
-        };
-      }
-
-      return {
-        fillColor: baseColor,
-        weight: isHovered ? 3 : 2,
-        opacity: 1,
-        color: isHovered ? "#1e40af" : "#ffffff",
-        fillOpacity: isHovered ? 0.7 : 0.5,
-      };
+      return getFeatureStyle(feature, currentLevel, isHovered);
     },
     [hoveredFeature, currentLevel]
   );

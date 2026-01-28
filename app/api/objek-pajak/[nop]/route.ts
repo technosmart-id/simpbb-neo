@@ -36,7 +36,7 @@ function parseNop(nopString: string) {
 }
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ nop: string }> }
 ) {
   const session = await auth.api.getSession({

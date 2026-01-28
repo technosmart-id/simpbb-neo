@@ -1,6 +1,9 @@
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth";
 
+// biome-ignore lint/performance/noBarrelFile: Barrel file is intentional for schema organization
+export * from "./auth";
+
 // Notification table
 export const notification = pgTable("notification", {
   id: text("id").primaryKey(),

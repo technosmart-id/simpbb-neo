@@ -40,19 +40,13 @@ const navMain = [
     title: "Objek Pajak",
     url: "/objek-pajak",
     icon: Search,
-    items: [
-      { title: "Cari NOP", url: "/objek-pajak" },
-      { title: "Peta Lokasi", url: "/objek-pajak/peta" },
-      { title: "Pendataan", url: "/objek-pajak/pendataan" },
-      { title: "Mutasi", url: "/objek-pajak/mutasi" },
-    ],
+    items: [{ title: "Peta Lokasi", url: "/objek-pajak/peta" }],
   },
   {
     title: "SPPT",
     url: "/sppt",
     icon: FileText,
     items: [
-      { title: "Cetak SPPT", url: "/sppt/cetak" },
       { title: "DHKP", url: "/sppt/dhkp" },
       { title: "Rekap SPPT", url: "/sppt/rekap" },
     ],

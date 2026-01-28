@@ -1,0 +1,353 @@
+$ ultracite check
+
+[38;5;208mUltracite[39m [38;5;208mv6.4.1[39m check
+[2mFound[22m 26 errors[2m.[22m
+[32m✓[39m [2mFinished in[22m 107ms [2mon[22m 78 files[2m.[22m
+
+[33mIssues found:[39m
+
+[38;5;208mapp\(app)\objek-pajak\peta\page.tsx:202:5[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m  201[22m [90m│[39m   const filteredProperties = mockProperties.filter((p) => {
+  [38;5;208m>[39m[2m  202[22m [90m│[39m     if (kecamatan !== "semua" && p.kecamatan !== kecamatan) return false;
+  [2m      [22m [90m│[39m     [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m  203[22m [90m│[39m     if (kelurahan !== "semua" && p.kelurahan !== kelurahan) return false;
+   [2m  204[22m [90m│[39m     if (statusBayar !== "semua" && p.statusBayar !== statusBayar) return false;
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\(app)\objek-pajak\peta\page.tsx:203:5[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m  202[22m [90m│[39m     if (kecamatan !== "semua" && p.kecamatan !== kecamatan) return false;
+  [38;5;208m>[39m[2m  203[22m [90m│[39m     if (kelurahan !== "semua" && p.kelurahan !== kelurahan) return false;
+  [2m      [22m [90m│[39m     [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m  204[22m [90m│[39m     if (statusBayar !== "semua" && p.statusBayar !== statusBayar) return false;
+   [2m  205[22m [90m│[39m     return true;
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\(app)\objek-pajak\peta\page.tsx:204:5[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m  203[22m [90m│[39m     if (kelurahan !== "semua" && p.kelurahan !== kelurahan) return false;
+  [38;5;208m>[39m[2m  204[22m [90m│[39m     if (statusBayar !== "semua" && p.statusBayar !== statusBayar) return false;
+  [2m      [22m [90m│[39m     [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m  205[22m [90m│[39m     return true;
+   [2m  206[22m [90m│[39m   });
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\(app)\peta\page.tsx:99:9[39m [2mlint/style/useAtIndex[22m
+[2mPrefer X.at(-Y) over X[X.length - Y].[22m
+
+   [2m   98[22m [90m│[39m     breadcrumbs.length > 0
+  [38;5;208m>[39m[2m   99[22m [90m│[39m       ? breadcrumbs[breadcrumbs.length - 1].name
+  [2m      [22m [90m│[39m         [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m  100[22m [90m│[39m       : "Indonesia";
+   [2m  101[22m [90m│[39m 
+
+  [38;5;208mi[39m [2mUsing .at() is more convenient and is easier to read.[22m
+
+  [38;5;208mi[39m [2mUnsafe fix: Use .at().[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\api\objek-pajak\[nop]\route.ts:39:3[39m [2mlint/correctness/noUnusedFunctionParameters[22m
+[2mThis parameter is unused.[22m
+
+   [2m   38[22m [90m│[39m export async function GET(
+  [38;5;208m>[39m[2m   39[22m [90m│[39m   request: Request,
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^[39m
+   [2m   40[22m [90m│[39m   { params }: { params: Promise<{ nop: string }> }
+   [2m   41[22m [90m│[39m ) {
+
+  [38;5;208mi[39m [2mUnused parameters might be the result of an incomplete refactoring.[22m
+
+  [38;5;208mi[39m [2mUnsafe fix: If this is intentional, prepend request with an underscore.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\api\openapi.json\route.ts:27:5[39m [2mlint/complexity/noForEach[22m
+[2mPrefer for...of instead of forEach.[22m
+
+   [2m   26[22m [90m│[39m   if (spec.paths) {
+  [38;5;208m>[39m[2m   27[22m [90m│[39m     Object.entries(spec.paths).forEach(([path, methods]: [string, any]) => {
+  [2m      [22m [90m│[39m     [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   28[22m [90m│[39m       Object.values(methods).forEach((operation: any) => {
+   [2m   29[22m [90m│[39m         let tags: string[] = ["Other"];
+
+  [38;5;208mi[39m [2mforEach may lead to performance issues when working with large arrays. When combined with functions like filter or map, this causes multiple iterations over the same type.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\api\openapi.json\route.ts:27:67[39m [2mlint/suspicious/noExplicitAny[22m
+[2mUnexpected any. Specify a different type.[22m
+
+   [2m   26[22m [90m│[39m   if (spec.paths) {
+  [38;5;208m>[39m[2m   27[22m [90m│[39m     Object.entries(spec.paths).forEach(([path, methods]: [string, any]) => {
+  [2m      [22m [90m│[39m                                                                   [38;5;208m^^^[39m
+   [2m   28[22m [90m│[39m       Object.values(methods).forEach((operation: any) => {
+   [2m   29[22m [90m│[39m         let tags: string[] = ["Other"];
+
+  [38;5;208mi[39m [2many disables many type checking rules. Its use should be avoided.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\api\openapi.json\route.ts:28:7[39m [2mlint/complexity/noForEach[22m
+[2mPrefer for...of instead of forEach.[22m
+
+   [2m   27[22m [90m│[39m     Object.entries(spec.paths).forEach(([path, methods]: [string, any]) => {
+  [38;5;208m>[39m[2m   28[22m [90m│[39m       Object.values(methods).forEach((operation: any) => {
+  [2m      [22m [90m│[39m       [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   29[22m [90m│[39m         let tags: string[] = ["Other"];
+   [2m   30[22m [90m│[39m         if (path.startsWith("/objek-pajak")) {
+
+  [38;5;208mi[39m [2mforEach may lead to performance issues when working with large arrays. When combined with functions like filter or map, this causes multiple iterations over the same type.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\api\openapi.json\route.ts:28:50[39m [2mlint/suspicious/noExplicitAny[22m
+[2mUnexpected any. Specify a different type.[22m
+
+   [2m   27[22m [90m│[39m     Object.entries(spec.paths).forEach(([path, methods]: [string, any]) => {
+  [38;5;208m>[39m[2m   28[22m [90m│[39m       Object.values(methods).forEach((operation: any) => {
+  [2m      [22m [90m│[39m                                                  [38;5;208m^^^[39m
+   [2m   29[22m [90m│[39m         let tags: string[] = ["Other"];
+   [2m   30[22m [90m│[39m         if (path.startsWith("/objek-pajak")) {
+
+  [38;5;208mi[39m [2many disables many type checking rules. Its use should be avoided.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\api\openapi.json\route.ts:28:55[39m [2mlint/complexity/noExcessiveCognitiveComplexity[22m
+[2mExcessive complexity of 21 detected (max: 15).[22m
+
+   [2m   27[22m [90m│[39m     Object.entries(spec.paths).forEach(([path, methods]: [string, any]) => {
+  [38;5;208m>[39m[2m   28[22m [90m│[39m       Object.values(methods).forEach((operation: any) => {
+  [2m      [22m [90m│[39m                                                       [38;5;208m^^^[39m
+   [2m   29[22m [90m│[39m         let tags: string[] = ["Other"];
+   [2m   30[22m [90m│[39m         if (path.startsWith("/objek-pajak")) {
+
+  [38;5;208mi[39m [2mPlease refactor this function to reduce its complexity score from 21 to the max allowed complexity 15.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mapp\api\reference\route.ts:12:43[39m [2mlint/suspicious/noExplicitAny[22m
+[2mUnexpected any. Specify a different type.[22m
+
+   [2m   11[22m [90m│[39m 
+  [38;5;208m>[39m[2m   12[22m [90m│[39m export const GET = ApiReference(config as any);
+  [2m      [22m [90m│[39m                                           [38;5;208m^^^[39m
+   [2m   13[22m [90m│[39m 
+
+  [38;5;208mi[39m [2many disables many type checking rules. Its use should be avoided.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\maps\drill-down-map.tsx:785:30[39m [2mlint/complexity/noExcessiveCognitiveComplexity[22m
+[2mExcessive complexity of 22 detected (max: 15).[22m
+
+   [2m  784[22m [90m│[39m   const geoJsonStyle = useCallback(
+  [38;5;208m>[39m[2m  785[22m [90m│[39m     (feature?: AdminFeature) => {
+  [2m      [22m [90m│[39m                              [38;5;208m^^^[39m
+   [2m  786[22m [90m│[39m       const isHovered =
+   [2m  787[22m [90m│[39m         hoveredFeature?.properties.id === feature?.properties.id;
+
+  [38;5;208mi[39m [2mPlease refactor this function to reduce its complexity score from 22 to the max allowed complexity 15.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\maps\property-map.tsx:110:19[39m [2mlint/nursery/noLeakedRender[22m
+[2mPotential leaked value that might cause unintended rendering.[22m
+
+   [2m  109[22m [90m│[39m             }}
+  [38;5;208m>[39m[2m  110[22m [90m│[39m             icon={isSelected ? highlightedIcon : defaultIcon}
+  [2m      [22m [90m│[39m                   [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m  111[22m [90m│[39m             key={property.nop}
+   [2m  112[22m [90m│[39m             position={[property.lat, property.lng]}
+
+  [38;5;208mi[39m [2mThis happens when you use ternary operators in JSX with alternate values that could be variables.[22m
+
+  [38;5;208mi[39m [2mReplace with a safe alternate value like an empty string , null or another JSX element.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\sppt\sppt-document.tsx:25:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   24[22m [90m│[39m 
+  [38;5;208m>[39m[2m   25[22m [90m│[39m   if (n < 12) return satuan[n];
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   26[22m [90m│[39m   if (n < 20) return `${satuan[n - 10]} belas`;
+   [2m   27[22m [90m│[39m   if (n < 100)
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\sppt\sppt-document.tsx:26:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   25[22m [90m│[39m   if (n < 12) return satuan[n];
+  [38;5;208m>[39m[2m   26[22m [90m│[39m   if (n < 20) return `${satuan[n - 10]} belas`;
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   27[22m [90m│[39m   if (n < 100)
+   [2m   28[22m [90m│[39m     return `${satuan[Math.floor(n / 10)]} puluh ${satuan[n % 10]}`.trim();
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\sppt\sppt-document.tsx:27:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   26[22m [90m│[39m   if (n < 20) return `${satuan[n - 10]} belas`;
+  [38;5;208m>[39m[2m   27[22m [90m│[39m   if (n < 100)
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^[39m
+   [2m   28[22m [90m│[39m     return `${satuan[Math.floor(n / 10)]} puluh ${satuan[n % 10]}`.trim();
+   [2m   29[22m [90m│[39m   if (n < 200) return `seratus ${terbilang(n - 100)}`.trim();
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\sppt\sppt-document.tsx:29:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   28[22m [90m│[39m     return `${satuan[Math.floor(n / 10)]} puluh ${satuan[n % 10]}`.trim();
+  [38;5;208m>[39m[2m   29[22m [90m│[39m   if (n < 200) return `seratus ${terbilang(n - 100)}`.trim();
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   30[22m [90m│[39m   if (n < 1000)
+   [2m   31[22m [90m│[39m     return `${satuan[Math.floor(n / 100)]} ratus ${terbilang(n % 100)}`.trim();
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\sppt\sppt-document.tsx:30:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   29[22m [90m│[39m   if (n < 200) return `seratus ${terbilang(n - 100)}`.trim();
+  [38;5;208m>[39m[2m   30[22m [90m│[39m   if (n < 1000)
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^^[39m
+   [2m   31[22m [90m│[39m     return `${satuan[Math.floor(n / 100)]} ratus ${terbilang(n % 100)}`.trim();
+   [2m   32[22m [90m│[39m   if (n < 2000) return `seribu ${terbilang(n - 1000)}`.trim();
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\sppt\sppt-document.tsx:32:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   31[22m [90m│[39m     return `${satuan[Math.floor(n / 100)]} ratus ${terbilang(n % 100)}`.trim();
+  [38;5;208m>[39m[2m   32[22m [90m│[39m   if (n < 2000) return `seribu ${terbilang(n - 1000)}`.trim();
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   33[22m [90m│[39m   if (n < 1_000_000)
+   [2m   34[22m [90m│[39m     return `${terbilang(Math.floor(n / 1000))} ribu ${terbilang(n % 1000)}`.trim();
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\sppt\sppt-document.tsx:33:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   32[22m [90m│[39m   if (n < 2000) return `seribu ${terbilang(n - 1000)}`.trim();
+  [38;5;208m>[39m[2m   33[22m [90m│[39m   if (n < 1_000_000)
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^^^^^^^[39m
+   [2m   34[22m [90m│[39m     return `${terbilang(Math.floor(n / 1000))} ribu ${terbilang(n % 1000)}`.trim();
+   [2m   35[22m [90m│[39m   if (n < 1_000_000_000)
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\sppt\sppt-document.tsx:35:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   34[22m [90m│[39m     return `${terbilang(Math.floor(n / 1000))} ribu ${terbilang(n % 1000)}`.trim();
+  [38;5;208m>[39m[2m   35[22m [90m│[39m   if (n < 1_000_000_000)
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   36[22m [90m│[39m     return `${terbilang(Math.floor(n / 1_000_000))} juta ${terbilang(n % 1_000_000)}`.trim();
+   [2m   37[22m [90m│[39m   if (n < 1_000_000_000_000)
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mcomponents\sppt\sppt-document.tsx:37:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   36[22m [90m│[39m     return `${terbilang(Math.floor(n / 1_000_000))} juta ${terbilang(n % 1_000_000)}`.trim();
+  [38;5;208m>[39m[2m   37[22m [90m│[39m   if (n < 1_000_000_000_000)
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   38[22m [90m│[39m     return `${terbilang(Math.floor(n / 1_000_000_000))} milyar ${terbilang(n % 1_000_000_000)}`.trim();
+   [2m   39[22m [90m│[39m   return `${terbilang(Math.floor(n / 1_000_000_000_000))} trilyun ${terbilang(n % 1_000_000_000_000)}`.trim();
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mlib\db\schema\index.ts:4:1[39m [2mlint/performance/noBarrelFile[22m
+[2mAvoid barrel files, they slow down performance, and cause large module graphs with modules that go unused.[22m
+
+   [2m    3[22m [90m│[39m 
+  [38;5;208m>[39m[2m    4[22m [90m│[39m export * from "./auth";
+  [2m      [22m [90m│[39m [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m    5[22m [90m│[39m 
+   [2m    6[22m [90m│[39m // Notification table
+
+  [38;5;208mi[39m [2mCheck this thorough explanation to better understand the context.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mlib\db\schema\pbb\index.ts:5:1[39m [2mlint/performance/noBarrelFile[22m
+[2mAvoid barrel files, they slow down performance, and cause large module graphs with modules that go unused.[22m
+
+   [2m    4[22m [90m│[39m // Bangunan (Building)
+  [38;5;208m>[39m[2m    5[22m [90m│[39m export {
+  [2m      [22m [90m│[39m [38;5;208m^^^^^^^^[39m
+   [2m    6[22m [90m│[39m   type DatFasilitasBangunan,
+   [2m    7[22m [90m│[39m   type DatOpBangunan,
+
+  [38;5;208mi[39m [2mCheck this thorough explanation to better understand the context.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mlib\orpc\routers\sppt.ts:4:8[39m [2mlint/style/useConsistentTypeDefinitions[22m
+[2mUse of the interface detected.[22m
+
+   [2m    3[22m [90m│[39m 
+  [38;5;208m>[39m[2m    4[22m [90m│[39m export interface SpptData {
+  [2m      [22m [90m│[39m        [38;5;208m^^^^^^^^^^^^^^^^^^^^[39m
+   [2m    5[22m [90m│[39m   kabupaten: string;
+   [2m    6[22m [90m│[39m   provinsi: string;
+
+  [38;5;208mi[39m [2mThe codebase should use a consistent coding style for the definition of types. This improves the readability and consistency.[22m
+
+  [38;5;208mi[39m [2mUnsafe fix: Use type alias.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mlib\orpc\server.ts:60:9[39m [2mlint/complexity/useOptionalChain[22m
+[2mChange to an optional chain.[22m
+
+   [2m   59[22m [90m│[39m 
+  [38;5;208m>[39m[2m   60[22m [90m│[39m     if (apiKey && apiKey.enabled) {
+  [2m      [22m [90m│[39m         [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   61[22m [90m│[39m       // Create a synthetic session for API Key access to satisfy protectedProcedure
+   [2m   62[22m [90m│[39m       const syntheticSession: Session = {
+
+  [38;5;208mi[39m [2mUnsafe fix: Change to an optional chain.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+

@@ -1,5 +1,7 @@
 import { objekPajakRouter } from "./routers/objek-pajak";
+import { pembayaranRouter } from "./routers/pembayaran";
 import { spptRouter } from "./routers/sppt";
+import { wilayahRouter } from "./routers/wilayah";
 import { protectedProcedure, publicProcedure } from "./server";
 
 export const router = {
@@ -15,8 +17,10 @@ export const router = {
     image: context.user.image,
   })),
 
-  objekPajak: objekPajakRouter,
+  "objek-pajak": objekPajakRouter,
   sppt: spptRouter,
+  pembayaran: pembayaranRouter,
+  wilayah: wilayahRouter,
 };
 
 export type Router = typeof router;

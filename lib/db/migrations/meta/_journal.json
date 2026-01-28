@@ -8,6 +8,13 @@
       "when": 1767295943569,
       "tag": "0000_last_mongoose",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769631292413,
+      "tag": "0001_fine_black_knight",
+      "breakpoints": true
     }
   ]
 }

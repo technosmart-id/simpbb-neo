@@ -1,0 +1,36 @@
+$ ultracite check
+
+[38;5;208mUltracite[39m [38;5;208mv6.4.1[39m check
+[2mFound[22m 2 errors[2m.[22m
+[32m✓[39m [2mFinished in[22m 123ms [2mon[22m 78 files[2m.[22m
+
+[33mIssues found:[39m
+
+[38;5;208mlib\orpc\routers\objek-pajak.ts:17:3[39m [2mlint/style/useBlockStatements[22m
+[2mBlock statements are preferred in this position.[22m
+
+   [2m   16[22m [90m│[39m   const clean = nop.replace(/[^0-9]/g, "");
+  [38;5;208m>[39m[2m   17[22m [90m│[39m   if (clean.length !== 18)
+  [2m      [22m [90m│[39m   [38;5;208m^^^^^^^^^^^^^^^^^^^^^^^^[39m
+   [2m   18[22m [90m│[39m     throw new Error("Invalid NOP format: length must be 18 digits");
+   [2m   19[22m [90m│[39m 
+
+  [38;5;208mi[39m [2mUnsafe fix: Wrap the statement with a `JsBlockStatement`[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+
+[38;5;208mlib\orpc\routers\objek-pajak.ts:197:16[39m [2mlint/correctness/noUnusedVariables[22m
+[2mThis variable e is unused.[22m
+
+   [2m  196[22m [90m│[39m         parsed = parseNop(nop);
+  [38;5;208m>[39m[2m  197[22m [90m│[39m       } catch (e) {
+  [2m      [22m [90m│[39m                [38;5;208m^[39m
+   [2m  198[22m [90m│[39m         // Return 404-like response or error if NOP is invalid (since we can't find it)
+   [2m  199[22m [90m│[39m         // For now let's just let it throw or return null? Handler expects return.
+
+  [38;5;208mi[39m [2mUnused variables are often the result of an incomplete refactoring, typos, or other sources of bugs.[22m
+
+  [38;5;208mi[39m [2mUnsafe fix: If this is intentional, prepend e with an underscore.[22m
+
+[2m────────────────────────────────────────────────────────────[22m
+

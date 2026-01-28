@@ -1,9 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { captcha, username } from "better-auth/plugins";
+import { apiKey, captcha, openAPI, username } from "better-auth/plugins";
 import { db } from "@/lib/db";
 import {
   account as accountTable,
+  apikey as apiKeyTable,
   session as sessionTable,
   user as userTable,
   verification as verificationTable,
@@ -21,6 +22,7 @@ export const auth = betterAuth({
       session: sessionTable,
       account: accountTable,
       verification: verificationTable,
+      apiKey: apiKeyTable,
     },
   }),
 
@@ -56,10 +58,12 @@ export const auth = betterAuth({
 
   plugins: [
     username(),
+    openAPI(),
     captcha({
       provider: "google-recaptcha",
       secretKey: process.env.RECAPTCHA_SECRET_KEY!,
     }),
+    apiKey(),
   ],
 });
 

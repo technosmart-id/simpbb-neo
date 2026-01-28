@@ -107,6 +107,7 @@ export function PropertyMap({
             eventHandlers={{
               click: () => onMarkerClick?.(property.nop),
             }}
+            // biome-ignore lint/nursery/noLeakedRender: Icons are always defined objects
             icon={isSelected ? highlightedIcon : defaultIcon}
             key={property.nop}
             position={[property.lat, property.lng]}
