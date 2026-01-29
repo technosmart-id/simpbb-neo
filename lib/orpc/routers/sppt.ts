@@ -40,9 +40,9 @@ export type SpptData = {
 };
 
 export const spptRouter = {
-  // getMany: GET /sppt/get-many (List SPPT)
-  getMany: protectedProcedure
-    .route({ method: "GET", summary: "Get All SPPT" })
+  // list: GET /sppt
+  list: protectedProcedure
+    .route({ method: "GET", path: "/sppt", summary: "Get All SPPT" })
     .input(
       z.object({
         /* TODO: filter params */
@@ -53,27 +53,35 @@ export const spptRouter = {
       return { message: "TODO: Implement list logic" };
     }),
 
-  // getOne: GET /sppt/get-one (Get SPPT Detail)
-  getOne: protectedProcedure
-    .route({ method: "GET", summary: "Get SPPT" })
+  // find: GET /sppt/{nop}/{tahun}
+  find: protectedProcedure
+    .route({ method: "GET", path: "/sppt/{nop}/{tahun}", summary: "Get SPPT" })
     .input(z.object({ nop: z.string(), tahun: z.string() }))
     .handler(({ input: _input }) => {
       // TODO: Implement detail logic
       return { message: "TODO: Implement detail logic" };
     }),
 
-  // inquiry: POST /sppt/inquiry (Inquiry Tagihan SPPT)
+  // inquiry: POST /sppt/inquiry
   inquiry: protectedProcedure
-    .route({ method: "POST", summary: "Inquiry Tagihan SPPT" })
+    .route({
+      method: "POST",
+      path: "/sppt/inquiry",
+      summary: "Inquiry Tagihan SPPT",
+    })
     .input(z.object({ nop: z.string(), tahun: z.string() }))
     .handler(({ input: _input }) => {
       // TODO: Implement inquiry logic
       return { message: "TODO: Implement inquiry logic" };
     }),
 
-  // printMass: POST /sppt/print-mass (Print Mass SPPT)
+  // printMass: POST /sppt/print-mass
   printMass: protectedProcedure
-    .route({ method: "POST", summary: "Print Mass SPPT" })
+    .route({
+      method: "POST",
+      path: "/sppt/print-mass",
+      summary: "Print Mass SPPT",
+    })
     .input(
       z.object({
         /* TODO: batch criteria */
@@ -84,9 +92,13 @@ export const spptRouter = {
       return { message: "TODO: Implement batch print logic" };
     }),
 
-  // printCopy: GET /sppt/print-copy (Print Salinan SPPT)
+  // printCopy: GET /sppt/{nop}/{tahun}/copy
   printCopy: protectedProcedure
-    .route({ method: "GET", summary: "Print Salinan SPPT" })
+    .route({
+      method: "GET",
+      path: "/sppt/{nop}/{tahun}/copy",
+      summary: "Print Salinan SPPT",
+    })
     .input(z.object({ nop: z.string(), tahun: z.string() }))
     .handler(({ input: _input }) => {
       // TODO: Implement copy print logic

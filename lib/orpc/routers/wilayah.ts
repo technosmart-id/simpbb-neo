@@ -2,9 +2,13 @@ import { z } from "zod";
 import { protectedProcedure } from "../server";
 
 export const wilayahRouter = {
-  // getProvinsi: GET /wilayah/get-provinsi
-  getProvinsi: protectedProcedure
-    .route({ method: "GET", summary: "Get Provinsi" })
+  // listProvinsi: GET /wilayah/provinsi
+  listProvinsi: protectedProcedure
+    .route({
+      method: "GET",
+      path: "/wilayah/provinsi",
+      summary: "Get Provinsi",
+    })
     .input(
       z
         .object({
@@ -17,9 +21,13 @@ export const wilayahRouter = {
       return { message: "TODO: Implement provinsi list logic" };
     }),
 
-  // getKabupaten: GET /wilayah/get-kabupaten
-  getKabupaten: protectedProcedure
-    .route({ method: "GET", summary: "Get Kabupaten" })
+  // listKabupaten: GET /wilayah/kabupaten
+  listKabupaten: protectedProcedure
+    .route({
+      method: "GET",
+      path: "/wilayah/kabupaten",
+      summary: "Get Kabupaten",
+    })
     .input(
       z
         .object({
@@ -32,9 +40,13 @@ export const wilayahRouter = {
       return { message: "TODO: Implement kabupaten list logic" };
     }),
 
-  // getKecamatan: GET /wilayah/get-kecamatan
-  getKecamatan: protectedProcedure
-    .route({ method: "GET", summary: "Get Kecamatan" })
+  // listKecamatan: GET /wilayah/kecamatan
+  listKecamatan: protectedProcedure
+    .route({
+      method: "GET",
+      path: "/wilayah/kecamatan",
+      summary: "Get Kecamatan",
+    })
     .input(
       z
         .object({
@@ -47,9 +59,13 @@ export const wilayahRouter = {
       return { message: "TODO: Implement kecamatan list logic" };
     }),
 
-  // getKelurahan: GET /wilayah/get-kelurahan
-  getKelurahan: protectedProcedure
-    .route({ method: "GET", summary: "Get Kelurahan" })
+  // listKelurahan: GET /wilayah/kelurahan
+  listKelurahan: protectedProcedure
+    .route({
+      method: "GET",
+      path: "/wilayah/kelurahan",
+      summary: "Get Kelurahan",
+    })
     .input(
       z
         .object({

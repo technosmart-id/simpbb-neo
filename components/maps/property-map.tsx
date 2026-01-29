@@ -171,9 +171,7 @@ export function PropertyMap({
 
                 {/* Action */}
                 <div className="pt-1">
-                  <Link
-                    href={`/objek-pajak/${encodeURIComponent(property.nop)}`}
-                  >
+                  <Link href={`/op/${encodeURIComponent(property.nop)}`}>
                     <Button className="w-full" size="sm" variant="outline">
                       Lihat Detail
                     </Button>

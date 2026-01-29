@@ -17,7 +17,7 @@ const pathLabels: Record<string, string> = {
   settings: "Pengaturan",
   profile: "Profil",
   dev: "Developer",
-  "objek-pajak": "Objek Pajak",
+  op: "Objek Pajak",
   sppt: "SPPT",
   pembayaran: "Pembayaran",
   laporan: "Laporan",

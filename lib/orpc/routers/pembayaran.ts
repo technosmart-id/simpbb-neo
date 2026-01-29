@@ -2,9 +2,13 @@ import { z } from "zod";
 import { protectedProcedure } from "../server";
 
 export const pembayaranRouter = {
-  // create: POST /pembayaran/create (Create Pembayaran)
+  // create: POST /pembayaran
   create: protectedProcedure
-    .route({ method: "POST", summary: "Create Pembayaran" })
+    .route({
+      method: "POST",
+      path: "/pembayaran",
+      summary: "Create Pembayaran",
+    })
     .input(
       z.object({
         /* TODO: payment data */
@@ -15,9 +19,13 @@ export const pembayaranRouter = {
       return { message: "TODO: Implement payment logic" };
     }),
 
-  // void: POST /pembayaran/void (Void Pembayaran)
+  // void: POST /pembayaran/void
   void: protectedProcedure
-    .route({ method: "POST", summary: "Void Pembayaran" })
+    .route({
+      method: "POST",
+      path: "/pembayaran/void",
+      summary: "Void Pembayaran",
+    })
     .input(
       z.object({
         /* TODO: reversal data */
@@ -28,9 +36,13 @@ export const pembayaranRouter = {
       return { message: "TODO: Implement reversal logic" };
     }),
 
-  // getHistory: GET /pembayaran/get-history (Get History Pembayaran)
-  getHistory: protectedProcedure
-    .route({ method: "GET", summary: "Get History Pembayaran" })
+  // history: GET /pembayaran/history
+  history: protectedProcedure
+    .route({
+      method: "GET",
+      path: "/pembayaran/history",
+      summary: "Get History Pembayaran",
+    })
     .input(
       z.object({
         /* TODO: filter params */

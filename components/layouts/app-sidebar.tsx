@@ -38,9 +38,9 @@ const navMain = [
   },
   {
     title: "Objek Pajak",
-    url: "/objek-pajak",
+    url: "/op",
     icon: Search,
-    items: [{ title: "Peta Lokasi", url: "/objek-pajak/peta" }],
+    items: [{ title: "Peta Lokasi", url: "/op/peta" }],
   },
   {
     title: "SPPT",

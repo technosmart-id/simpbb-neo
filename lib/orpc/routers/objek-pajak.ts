@@ -46,36 +46,34 @@ const ObjekPajakSchema = z.object({
 });
 
 export const objekPajakRouter = {
-  // get-all: GET /objek-pajak/get-many (List Objek Pajak)
-  "get-all": protectedProcedure
-    .route({ method: "GET", summary: "Get All Objek Pajak" })
+  // list: GET /op
+  list: protectedProcedure
+    .route({ method: "GET", path: "/op", summary: "List Objek Pajak" })
     .input(
-      z
-        .object({
-          cursor: z.string().optional(),
-          limit: z.coerce.number().min(1).max(100).default(10),
-          // Filter by Subjek Pajak (Owner)
-          subjekPajakId: z
-            .string()
-            .optional()
-            .describe("Filter by Owner ID (NIK/KTP)"),
-          nama: z.string().optional(),
-        })
-        .default({ limit: 10 })
+      z.object({
+        cursor: z.string().optional(),
+        limit: z.coerce.number().min(1).max(100).optional(),
+        // Filter by Subjek Pajak (Owner)
+        subjekPajakId: z
+          .string()
+          .optional()
+          .describe("Filter by Owner ID (NIK/KTP)"),
+        nama: z.string().optional(),
+      })
     )
     .output(zCollectionResponse(ObjekPajakSchema))
     .handler(async ({ input }) => {
-      const page = Number(input.cursor) || 1;
-      const pageSize = input.limit;
+      const page = Number(input?.cursor) || 1;
+      const pageSize = input?.limit || 10;
       const offset = (page - 1) * pageSize;
       const currentYear = new Date().getFullYear().toString();
 
       // Build conditions
       const conditions: SQL[] = [];
-      if (input.subjekPajakId) {
+      if (input?.subjekPajakId) {
         conditions.push(eq(datObjekPajak.subjekPajakId, input.subjekPajakId));
       }
-      if (input.nama) {
+      if (input?.nama) {
         conditions.push(ilike(datSubjekPajak.nmWp, `%${input.nama}%`));
       }
 
@@ -166,9 +164,9 @@ export const objekPajakRouter = {
       };
     }),
 
-  // create: POST /objek-pajak/create (Register New Objek Pajak)
+  // create: POST /op
   create: protectedProcedure
-    .route({ method: "POST", summary: "Create Objek Pajak" })
+    .route({ method: "POST", path: "/op", summary: "Create Objek Pajak" })
     .input(
       z.object({
         /* TODO: registration data */
@@ -186,9 +184,9 @@ export const objekPajakRouter = {
       };
     }),
 
-  // getOne: GET /objek-pajak/get-one (Get Objek Pajak Detail)
-  getOne: protectedProcedure
-    .route({ method: "GET", summary: "Get Objek Pajak" })
+  // find: GET /op/{nop}
+  find: protectedProcedure
+    .route({ method: "GET", path: "/op/{nop}", summary: "Get Objek Pajak" })
     .input(z.object({ nop: z.string() }))
     .output(zSingleResourceResponse(ObjekPajakSchema))
     .handler(async ({ input }) => {
@@ -276,9 +274,13 @@ export const objekPajakRouter = {
       };
     }),
 
-  // updateData: PATCH /objek-pajak/update-data (Update Objek Pajak Data)
-  updateData: protectedProcedure
-    .route({ method: "PATCH", summary: "Update Data Objek Pajak" })
+  // update: PATCH /op/{nop}
+  update: protectedProcedure
+    .route({
+      method: "PATCH",
+      path: "/op/{nop}",
+      summary: "Update Data Objek Pajak",
+    })
     .input(z.object({ nop: z.string() /* TODO: update data */ }))
     .output(zSingleResourceResponse(z.any()))
     .handler(({ input: _input }) => {
@@ -292,9 +294,13 @@ export const objekPajakRouter = {
       };
     }),
 
-  // updateSubjek: PATCH /objek-pajak/update-subjek (Transfer Ownership)
+  // updateSubjek: PATCH /op/{nop}/subjek
   updateSubjek: protectedProcedure
-    .route({ method: "PATCH", summary: "Update Subjek Pajak" })
+    .route({
+      method: "PATCH",
+      path: "/op/{nop}/subjek",
+      summary: "Update Subjek Pajak",
+    })
     .input(z.object({ nop: z.string() /* TODO: subject data */ }))
     .output(zSingleResourceResponse(z.any()))
     .handler(({ input: _input }) => {
@@ -308,9 +314,13 @@ export const objekPajakRouter = {
       };
     }),
 
-  // getHistory: GET /objek-pajak/get-history (View History)
-  getHistory: protectedProcedure
-    .route({ method: "GET", summary: "Get History Objek Pajak" })
+  // history: GET /op/{nop}/history
+  history: protectedProcedure
+    .route({
+      method: "GET",
+      path: "/op/{nop}/history",
+      summary: "Get History Objek Pajak",
+    })
     .input(z.object({ nop: z.string() }))
     .output(zCollectionResponse(z.any()))
     .handler(({ input: _input }) => {

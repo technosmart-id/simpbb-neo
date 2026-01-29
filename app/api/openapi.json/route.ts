@@ -1,5 +1,5 @@
 import { OpenAPIGenerator } from "@orpc/openapi";
-import { ZodToJsonSchemaConverter } from "@orpc/zod";
+import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { NextResponse } from "next/server";
 import { router } from "@/lib/orpc/router";
 
@@ -34,11 +34,17 @@ export async function GET() {
     }
   }
 
+  // Force OpenAPI 3.0.3 for better compatibility with Swagger UI
+  // Force OpenAPI 3.0.3 for better compatibility with Swagger UI
+  // oRPC generates 3.1.1 by default which causes "refract is not a function" in Turbopack/Next.js
+  // biome-ignore lint/suspicious/noExplicitAny: Intentional override to fix Swagger UI
+  (spec as any).openapi = "3.0.3";
+
   return NextResponse.json(spec);
 }
 
 function getTagsForPath(path: string): string[] {
-  if (path.startsWith("/objek-pajak")) {
+  if (path.startsWith("/op")) {
     return ["Objek Pajak"];
   }
   if (path.startsWith("/sppt")) {
