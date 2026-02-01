@@ -23,3 +23,4 @@ export type Notification = typeof notification.$inferSelect;
 export type NewNotification = typeof notification.$inferInsert;
 
 // PBB Schema: import from "@/lib/db/schema/pbb" directly to avoid barrel file issues
+export * from "./pbb";

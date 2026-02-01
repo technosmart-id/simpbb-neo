@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { oz } from "../oz";
+import { PaginationInputSchema } from "../schemas/pagination";
 import { protectedProcedure } from "../server";
 
 export type SpptData = {
@@ -42,10 +44,13 @@ export type SpptData = {
 export const spptRouter = {
   // list: GET /sppt
   list: protectedProcedure
-    .route({ method: "GET", path: "/sppt", summary: "Get All SPPT" })
+    .route({ method: "GET", path: "/sppt", summary: "List Data SPPT" })
     .input(
-      z.object({
-        /* TODO: filter params */
+      PaginationInputSchema.extend({
+        nop: oz.openapi(z.string().optional(), {
+          example: "00010100100100010",
+        }),
+        tahun: oz.openapi(z.string().optional(), { example: "2024" }),
       })
     )
     .handler(({ input: _input }) => {
@@ -55,7 +60,11 @@ export const spptRouter = {
 
   // find: GET /sppt/{nop}/{tahun}
   find: protectedProcedure
-    .route({ method: "GET", path: "/sppt/{nop}/{tahun}", summary: "Get SPPT" })
+    .route({
+      method: "GET",
+      path: "/sppt/{nop}/{tahun}",
+      summary: "Get Detail SPPT",
+    })
     .input(z.object({ nop: z.string(), tahun: z.string() }))
     .handler(({ input: _input }) => {
       // TODO: Implement detail logic
@@ -80,7 +89,7 @@ export const spptRouter = {
     .route({
       method: "POST",
       path: "/sppt/print-mass",
-      summary: "Print Mass SPPT",
+      summary: "Cetak Massal SPPT",
     })
     .input(
       z.object({
@@ -97,7 +106,7 @@ export const spptRouter = {
     .route({
       method: "GET",
       path: "/sppt/{nop}/{tahun}/copy",
-      summary: "Print Salinan SPPT",
+      summary: "Cetak Salinan SPPT",
     })
     .input(z.object({ nop: z.string(), tahun: z.string() }))
     .handler(({ input: _input }) => {

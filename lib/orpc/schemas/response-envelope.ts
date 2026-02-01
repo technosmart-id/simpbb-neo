@@ -103,7 +103,6 @@ export function zSingleResourceResponse<T extends z.ZodTypeAny>(itemSchema: T) {
   return z.object({
     data: itemSchema,
     warnings: z.array(WarningSchema).optional(),
-    meta: ResponseMetaSchema,
   });
 }
 
@@ -115,7 +114,6 @@ export function zCollectionResponse<T extends z.ZodTypeAny>(itemSchema: T) {
     data: z.array(itemSchema),
     pagination: PaginationSchema,
     warnings: z.array(WarningSchema).optional(),
-    meta: ResponseMetaSchema,
   });
 }
 
@@ -129,7 +127,6 @@ export function zCursorCollectionResponse<T extends z.ZodTypeAny>(
     data: z.array(itemSchema),
     pagination: CursorPaginationSchema,
     warnings: z.array(WarningSchema).optional(),
-    meta: ResponseMetaSchema,
   });
 }
 
@@ -179,7 +176,6 @@ export function zBatchResponse<T extends z.ZodTypeAny>(itemSchema: T) {
       })
     ),
     summary: BatchSummarySchema,
-    meta: ResponseMetaSchema,
   });
 }
 

@@ -8,7 +8,7 @@ async function handleRequest(request: Request) {
   const context = await createContext();
 
   const { response } = await handler.handle(request, {
-    prefix: "/api/rpc",
+    prefix: "/api/v1",
     context,
   });
 

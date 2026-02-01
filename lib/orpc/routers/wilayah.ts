@@ -7,7 +7,7 @@ export const wilayahRouter = {
     .route({
       method: "GET",
       path: "/wilayah/provinsi",
-      summary: "Get Provinsi",
+      summary: "List Provinsi",
     })
     .input(
       z
@@ -26,7 +26,7 @@ export const wilayahRouter = {
     .route({
       method: "GET",
       path: "/wilayah/kabupaten",
-      summary: "Get Kabupaten",
+      summary: "List Kabupaten",
     })
     .input(
       z
@@ -45,7 +45,7 @@ export const wilayahRouter = {
     .route({
       method: "GET",
       path: "/wilayah/kecamatan",
-      summary: "Get Kecamatan",
+      summary: "List Kecamatan",
     })
     .input(
       z
@@ -64,7 +64,7 @@ export const wilayahRouter = {
     .route({
       method: "GET",
       path: "/wilayah/kelurahan",
-      summary: "Get Kelurahan",
+      summary: "List Kelurahan",
     })
     .input(
       z

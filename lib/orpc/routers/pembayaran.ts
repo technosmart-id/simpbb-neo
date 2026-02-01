@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { oz } from "../oz";
 import { protectedProcedure } from "../server";
 
 export const pembayaranRouter = {
@@ -7,11 +8,13 @@ export const pembayaranRouter = {
     .route({
       method: "POST",
       path: "/pembayaran",
-      summary: "Create Pembayaran",
+      summary: "Create Data Pembayaran",
     })
     .input(
       z.object({
-        /* TODO: payment data */
+        nop: oz.openapi(z.string(), { example: "00010100100100010" }),
+        tahun: oz.openapi(z.string(), { example: "2024" }),
+        amount: oz.openapi(z.number().min(0), { example: 150_000 }),
       })
     )
     .handler(({ input: _input }) => {
@@ -24,7 +27,7 @@ export const pembayaranRouter = {
     .route({
       method: "POST",
       path: "/pembayaran/void",
-      summary: "Void Pembayaran",
+      summary: "Cancel Pembayaran",
     })
     .input(
       z.object({
@@ -41,7 +44,7 @@ export const pembayaranRouter = {
     .route({
       method: "GET",
       path: "/pembayaran/history",
-      summary: "Get History Pembayaran",
+      summary: "List Riwayat Pembayaran",
     })
     .input(
       z.object({

@@ -16,8 +16,8 @@ export async function GET() {
     },
     servers: [
       {
-        url: "/api/rpc",
-        description: "Main API Server",
+        url: "/api/v1",
+        description: "Main API Server (v1)",
       },
     ],
   });
@@ -44,6 +44,9 @@ export async function GET() {
 }
 
 function getTagsForPath(path: string): string[] {
+  if (path.startsWith("/subjek")) {
+    return ["Subjek Pajak"];
+  }
   if (path.startsWith("/op")) {
     return ["Objek Pajak"];
   }
