@@ -1,0 +1,65 @@
+services:
+  # MySQL Database (Main Application Database)
+  mysql:
+    image: mysql:8.0
+    container_name: simpbb-neo-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_USER: ${MYSQL_USER:-simpbb}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-simpbb_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-simpbb_neo}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: --default-authentication-plugin=mysql_native_password
+
+  # PostgreSQL with PostGIS (For Map/Spatial Data Only)
+  postgis:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: simpbb-neo-postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGIS_USER:-simpbb_geo}
+      POSTGRES_PASSWORD: ${POSTGIS_PASSWORD:-postgis_password}
+      POSTGRES_DB: ${POSTGIS_DATABASE:-simpbb_geo}
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGIS_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGIS_USER:-simpbb_geo} -d ${POSTGIS_DATABASE:-simpbb_geo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: simpbb-neo-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      - DATABASE_URL=mysql://${MYSQL_USER:-simpbb}:${MYSQL_PASSWORD:-simpbb_password}@mysql:3306/${MYSQL_DATABASE:-simpbb_neo}
+      - POSTGIS_URL=postgresql://${POSTGIS_USER:-simpbb_geo}:${POSTGIS_PASSWORD:-postgis_password}@postgis:5432/${POSTGIS_DATABASE:-simpbb_geo}
+      - NODE_ENV=production
+    env_file:
+      - .env.local
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgis:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  postgis_data:
