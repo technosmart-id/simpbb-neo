@@ -1,0 +1,309 @@
+{
+  "info": {
+    "title": "SimPBB Neo API",
+    "version": "1.0.0",
+    "description": "API Documentation for SimPBB Neo"
+  },
+  "servers": [{ "url": "/api/rpc", "description": "Main API Server" }],
+  "openapi": "3.1.1",
+  "paths": {
+    "/health": {
+      "post": {
+        "operationId": "health",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "post": {
+        "operationId": "me",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/objek-pajak/get-all": {
+      "get": {
+        "operationId": "objek-pajak.get-all",
+        "summary": "Get All Objek Pajak",
+        "tags": ["Objek Pajak"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/objek-pajak/create": {
+      "post": {
+        "operationId": "objek-pajak.create",
+        "summary": "Create Objek Pajak",
+        "tags": ["Objek Pajak"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/objek-pajak/getOne": {
+      "get": {
+        "operationId": "objek-pajak.getOne",
+        "summary": "Get Objek Pajak",
+        "tags": ["Objek Pajak"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/objek-pajak/updateData": {
+      "patch": {
+        "operationId": "objek-pajak.updateData",
+        "summary": "Update Data Objek Pajak",
+        "tags": ["Objek Pajak"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/objek-pajak/updateSubjek": {
+      "patch": {
+        "operationId": "objek-pajak.updateSubjek",
+        "summary": "Update Subjek Pajak",
+        "tags": ["Objek Pajak"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/objek-pajak/getHistory": {
+      "get": {
+        "operationId": "objek-pajak.getHistory",
+        "summary": "Get History Objek Pajak",
+        "tags": ["Objek Pajak"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/sppt/getMany": {
+      "get": {
+        "operationId": "sppt.getMany",
+        "summary": "Get All SPPT",
+        "tags": ["SPPT"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/sppt/getOne": {
+      "get": {
+        "operationId": "sppt.getOne",
+        "summary": "Get SPPT",
+        "tags": ["SPPT"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/sppt/inquiry": {
+      "post": {
+        "operationId": "sppt.inquiry",
+        "summary": "Inquiry Tagihan SPPT",
+        "tags": ["SPPT"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/sppt/printMass": {
+      "post": {
+        "operationId": "sppt.printMass",
+        "summary": "Print Mass SPPT",
+        "tags": ["SPPT"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/sppt/printCopy": {
+      "get": {
+        "operationId": "sppt.printCopy",
+        "summary": "Print Salinan SPPT",
+        "tags": ["SPPT"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/pembayaran/create": {
+      "post": {
+        "operationId": "pembayaran.create",
+        "summary": "Create Pembayaran",
+        "tags": ["Pembayaran"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/pembayaran/void": {
+      "post": {
+        "operationId": "pembayaran.void",
+        "summary": "Void Pembayaran",
+        "tags": ["Pembayaran"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/pembayaran/getHistory": {
+      "get": {
+        "operationId": "pembayaran.getHistory",
+        "summary": "Get History Pembayaran",
+        "tags": ["Pembayaran"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/wilayah/getProvinsi": {
+      "get": {
+        "operationId": "wilayah.getProvinsi",
+        "summary": "Get Provinsi",
+        "tags": ["Wilayah"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/wilayah/getKabupaten": {
+      "get": {
+        "operationId": "wilayah.getKabupaten",
+        "summary": "Get Kabupaten",
+        "tags": ["Wilayah"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/wilayah/getKecamatan": {
+      "get": {
+        "operationId": "wilayah.getKecamatan",
+        "summary": "Get Kecamatan",
+        "tags": ["Wilayah"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    },
+    "/wilayah/getKelurahan": {
+      "get": {
+        "operationId": "wilayah.getKelurahan",
+        "summary": "Get Kelurahan",
+        "tags": ["Wilayah"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "anyOf": [{}, { "not": {} }] } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -129,7 +129,7 @@ function getJenisBumiLabel(jenis: string): string {
 }
 
 async function fetchObjekPajak(nop: string): Promise<ObjekPajakResponse> {
-  const res = await fetch(`/api/objek-pajak/${encodeURIComponent(nop)}`);
+  const res = await fetch(`/api/op/${encodeURIComponent(nop)}`);
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.error || "Failed to fetch data");
@@ -167,7 +167,7 @@ export default function ObjekPajakDetailPage() {
   const nop = params.nop as string;
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["objek-pajak", nop],
+    queryKey: ["op", nop],
     queryFn: () => fetchObjekPajak(decodeURIComponent(nop)),
   });
 

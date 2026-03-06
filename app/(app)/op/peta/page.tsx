@@ -199,9 +199,15 @@ export default function ObjekPajakPetaPage() {
 
   // Filter properties based on selected filters
   const filteredProperties = mockProperties.filter((p) => {
-    if (kecamatan !== "semua" && p.kecamatan !== kecamatan) return false;
-    if (kelurahan !== "semua" && p.kelurahan !== kelurahan) return false;
-    if (statusBayar !== "semua" && p.statusBayar !== statusBayar) return false;
+    if (kecamatan !== "semua" && p.kecamatan !== kecamatan) {
+      return false;
+    }
+    if (kelurahan !== "semua" && p.kelurahan !== kelurahan) {
+      return false;
+    }
+    if (statusBayar !== "semua" && p.statusBayar !== statusBayar) {
+      return false;
+    }
     return true;
   });
 

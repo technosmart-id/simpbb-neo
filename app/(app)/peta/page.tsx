@@ -95,9 +95,7 @@ export default function PetaPage() {
 
   // Get current location from breadcrumbs
   const currentLocation =
-    breadcrumbs.length > 0
-      ? breadcrumbs[breadcrumbs.length - 1].name
-      : "Indonesia";
+    breadcrumbs.length > 0 ? breadcrumbs.at(-1)?.name : "Indonesia";
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col gap-4 p-4 pt-0">

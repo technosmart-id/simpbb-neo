@@ -6,7 +6,6 @@ import {
   CreditCard,
   FileText,
   Home,
-  Search,
   Settings,
   User,
 } from "lucide-react";
@@ -30,7 +29,6 @@ import {
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Objek Pajak", href: "/objek-pajak", icon: Search },
   { name: "SPPT", href: "/sppt", icon: FileText },
   { name: "Pembayaran", href: "/pembayaran", icon: CreditCard },
   { name: "Laporan", href: "/laporan", icon: Calculator },
