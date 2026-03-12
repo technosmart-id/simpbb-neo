@@ -31,7 +31,7 @@ interface BookFormProps {
 }
 
 export function BookForm({ book, onSuccess }: BookFormProps) {
-  const orpc = useORPC() as any
+  const orpc = useORPC()
   const queryClient = useQueryClient()
 
   const { register, handleSubmit, formState: { errors } } = useForm<BookFormValues>({
@@ -51,7 +51,7 @@ export function BookForm({ book, onSuccess }: BookFormProps) {
       toast.success('Book created successfully')
       onSuccess?.()
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error('Failed to create book: ' + error.message)
     }
   }))
@@ -62,7 +62,7 @@ export function BookForm({ book, onSuccess }: BookFormProps) {
       toast.success('Book updated successfully')
       onSuccess?.()
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error('Failed to update book: ' + error.message)
     }
   }))
@@ -71,9 +71,9 @@ export function BookForm({ book, onSuccess }: BookFormProps) {
 
   const onSubmit = (values: BookFormValues) => {
     if (book) {
-      updateMutation.mutate({ id: book.id, ...values } as any)
+      updateMutation.mutate({ id: book.id, ...values })
     } else {
-      createMutation.mutate(values as any)
+      createMutation.mutate(values)
     }
   }
 

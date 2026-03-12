@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ArrowRightIcon, LayoutDashboardIcon, LogInIcon, SparklesIcon } from "lucide-react"
+import { LayoutDashboardIcon, LogInIcon, SparklesIcon } from "lucide-react"
 import { ModeToggle } from "@/components/mode-toggle"
 
 export default function Page() {

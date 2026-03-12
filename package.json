@@ -24,6 +24,7 @@
     "@orpc/react-query": "^1.13.6",
     "@orpc/server": "^1.13.6",
     "@orpc/zod": "^1.13.6",
+    "@scalar/api-reference-react": "^0.9.6",
     "@tanstack/react-query": "^5.90.21",
     "better-auth": "^1.5.5",
     "class-variance-authority": "^0.7.1",

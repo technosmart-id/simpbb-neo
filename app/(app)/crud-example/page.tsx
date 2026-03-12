@@ -62,13 +62,46 @@ import { Input } from "@/components/ui/input"
 
 const PAGE_SIZE = 5
 
+type Book = {
+  id: number
+  title: string
+  author: string
+  publishedAt: string | Date | null
+}
+
+type BooksListResponse = {
+  rows: Book[]
+  total: number
+}
+
+type DeleteVariables = { id: number }
+
+type SortState = {
+  column: string
+  order: 'asc' | 'desc'
+}
+
+// Memoized SortIcon component declared outside render
+interface SortIconProps {
+  column: string
+  sort: SortState
+}
+
+const SortIcon = React.memo<SortIconProps>(({ column, sort }) => {
+  if (sort.column !== column) return <ArrowUpDown size={14} className="ml-2 opacity-50" />
+  return sort.order === 'asc'
+    ? <ArrowUp size={14} className="ml-2" />
+    : <ArrowDown size={14} className="ml-2" />
+})
+SortIcon.displayName = 'SortIcon'
+
 export default function CrudExamplePage() {
-  const orpc = useORPC() as any
+  const orpc = useORPC()
   const queryClient = useQueryClient()
 
   // UI State
   const [isAddOpen, setIsAddOpen] = React.useState(false)
-  const [editingBook, setEditingBook] = React.useState<any>(null)
+  const [editingBook, setEditingBook] = React.useState<Book | null>(null)
 
   // Query State
   const [page, setPage] = React.useState(1)
@@ -80,20 +113,18 @@ export default function CrudExamplePage() {
   })
 
   // Data Fetching
-  const { data, isLoading } = useQuery(
-    orpc.books.list.queryOptions({
-      input: {
-        limit: PAGE_SIZE,
-        offset: (page - 1) * PAGE_SIZE,
-        search: debouncedSearch || undefined,
-        sortBy: sort.column,
-        sortOrder: sort.order
-      }
-    })
-  ) as any
+  const { data, isLoading } = useQuery(orpc.books.list.queryOptions({
+    input: {
+      limit: PAGE_SIZE,
+      offset: (page - 1) * PAGE_SIZE,
+      search: debouncedSearch || undefined,
+      sortBy: sort.column as 'id' | 'title' | 'author' | 'publishedAt' | 'createdAt',
+      sortOrder: sort.order
+    }
+  }))
 
-  const books = data?.rows ?? []
-  const total = data?.total ?? 0
+  const books = (data as BooksListResponse | undefined)?.rows ?? []
+  const total = (data as BooksListResponse | undefined)?.total ?? 0
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   // Reset page when search changes
@@ -106,7 +137,7 @@ export default function CrudExamplePage() {
       queryClient.invalidateQueries({ queryKey: orpc.books.key() })
       toast.success('Book deleted successfully')
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error('Failed to delete book: ' + error.message)
     }
   }))
@@ -116,13 +147,6 @@ export default function CrudExamplePage() {
       column,
       order: prev.column === column && prev.order === 'asc' ? 'desc' : 'asc'
     }))
-  }
-
-  const SortIcon = ({ column }: { column: string }) => {
-    if (sort.column !== column) return <ArrowUpDown size={14} className="ml-2 opacity-50" />
-    return sort.order === 'asc'
-      ? <ArrowUp size={14} className="ml-2" />
-      : <ArrowDown size={14} className="ml-2" />
   }
 
   return (
@@ -208,25 +232,25 @@ export default function CrudExamplePage() {
                       className="w-[80px] cursor-pointer"
                       onClick={() => toggleSort('id')}
                     >
-                      <div className="flex items-center">ID <SortIcon column="id" /></div>
+                      <div className="flex items-center">ID <SortIcon column="id" sort={sort} /></div>
                     </TableHead>
                     <TableHead
                       className="cursor-pointer"
                       onClick={() => toggleSort('title')}
                     >
-                      <div className="flex items-center">Title <SortIcon column="title" /></div>
+                      <div className="flex items-center">Title <SortIcon column="title" sort={sort} /></div>
                     </TableHead>
                     <TableHead
                       className="cursor-pointer"
                       onClick={() => toggleSort('author')}
                     >
-                      <div className="flex items-center">Author <SortIcon column="author" /></div>
+                      <div className="flex items-center">Author <SortIcon column="author" sort={sort} /></div>
                     </TableHead>
                     <TableHead
                       className="cursor-pointer"
                       onClick={() => toggleSort('publishedAt')}
                     >
-                      <div className="flex items-center">Published <SortIcon column="publishedAt" /></div>
+                      <div className="flex items-center">Published <SortIcon column="publishedAt" sort={sort} /></div>
                     </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -252,7 +276,7 @@ export default function CrudExamplePage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    books.map((book: any) => (
+                    books.map((book: Book) => (
                       <TableRow key={book.id}>
                         <TableCell className="font-mono text-xs text-muted-foreground">
                           #{book.id}
@@ -275,8 +299,8 @@ export default function CrudExamplePage() {
                           <BookActions
                             book={book}
                             onEdit={setEditingBook}
-                            onDelete={(id) => deleteMutation.mutate({ id } as any)}
-                            isDeleting={deleteMutation.isPending && (deleteMutation.variables as any)?.id === book.id}
+                            onDelete={(id) => deleteMutation.mutate({ id })}
+                            isDeleting={deleteMutation.isPending && (deleteMutation.variables as DeleteVariables)?.id === book.id}
                           />
                         </TableCell>
                       </TableRow>

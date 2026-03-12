@@ -72,7 +72,7 @@ export const router = os.router({
           author: input.author,
           publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
         })
-        return { id: (result as any).insertId }
+        return { id: (result as { insertId: number }).insertId }
       }),
 
     update: os

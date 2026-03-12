@@ -22,9 +22,16 @@ import {
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 
+interface Book {
+  id: number
+  title: string
+  author: string
+  publishedAt: string | Date | null
+}
+
 interface BookActionsProps {
-  book: any
-  onEdit: (book: any) => void
+  book: Book
+  onEdit: (book: Book) => void
   onDelete: (id: number) => void
   isDeleting?: boolean
 }

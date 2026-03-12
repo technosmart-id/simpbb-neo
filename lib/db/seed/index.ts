@@ -1,6 +1,3 @@
-import { db } from "../index";
-import * as schema from "../schema";
-
 async function main() {
   console.log("Seed started...");
   // Add your seeding logic here
