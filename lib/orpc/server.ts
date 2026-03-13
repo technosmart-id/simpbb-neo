@@ -1,7 +1,7 @@
 import { os as osBase } from "@orpc/server"
 import { z } from "zod"
 import { db } from "@/lib/db"
-import { books, notifications } from "@/lib/db/schema"
+import { books, notifications, notificationPreferences } from "@/lib/db/schema"
 import { eq, desc, asc, sql, like, or } from "drizzle-orm"
 import { auth } from "@/lib/auth"
 
@@ -112,6 +112,63 @@ export const router = os.router({
           message: "This successful test notification was triggered via oRPC! SSE is working beautifully using native Next.js 16 WebStreams.",
           type: "success",
         })
+      }),
+
+    getPreferences: os
+      .handler(async ({ context }) => {
+        if (!context.session?.user) {
+          throw new Error("Unauthorized")
+        }
+
+        let [prefs] = await db.select()
+          .from(notificationPreferences)
+          .where(eq(notificationPreferences.userId, context.session.user.id))
+
+        if (!prefs) {
+          // Create default preferences
+          const id = crypto.randomUUID()
+          await db.insert(notificationPreferences).values({
+            id,
+            userId: context.session.user.id,
+            inAppEnabled: true,
+            toastsEnabled: true,
+            successEnabled: true,
+            warningEnabled: true,
+            errorEnabled: true,
+            infoEnabled: true,
+          })
+          
+          const [newPrefs] = await db.select()
+            .from(notificationPreferences)
+            .where(eq(notificationPreferences.id, id))
+          prefs = newPrefs
+        }
+
+        return prefs
+      }),
+
+    updatePreferences: os
+      .input(z.object({
+        inAppEnabled: z.boolean().optional(),
+        toastsEnabled: z.boolean().optional(),
+        successEnabled: z.boolean().optional(),
+        warningEnabled: z.boolean().optional(),
+        errorEnabled: z.boolean().optional(),
+        infoEnabled: z.boolean().optional(),
+      }))
+      .handler(async ({ input, context }) => {
+        if (!context.session?.user) {
+          throw new Error("Unauthorized")
+        }
+
+        await db.update(notificationPreferences)
+          .set({
+            ...input,
+            updatedAt: new Date(),
+          })
+          .where(eq(notificationPreferences.userId, context.session.user.id))
+
+        return { success: true }
       }),
   }),
 

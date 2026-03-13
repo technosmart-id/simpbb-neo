@@ -63,14 +63,16 @@ export function NotificationBell() {
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
 
-      // Show toast
-      toast(data.title, {
-        description: data.message,
-        action: data.link ? {
-          label: "View",
-          onClick: () => window.location.href = data.link
-        } : undefined
-      })
+      // Show toast if not suppressed
+      if (!data.suppressToast) {
+        toast(data.title, {
+          description: data.message,
+          action: data.link ? {
+            label: "View",
+            onClick: () => window.location.href = data.link
+          } : undefined
+        })
+      }
 
       // Invalidate count
       queryClient.invalidateQueries({ queryKey: orpc.notifications.unreadCount.key() })
@@ -95,14 +97,6 @@ export function NotificationBell() {
     markReadMutation.mutate({})
   }
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "success": return <CheckCircle2 className="size-4 text-green-500" />
-      case "warning": return <AlertTriangle className="size-4 text-yellow-500" />
-      case "error": return <AlertCircle className="size-4 text-red-500" />
-      default: return <Info className="size-4 text-blue-500" />
-    }
-  }
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -125,7 +119,7 @@ export function NotificationBell() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-auto p-0 text-xs text-muted-foreground hover:text-primary font-medium"
+              className="h-auto p-0 text-xs text-muted-foreground font-medium cursor-pointer"
               onClick={handleMarkAllRead}
               disabled={markReadMutation.isPending}
             >
@@ -150,24 +144,22 @@ export function NotificationBell() {
                 <div
                   key={n.id}
                   className={cn(
-                    "flex flex-col gap-1 p-4 transition-colors relative group",
-                    !n.isRead ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-muted/50",
+                    "flex flex-col gap-1 p-4 transition-colors relative group hover:bg-muted/50",
                     n.link && "cursor-pointer"
                   )}
                 >
                   <div className="flex gap-2 items-start relative z-10">
-                    <div className="mt-0.5">{getIcon(n.type)}</div>
                     <div className="flex-1 space-y-1">
-                      <p className={cn(
-                        "text-xs leading-none transition-colors", 
-                        !n.isRead ? "font-bold text-foreground" : "font-normal text-muted-foreground"
+                      <h5 className={cn(
+                        "text-xs leading-none transition-colors w-fit",
+                        !n.isRead ? "font-bold text-foreground" : "font-normal text-foreground/70 border-b border-foreground/20 pb-0.5"
                       )}>
                         {n.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground line-clamp-2">
+                      </h5>
+                      <p className="text-xs text-foreground/90 line-clamp-2">
                         {n.message}
                       </p>
-                      <p className="text-[10px] text-muted-foreground tabular-nums opacity-60">
+                      <p className="text-xs tabular-nums text-foreground/50">
                         {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                       </p>
                     </div>
@@ -176,7 +168,7 @@ export function NotificationBell() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-6"
+                          className="size-6 text-muted-foreground hover:text-green-500"
                           onClick={(e) => {
                             e.stopPropagation()
                             markReadMutation.mutate({ id: n.id })

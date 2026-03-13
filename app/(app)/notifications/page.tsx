@@ -37,9 +37,9 @@ export default function NotificationsPage() {
   // Notifications List Query
   const { data: listData, isLoading, refetch } = useQuery(
     orpc.notifications.list.queryOptions({
-      input: { 
-        limit, 
-        offset: page * limit 
+      input: {
+        limit,
+        offset: page * limit
       },
     })
   )
@@ -59,14 +59,6 @@ export default function NotificationsPage() {
     },
   }))
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "success": return <CheckCircle2 className="size-5 text-green-500" />
-      case "warning": return <AlertTriangle className="size-5 text-yellow-500" />
-      case "error": return <AlertCircle className="size-5 text-red-500" />
-      default: return <Info className="size-5 text-blue-500" />
-    }
-  }
 
   const handleMarkAllRead = () => {
     markReadMutation.mutate({})
@@ -84,17 +76,17 @@ export default function NotificationsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-           {unreadCount > 0 && (
-            <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleMarkAllRead}
-                disabled={markReadMutation.isPending}
+          {unreadCount > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleMarkAllRead}
+              disabled={markReadMutation.isPending}
             >
               <Check className="mr-2 h-4 w-4" />
               Mark all as read
             </Button>
-           )}
+          )}
         </div>
       </div>
 
@@ -122,37 +114,33 @@ export default function NotificationsPage() {
           ) : (
             <div className="divide-y text-sm">
               {listData.rows.map((n) => (
-                <div 
-                  key={n.id} 
+                <div
+                  key={n.id}
                   className={cn(
-                    "flex flex-col md:flex-row gap-4 p-6 transition-colors relative group",
-                    !n.isRead ? "bg-primary/5 hover:bg-primary/10 border-l-4 border-l-[#ff4500]" : "hover:bg-muted/30 border-l-4 border-l-transparent",
+                    "flex flex-col md:flex-row gap-4 p-6 transition-colors relative group hover:bg-muted/30",
                     n.link && "cursor-pointer"
                   )}
                 >
-                  <div className="flex-shrink-0 mt-1 relative z-10">
-                    {getIcon(n.type)}
-                  </div>
                   <div className="flex-1 min-w-0 relative z-10">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className={cn(
-                        "text-base transition-colors", 
-                        !n.isRead ? "font-bold text-foreground" : "font-normal text-muted-foreground"
+                        "text-base transition-colors w-fit",
+                        !n.isRead ? "font-bold text-foreground" : "font-normal text-foreground/70 border-b border-foreground/20 pb-0.5"
                       )}>
                         {n.title}
                       </h4>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap ml-4 opacity-70">
+                      <span className="text-xs text-foreground/50 whitespace-nowrap ml-4">
                         {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                    <p className="text-sm text-foreground/90 leading-relaxed line-clamp-3">
                       {n.message}
                     </p>
                     {n.link && (
                       <div className="mt-3">
-                        <Button 
-                          variant="secondary" 
-                          size="sm" 
+                        <Button
+                          variant="secondary"
+                          size="sm"
                           className="h-8 font-medium"
                           asChild
                         >
@@ -163,10 +151,10 @@ export default function NotificationsPage() {
                   </div>
                   <div className="flex-shrink-0 flex md:flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity relative z-10">
                     {!n.isRead && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8"
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 hover:text-green-500"
                         title="Mark as read"
                         onClick={(e) => {
                           e.preventDefault()
@@ -178,9 +166,9 @@ export default function NotificationsPage() {
                         <Check className="h-4 w-4" />
                       </Button>
                     )}
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-8 w-8 text-muted-foreground hover:text-destructive"
                       title="Delete notification"
                       onClick={(e) => {
@@ -208,25 +196,25 @@ export default function NotificationsPage() {
         {totalPages > 1 && (
           <CardFooter className="flex items-center justify-between p-4 border-t">
             <div className="text-sm text-muted-foreground">
-                Showing {page * limit + 1} - {Math.min((page + 1) * limit, listData?.total ?? 0)} of {listData?.total} notifications
+              Showing {page * limit + 1} - {Math.min((page + 1) * limit, listData?.total ?? 0)} of {listData?.total} notifications
             </div>
             <div className="flex items-center gap-2">
-                <Button 
-                    variant="outline" 
-                    size="sm" 
-                    disabled={page === 0}
-                    onClick={() => setPage(p => p - 1)}
-                >
-                    Previous
-                </Button>
-                <Button 
-                    variant="outline" 
-                    size="sm" 
-                    disabled={page >= totalPages - 1}
-                    onClick={() => setPage(p => p + 1)}
-                >
-                    Next
-                </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 0}
+                onClick={() => setPage(p => p - 1)}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage(p => p + 1)}
+              >
+                Next
+              </Button>
             </div>
           </CardFooter>
         )}
