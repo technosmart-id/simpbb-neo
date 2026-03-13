@@ -30,7 +30,8 @@ try {
     try {
       await conn.query(statement);
       console.log(`[${i + 1}/${statements.length}] ✓ Executed`);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as { code?: string; message?: string };
       if (error.code === "ER_TABLE_EXISTS_ERROR") {
         console.log(`[${i + 1}/${statements.length}] ⊘ Table already exists, skipping`);
       } else if (error.code === "ER_DUP_KEYNAME") {
@@ -38,7 +39,7 @@ try {
       } else if (error.code === "ER_DUP_ENTRY") {
         console.log(`[${i + 1}/${statements.length}] ⊘ Duplicate entry, skipping`);
       } else {
-        console.error(`[${i + 1}/${statements.length}] ✗ Error: ${error.message}`);
+        console.error(`[${i + 1}/${statements.length}] ✗ Error: ${error.message || String(err)}`);
         console.error(`Statement was: ${statement.substring(0, 100)}...`);
         // Continue anyway
       }

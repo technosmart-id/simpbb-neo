@@ -88,19 +88,16 @@ export function VerifyTwoFactor({ onSuccess }: VerifyTwoFactorProps) {
 										maxLength={6}
 										value={code}
 										onChange={setCode}
-										render={({ slots }) => (
-											<InputOTPGroup>
-												{slots.map((slot, index) => (
-													<InputOTPSlot
-														key={index}
-														index={index}
-														{...slot}
-														className="w-10 h-12 text-lg"
-													/>
-												))}
-											</InputOTPGroup>
-										)}
-									/>
+									>
+										<InputOTPGroup>
+											<InputOTPSlot index={0} />
+											<InputOTPSlot index={1} />
+											<InputOTPSlot index={2} />
+											<InputOTPSlot index={3} />
+											<InputOTPSlot index={4} />
+											<InputOTPSlot index={5} />
+										</InputOTPGroup>
+									</InputOTP>
 								</div>
 								<FieldDescription>
 									Enter the 6-digit code from your authenticator app.

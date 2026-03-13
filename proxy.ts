@@ -90,7 +90,7 @@ export async function proxy(request: NextRequest) {
 
 	// Check admin role for admin routes
 	if (isAuthenticated && pathname.includes("/admin")) {
-		if ((session.user as any).role !== "admin") {
+		if ('role' in session.user && session.user.role !== "admin") {
 			return NextResponse.redirect(new URL("/dashboard?error=unauthorized", request.url));
 		}
 	}

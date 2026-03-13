@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       // Send initial keep-alive/comment
       controller.enqueue(encoder.encode(": connected\n\n"));
 
-      const onNotification = (data: any) => {
+      const onNotification = (data: { userId?: string; [key: string]: unknown }) => {
         // Only send if the notification is for this user
         if (data.userId === userId) {
           const payload = `data: ${JSON.stringify(data)}\n\n`;

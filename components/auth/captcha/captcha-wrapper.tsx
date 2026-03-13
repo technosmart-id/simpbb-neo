@@ -54,7 +54,6 @@ export function ReCaptcha({
 		// Skip if no site key
 		if (!siteKey) {
 			console.warn("[ReCaptcha] No site key provided");
-			setLoading(false);
 			return;
 		}
 

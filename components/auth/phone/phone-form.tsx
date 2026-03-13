@@ -34,7 +34,7 @@ export function PhoneForm({ mode = "login" }: { mode?: "login" | "verify" | "reg
 		e.preventDefault();
 		setLoading(true);
 
-		const res = await (authClient.phoneNumber as any).sendVerificationOtp({
+		const res = await authClient.phoneNumber.sendOtp({
 			phoneNumber,
 		});
 
@@ -51,9 +51,9 @@ export function PhoneForm({ mode = "login" }: { mode?: "login" | "verify" | "reg
 	const handleVerifyOtp = async () => {
 		setLoading(true);
 
-		const res = await (authClient.phoneNumber as any).verifyOtp({
+		const res = await authClient.phoneNumber.verify({
 			phoneNumber,
-			code: otp,
+			otp,
 		});
 
 		if (res.error) {
@@ -73,10 +73,9 @@ export function PhoneForm({ mode = "login" }: { mode?: "login" | "verify" | "reg
 		e.preventDefault();
 		setLoading(true);
 
-		const res = await (authClient.signIn as any).phoneNumber({
+		const res = await authClient.signIn.phoneNumber({
 			phoneNumber,
 			password,
-			callbackURL: "/dashboard",
 		});
 
 		if (res.error) {

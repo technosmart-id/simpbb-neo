@@ -30,11 +30,6 @@ export default function AccountSettingsPage() {
 	const [user, setUser] = useState<User | null>(null);
 	const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
-	// Avoid hydration mismatch
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
 	const fetchUser = useCallback(async () => {
 		const res = await authClient.getSession();
 		const userData = res.data?.user as User | null;
@@ -42,9 +37,13 @@ export default function AccountSettingsPage() {
 		setTwoFactorEnabled(userData?.twoFactorEnabled ?? false);
 	}, []);
 
+	// Avoid hydration mismatch
 	useEffect(() => {
+		setMounted(true);
 		fetchUser();
-	}, [fetchUser]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 
 	// Refresh 2FA status
 	const refresh2FAStatus = async () => {

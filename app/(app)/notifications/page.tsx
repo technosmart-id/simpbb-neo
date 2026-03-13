@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 import {
   DropdownMenu,
@@ -115,7 +116,7 @@ export default function NotificationsPage() {
               <Bell className="size-16 text-muted-foreground/20 mb-4" />
               <h3 className="text-xl font-semibold">Nothing to see here</h3>
               <p className="text-muted-foreground text-sm max-w-sm mt-2">
-                We'll let you know when something important happens. In the meantime, enjoy the silence.
+                We&apos;ll let you know when something important happens. In the meantime, enjoy the silence.
               </p>
             </div>
           ) : (
