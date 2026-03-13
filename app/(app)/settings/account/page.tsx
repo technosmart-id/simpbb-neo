@@ -60,7 +60,7 @@ export default function AccountSettingsPage() {
 		<div className="space-y-6">
 			{/* Page Header */}
 			<div>
-				<h2 className="text-2xl font-bold">Account</h2>
+				<h1 className="text-2xl font-bold">Account</h1>
 				<p className="text-muted-foreground">Manage your profile and personal information</p>
 			</div>
 

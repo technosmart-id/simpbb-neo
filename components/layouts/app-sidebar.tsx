@@ -138,27 +138,27 @@ const data = {
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/settings",
       icon: (
         <Settings2Icon
         />
       ),
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "Account",
+          url: "/settings/account",
         },
         {
-          title: "Team",
-          url: "#",
+          title: "Security",
+          url: "/settings/security",
         },
         {
-          title: "Billing",
-          url: "#",
+          title: "Organizations",
+          url: "/settings/organizations",
         },
         {
-          title: "Limits",
-          url: "#",
+          title: "Notifications",
+          url: "/settings/notifications",
         },
       ],
     },

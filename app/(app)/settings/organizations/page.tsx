@@ -86,7 +86,7 @@ export default function OrganizationsSettingsPage() {
 			{/* Page Header with Action */}
 			<div className="flex items-center justify-between">
 				<div>
-					<h2 className="text-2xl font-bold">Organizations</h2>
+					<h1 className="text-2xl font-bold">Organizations</h1>
 					<p className="text-muted-foreground">Manage your teams and collaborate with others</p>
 				</div>
 				<Dialog open={createOpen} onOpenChange={setCreateOpen}>

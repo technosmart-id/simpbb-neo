@@ -54,7 +54,7 @@ export default function SecuritySettingsPage() {
 		<div className="space-y-6">
 			{/* Page Header */}
 			<div>
-				<h2 className="text-2xl font-bold">Security</h2>
+				<h1 className="text-2xl font-bold">Security</h1>
 				<p className="text-muted-foreground">Manage your account security and authentication</p>
 			</div>
 
