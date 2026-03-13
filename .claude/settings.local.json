@@ -23,7 +23,11 @@
       "Bash(npx drizzle-kit push:*)",
       "Bash(del:*)",
       "Bash(test:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(curl:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pkill:*)",
+      "Bash(find:*)"
     ]
   }
 }

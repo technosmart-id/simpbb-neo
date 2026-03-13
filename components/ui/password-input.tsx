@@ -96,21 +96,24 @@ function PasswordStrengthBar({ strength }: { strength: ReturnType<typeof calcula
 }
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
-	({ className, showStrength = false, minLength = 8, value = "", ...props }, ref) => {
+	({ className, showStrength = false, minLength = 8, value, defaultValue, ...props }, ref) => {
 		const [showPassword, setShowPassword] = React.useState(false);
+		const isControlled = value !== undefined;
+		const inputValue = isControlled ? value : defaultValue;
 		const strength = React.useMemo(
-			() => calculatePasswordStrength(value as string, minLength),
-			[value, minLength]
+			() => calculatePasswordStrength((inputValue as string | undefined) ?? "", minLength),
+			[inputValue, minLength]
 		);
 
 		return (
-			<div className="space-y-2">
+			<div className="space-y-1.5">
 				<div className="relative">
 					<Input
 						type={showPassword ? "text" : "password"}
 						ref={ref}
 						className={cn("pr-10", className)}
-						value={value}
+						value={isControlled ? value : undefined}
+						defaultValue={!isControlled ? defaultValue : undefined}
 						{...props}
 					/>
 					<Button
@@ -131,9 +134,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
 						</span>
 					</Button>
 				</div>
-				{showStrength && (
-					<PasswordStrengthBar strength={strength} />
-				)}
+				{showStrength && <PasswordStrengthBar strength={strength} />}
 			</div>
 		);
 	}

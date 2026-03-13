@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import { NavMain } from "@/components/layouts/nav-main"
-import { NavProjects } from "@/components/layouts/nav-projects"
+import { NavDeveloper } from "@/components/layouts/nav-developer"
 import { NavUser } from "@/components/layouts/nav-user"
 import { TeamSwitcher } from "@/components/layouts/team-switcher"
 import {
@@ -137,32 +137,6 @@ const data = {
       ],
     },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: (
-        <FrameIcon
-        />
-      ),
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: (
-        <PieChartIcon
-        />
-      ),
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: (
-        <MapIcon
-        />
-      ),
-    },
-  ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -173,7 +147,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavDeveloper />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

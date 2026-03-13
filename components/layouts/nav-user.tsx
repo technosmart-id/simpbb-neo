@@ -13,7 +13,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -25,8 +24,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { ChevronsUpDownIcon, CreditCardIcon, LogOutIcon, Moon, Sun, SettingsIcon, ShieldIcon, UserIcon } from "lucide-react"
-import { useTheme } from "next-themes"
+import { ChevronsUpDownIcon, LogOutIcon, UserIcon } from "lucide-react"
 
 export function NavUser({
   user,
@@ -39,7 +37,6 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const router = useRouter()
-  const { setTheme, resolvedTheme } = useTheme()
 
   const handleLogout = async () => {
     await authClient.signOut({
@@ -94,47 +91,15 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span>Theme</span>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/settings/account">
-                  <UserIcon className="h-4 w-4" />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings/security">
-                  <ShieldIcon className="h-4 w-4" />
-                  Security
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings/organizations">
-                  <CreditCardIcon className="h-4 w-4" />
-                  Organizations
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/settings">
-                  <SettingsIcon className="h-4 w-4" />
-                  Settings
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+            <DropdownMenuItem asChild>
+              <Link href="/settings">
+                <UserIcon className="h-4 w-4" />
+                Profile
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
-              <LogOutIcon
-              />
+              <LogOutIcon className="h-4 w-4" />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

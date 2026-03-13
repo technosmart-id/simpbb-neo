@@ -10,10 +10,19 @@ const handler = new RPCHandler(router, {
   ],
 })
 
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
+
 async function handleRequest(request: Request) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
   const { response } = await handler.handle(request, {
     prefix: '/api/rpc',
-    context: {},
+    context: {
+      session,
+    },
   })
   return response ?? new Response('Not found', { status: 404 })
 }

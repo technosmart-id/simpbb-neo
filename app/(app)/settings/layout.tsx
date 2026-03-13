@@ -1,30 +1,29 @@
 "use client"
 
-import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { UserIcon, ShieldIcon, Building2Icon, BellIcon } from "lucide-react"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
+import {
+	UserIcon,
+	Bell,
+	Building2,
+} from "lucide-react"
 
-const settingsTabs = [
+const settingsNav = [
 	{
 		title: "Account",
-		href: "/settings/account",
+		href: "/settings",
 		icon: UserIcon,
-	},
-	{
-		title: "Security",
-		href: "/settings/security",
-		icon: ShieldIcon,
-	},
-	{
-		title: "Organizations",
-		href: "/settings/organizations",
-		icon: Building2Icon,
 	},
 	{
 		title: "Notifications",
 		href: "/settings/notifications",
-		icon: BellIcon,
+		icon: Bell,
+	},
+	{
+		title: "Organizations",
+		href: "/settings/organizations",
+		icon: Building2,
 	},
 ]
 
@@ -36,34 +35,36 @@ export default function SettingsLayout({
 	const pathname = usePathname()
 
 	return (
-		<div className="space-y-6">
-			{/* Settings Navigation Tabs */}
-			<div className="border-b">
-				<nav className="flex gap-1 overflow-x-auto">
-					{settingsTabs.map((tab) => {
-						const Icon = tab.icon
-						const isActive = pathname === tab.href || (pathname.startsWith(tab.href) && tab.href !== "/settings")
+		<div className="flex-1 flex flex-col md:flex-row gap-6">
+			{/* Sidebar Navigation */}
+			<aside className="w-full md:w-48 flex-shrink-0">
+				<nav className="sticky top-20 space-y-1">
+					{settingsNav.map((item) => {
+						const isActive = pathname === item.href
+						const Icon = item.icon
 						return (
 							<Link
-								key={tab.href}
-								href={tab.href}
+								key={item.href}
+								href={item.href}
 								className={cn(
-									"flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors",
+									"flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors",
 									isActive
-										? "border-primary text-foreground"
-										: "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+										? "bg-primary text-primary-foreground"
+										: "text-muted-foreground hover:bg-muted hover:text-foreground"
 								)}
 							>
 								<Icon className="h-4 w-4" />
-								{tab.title}
+								{item.title}
 							</Link>
 						)
 					})}
 				</nav>
-			</div>
+			</aside>
 
-			{/* Settings Content */}
-			<div>{children}</div>
+			{/* Main Content */}
+			<main className="flex-1 min-w-0">
+				{children}
+			</main>
 		</div>
 	)
 }

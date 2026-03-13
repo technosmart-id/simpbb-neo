@@ -82,7 +82,7 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 
 	useEffect(() => {
 		fetchMembers();
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [organizationId]);
 
 	const inviteMember = async () => {

@@ -1,23 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -57,13 +42,9 @@ interface DeviceInfo {
 	icon: React.ReactNode;
 }
 
-/**
- * Parse user agent to get device information
- */
 function parseUserAgent(userAgent?: string): DeviceInfo {
 	const ua = userAgent?.toLowerCase() || "";
 
-	// Detect device type
 	if (/mobile|android|iphone|ipod|blackberry|iemobile|opera mini/i.test(ua)) {
 		return {
 			type: "mobile",
@@ -82,7 +63,6 @@ function parseUserAgent(userAgent?: string): DeviceInfo {
 		};
 	}
 
-	// Monitor
 	let os = "Unknown";
 	if (ua.includes("windows")) os = "Windows";
 	else if (ua.includes("mac")) os = "macOS";
@@ -102,9 +82,6 @@ function parseUserAgent(userAgent?: string): DeviceInfo {
 	};
 }
 
-/**
- * Format IP address for display (mask last octet for privacy)
- */
 function formatIP(ip?: string): string {
 	if (!ip) return "Unknown";
 	const parts = ip.split(".");
@@ -112,11 +89,6 @@ function formatIP(ip?: string): string {
 	return `${parts[0]}.${parts[1]}.${parts[2]}.***`;
 }
 
-/**
- * Session Manager Component
- *
- * Displays all active sessions with device info, location, and allows revoking sessions.
- */
 export function SessionManager() {
 	const [sessions, setSessions] = useState<SessionInfo[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -186,146 +158,97 @@ export function SessionManager() {
 
 	if (loading) {
 		return (
-			<Card>
-				<CardHeader>
-					<CardTitle>Active Sessions</CardTitle>
-					<CardDescription>
-						Manage your active sessions across devices
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<div className="flex items-center justify-center py-8">
-						<div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-					</div>
-				</CardContent>
-			</Card>
+			<div className="flex items-center justify-center py-8">
+				<div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+			</div>
 		);
 	}
 
 	return (
 		<>
-			<Card>
-				<CardHeader>
-					<div className="flex items-center justify-between">
-						<div>
-							<CardTitle>Active Sessions</CardTitle>
-							<CardDescription>
-								{sessions.length} active session
-								{sessions.length !== 1 ? "s" : ""}
-							</CardDescription>
-						</div>
-						{sessions.length > 1 && (
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={handleRevokeAll}
-								className="gap-2"
-							>
-								<Shield className="h-4 w-4" />
-								Sign out all other sessions
-							</Button>
-						)}
+			{sessions.length > 1 && (
+				<div className="flex justify-end mb-4">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={handleRevokeAll}
+						className="gap-2"
+					>
+						<Shield className="h-4 w-4" />
+						Sign out all other sessions
+					</Button>
+				</div>
+			)}
+			{sessions.length === 0 ? (
+				<div className="flex flex-col items-center justify-center py-8 text-center">
+					<div className="rounded-full bg-muted p-4">
+						<Globe className="h-8 w-8 text-muted-foreground" />
 					</div>
-				</CardHeader>
-				<CardContent>
-					{sessions.length === 0 ? (
-						<div className="flex flex-col items-center justify-center py-8 text-center">
-							<div className="rounded-full bg-muted p-4">
-								<Globe className="h-8 w-8 text-muted-foreground" />
-							</div>
-							<p className="mt-4 text-sm text-muted-foreground">
-								No active sessions found
-							</p>
-						</div>
-					) : (
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>Device</TableHead>
-									<TableHead>Location</TableHead>
-									<TableHead>Last Active</TableHead>
-									<TableHead className="text-right">Actions</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{sessions.map((session) => {
-									const device = parseUserAgent(session.userAgent);
-									const isExpired = new Date(session.expiresAt) < new Date();
+					<p className="mt-4 text-sm text-muted-foreground">
+						No active sessions found
+					</p>
+				</div>
+			) : (
+				<div className="space-y-3">
+					{sessions.map((session) => {
+						const device = parseUserAgent(session.userAgent);
+						const isExpired = new Date(session.expiresAt) < new Date();
 
-									return (
-										<TableRow
-											key={session.id}
-											className={isExpired ? "opacity-50" : undefined}
-										>
-											<TableCell>
-												<div className="flex items-center gap-3">
-													<div className="rounded-full bg-muted p-2">
-														{device.icon}
-													</div>
-													<div>
-														<div className="flex items-center gap-2">
-															<span className="font-medium">
-																{device.browser} on {device.os}
-															</span>
-															{session.isCurrent && (
-																<Badge variant="secondary" className="text-xs">
-																	Current
-																</Badge>
-															)}
-														</div>
-														<p className="text-xs text-muted-foreground">
-															{device.type}
-														</p>
-													</div>
-												</div>
-											</TableCell>
-											<TableCell>
-												<div className="flex items-center gap-2 text-sm">
-													<Globe className="h-3 w-3 text-muted-foreground" />
-													{formatIP(session.ipAddress)}
-												</div>
-											</TableCell>
-											<TableCell>
-												<div className="flex items-center gap-2 text-sm">
-													<Clock className="h-3 w-3 text-muted-foreground" />
-													<span>
-														{formatDistanceToNow(
-															new Date(session.createdAt),
-															{ addSuffix: true }
-														)}
-													</span>
-												</div>
-												{isExpired && (
-													<Badge variant="destructive" className="text-xs">
-														Expired
-													</Badge>
-												)}
-											</TableCell>
-											<TableCell className="text-right">
-												{!session.isCurrent && (
-													<Button
-														variant="ghost"
-														size="icon"
-														onClick={() =>
-															setRevokeDialog({
-																open: true,
-																sessionId: session.id,
-															})
-														}
-														className="text-destructive hover:text-destructive"
-													>
-														<Trash2 className="h-4 w-4" />
-													</Button>
-												)}
-											</TableCell>
-										</TableRow>
-									);
-								})}
-							</TableBody>
-						</Table>
-					)}
-				</CardContent>
-			</Card>
+						return (
+							<div
+								key={session.id}
+								className={`flex items-center gap-4 p-3 rounded-lg border transition-colors hover:bg-muted/50 ${isExpired ? "opacity-50" : ""}`}
+							>
+								<div className="rounded-full bg-muted p-2.5 shrink-0">
+									{device.icon}
+								</div>
+								<div className="flex-1 min-w-0">
+									<div className="flex items-center gap-2 flex-wrap">
+										<span className="font-medium text-sm truncate">
+											{device.browser} on {device.os}
+										</span>
+										{session.isCurrent && (
+											<Badge variant="secondary" className="text-xs shrink-0">
+												Current
+											</Badge>
+										)}
+										{isExpired && (
+											<Badge variant="destructive" className="text-xs shrink-0">
+												Expired
+											</Badge>
+										)}
+									</div>
+									<div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+										<span className="flex items-center gap-1">
+											<Globe className="h-3 w-3" />
+											{formatIP(session.ipAddress)}
+										</span>
+										<span className="flex items-center gap-1">
+											<Clock className="h-3 w-3" />
+											{formatDistanceToNow(new Date(session.createdAt), { addSuffix: true })}
+										</span>
+									</div>
+								</div>
+								{!session.isCurrent && (
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={() =>
+											setRevokeDialog({
+												open: true,
+												sessionId: session.id,
+											})
+										}
+										className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+									>
+										<Trash2 className="h-4 w-4" />
+									</Button>
+								)}
+							</div>
+						);
+					})}
+				</div>
+			)}
 
 			<AlertDialog
 				open={revokeDialog.open}
