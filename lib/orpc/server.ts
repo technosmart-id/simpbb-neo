@@ -6,6 +6,7 @@ import { eq, desc, asc, sql, like, or } from "drizzle-orm"
 import { auth } from "@/lib/auth"
 
 import { createNotification } from "@/lib/services/notifications"
+import { StorageService } from "@/lib/services/storage"
 
 export const os = osBase.$context<{ 
   session: typeof auth.$Infer.Session | null 
@@ -222,12 +223,37 @@ export const router = os.router({
         title: z.string().min(1),
         author: z.string().min(1),
         publishedAt: z.string().optional().nullable(),
+        coverImage: z.string().optional().nullable(),
+        attachmentFile: z.string().optional().nullable(),
+        galleryImages: z.array(z.string()).optional().nullable(),
+        additionalDocuments: z.array(z.string()).optional().nullable(),
       }))
       .handler(async ({ input }) => {
+        // Collect all temp paths to move
+        const tempPaths = [
+          input.coverImage,
+          input.attachmentFile,
+          ...(input.galleryImages ?? []),
+          ...(input.additionalDocuments ?? []),
+        ].filter((p): p is string => !!p && p.startsWith('temp/'))
+
+        if (tempPaths.length > 0) {
+          await StorageService.moveToUploads(tempPaths)
+          await StorageService.cleanupTemp()
+        }
+
+        // Map paths to their final destination
+        const mapPath = (p: string | null | undefined) => 
+          p?.startsWith('temp/') ? p.replace('temp/', 'files/') : p
+
         const [result] = await db.insert(books).values({
           title: input.title,
           author: input.author,
           publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
+          coverImage: mapPath(input.coverImage),
+          attachmentFile: mapPath(input.attachmentFile),
+          galleryImages: input.galleryImages?.map(mapPath) ?? [],
+          additionalDocuments: input.additionalDocuments?.map(mapPath) ?? [],
         })
         return { id: (result as { insertId: number }).insertId }
       }),
@@ -238,13 +264,39 @@ export const router = os.router({
         title: z.string().min(1),
         author: z.string().min(1),
         publishedAt: z.string().optional().nullable(),
+        coverImage: z.string().optional().nullable(),
+        attachmentFile: z.string().optional().nullable(),
+        galleryImages: z.array(z.string()).optional().nullable(),
+        additionalDocuments: z.array(z.string()).optional().nullable(),
       }))
       .handler(async ({ input }) => {
+        // Collect all temp paths to move
+        const tempPaths = [
+          input.coverImage,
+          input.attachmentFile,
+          ...(input.galleryImages ?? []),
+          ...(input.additionalDocuments ?? []),
+        ].filter((p): p is string => !!p && p.startsWith('temp/'))
+
+        if (tempPaths.length > 0) {
+          await StorageService.moveToUploads(tempPaths)
+          await StorageService.cleanupTemp()
+        }
+
+        // Map paths to their final destination
+        const mapPath = (p: string | null | undefined) => 
+          p?.startsWith('temp/') ? p.replace('temp/', 'files/') : p
+
         await db.update(books)
           .set({
             title: input.title,
             author: input.author,
             publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
+            coverImage: mapPath(input.coverImage),
+            attachmentFile: mapPath(input.attachmentFile),
+            galleryImages: input.galleryImages?.map(mapPath) ?? [],
+            additionalDocuments: input.additionalDocuments?.map(mapPath) ?? [],
+            updatedAt: new Date(),
           })
           .where(eq(books.id, input.id))
         return { success: true }
@@ -255,6 +307,51 @@ export const router = os.router({
       .handler(async ({ input }) => {
         await db.delete(books).where(eq(books.id, input.id))
         return { success: true }
+      }),
+  }),
+  
+  files: os.router({
+    list: os
+      .input(z.object({
+        path: z.string().optional().default(""),
+      }).optional())
+      .handler(async ({ input }) => {
+        console.log(`[ORPC] files.list: path="${input?.path}"`)
+        return await StorageService.listFiles(input?.path ?? "")
+      }),
+
+    createFolder: os
+      .input(z.object({
+        parentPath: z.string(),
+        name: z.string().min(1),
+      }))
+      .handler(async ({ input }) => {
+        await StorageService.createFolder(input.parentPath, input.name)
+        return { success: true }
+      }),
+
+    delete: os
+      .input(z.object({
+        path: z.string(),
+      }))
+      .handler(async ({ input }) => {
+        await StorageService.deleteFile(input.path)
+        return { success: true }
+      }),
+
+    stats: os
+      .handler(async () => {
+        return await StorageService.getStorageStats()
+      }),
+
+    submit: os
+      .input(z.object({
+        tempPaths: z.array(z.string()),
+      }))
+      .handler(async ({ input }) => {
+        const movedPaths = await StorageService.moveToUploads(input.tempPaths)
+        await StorageService.cleanupTemp()
+        return { movedPaths }
       }),
   }),
 })

@@ -28,8 +28,8 @@ export default function NotificationsSettingsPage() {
       toast.success("Preferences updated");
       refetch();
     },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to update preferences");
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Failed to update preferences");
     }
   }));
 

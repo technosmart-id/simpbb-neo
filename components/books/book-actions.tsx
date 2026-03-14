@@ -20,7 +20,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
+import { MoreHorizontal, Pencil, Trash2, ExternalLink } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface Book {
   id: number
@@ -31,13 +32,14 @@ interface Book {
 
 interface BookActionsProps {
   book: Book
-  onEdit: (book: Book) => void
+  onShow: (book: Book) => void
   onDelete: (id: number) => void
   isDeleting?: boolean
 }
 
-export function BookActions({ book, onEdit, onDelete, isDeleting }: BookActionsProps) {
+export function BookActions({ book, onShow, onDelete, isDeleting }: BookActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
+  const router = useRouter()
 
   return (
     <>
@@ -50,7 +52,11 @@ export function BookActions({ book, onEdit, onDelete, isDeleting }: BookActionsP
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => onEdit(book)}>
+          <DropdownMenuItem onClick={() => onShow(book)}>
+            <ExternalLink size={14} className="mr-2" />
+            Show Detail
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push(`/crud-example/${book.id}/edit`)}>
             <Pencil size={14} className="mr-2" />
             Edit
           </DropdownMenuItem>

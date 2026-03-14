@@ -32,6 +32,9 @@ import {
   ArrowDown,
   X,
   Bell,
+  Pencil,
+  Image as ImageIcon,
+  FileText,
 } from "lucide-react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
@@ -45,6 +48,18 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Input } from "@/components/ui/input"
+import Link from 'next/link'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { useRouter } from 'next/navigation'
 
 const PAGE_SIZE = 5
 
@@ -53,6 +68,10 @@ type Book = {
   title: string
   author: string
   publishedAt: string | Date | null
+  coverImage?: string | null
+  galleryImages?: any
+  attachmentFile?: string | null
+  additionalDocuments?: any
 }
 
 type BooksListResponse = {
@@ -86,8 +105,7 @@ export default function CrudExamplePage() {
   const queryClient = useQueryClient()
 
   // UI State
-  const [isAddOpen, setIsAddOpen] = React.useState(false)
-  const [editingBook, setEditingBook] = React.useState<Book | null>(null)
+  const [showBook, setShowBook] = React.useState<Book | null>(null)
 
   // Test Notification Mutation
   const testNotification = useMutation(orpc.notifications.test.mutationOptions({
@@ -168,23 +186,12 @@ export default function CrudExamplePage() {
             )}
             Test Notification
           </Button>
-          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus />
-                Add New Book
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Book</DialogTitle>
-                <DialogDescription>
-                  Fill in the details below to add a new book to the library.
-                </DialogDescription>
-              </DialogHeader>
-              <BookForm onSuccess={() => setIsAddOpen(false)} />
-            </DialogContent>
-          </Dialog>
+          <Button asChild>
+            <Link href="/crud-example/new">
+              <Plus />
+              Add New Book
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -283,7 +290,7 @@ export default function CrudExamplePage() {
                     <TableCell className="text-right">
                       <BookActions
                         book={book}
-                        onEdit={setEditingBook}
+                        onShow={setShowBook}
                         onDelete={(id) => deleteMutation.mutate({ id })}
                         isDeleting={deleteMutation.isPending && (deleteMutation.variables as DeleteVariables)?.id === book.id}
                       />
@@ -355,21 +362,135 @@ export default function CrudExamplePage() {
         )}
       </div>
 
-      {/* Edit Dialog */}
-      <Dialog open={!!editingBook} onOpenChange={(open) => !open && setEditingBook(null)}>
-        <DialogContent>
+      {/* Show Detail Dialog */}
+      <Dialog open={!!showBook} onOpenChange={(open) => !open && setShowBook(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Book</DialogTitle>
+            <DialogTitle>Book Details</DialogTitle>
             <DialogDescription>
-              Update the details of the selected book.
+              Detailed information including media and attachments.
             </DialogDescription>
           </DialogHeader>
-          {editingBook && (
-            <BookForm
-              book={editingBook}
-              onSuccess={() => setEditingBook(null)}
-            />
+          
+          {showBook && (
+            <div className="space-y-6 py-4">
+              {/* Cover Image & Metadata */}
+              <div className="flex flex-col sm:flex-row gap-8">
+                {showBook.coverImage ? (
+                  <div className="w-full sm:w-64 aspect-[3/4] rounded-lg border bg-muted overflow-hidden shrink-0 shadow-md">
+                    <img 
+                      src={`/api/files/${showBook.coverImage}`} 
+                      alt={showBook.title} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full sm:w-64 aspect-[3/4] rounded-lg border bg-muted flex flex-col items-center justify-center gap-2 text-muted-foreground shrink-0">
+                    <ImageIcon size={48} />
+                    <span className="text-sm">No Cover</span>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-[100px_1fr] gap-x-6 gap-y-4 text-sm flex-1">
+                  <span className="text-muted-foreground font-medium">ID</span>
+                  <span className="font-mono text-xs">#{showBook.id}</span>
+                  
+                  <span className="text-muted-foreground font-medium">Title</span>
+                  <span className="text-lg font-bold text-primary leading-tight">{showBook.title}</span>
+                  
+                  <span className="text-muted-foreground font-medium">Author</span>
+                  <span className="text-base font-medium">{showBook.author}</span>
+                  
+                  <span className="text-muted-foreground font-medium">Published</span>
+                  <span>
+                    {showBook.publishedAt 
+                      ? new Date(showBook.publishedAt).toLocaleDateString(undefined, { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        }) 
+                      : 'Not specified'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Gallery */}
+              {Array.isArray(showBook.galleryImages) && showBook.galleryImages.length > 0 && (
+                <div className="space-y-4 pt-4 border-t">
+                  <h4 className="text-base font-semibold flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-primary" />
+                    Gallery
+                  </h4>
+                  <div className="flex flex-wrap gap-3">
+                    {showBook.galleryImages.map((path: string, i: number) => (
+                      <div key={i} className="size-24 sm:size-28 lg:size-[120px] rounded-md border bg-muted overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <img 
+                          src={`/api/files/${path}`} 
+                          alt={`Gallery ${i}`} 
+                          className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer" 
+                          onClick={() => window.open(`/api/files/${path}`, '_blank')}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Attachments */}
+              {(showBook.attachmentFile || (Array.isArray(showBook.additionalDocuments) && showBook.additionalDocuments.length > 0)) && (
+                <div className="space-y-4 border-t pt-4">
+                  <h4 className="text-base font-semibold flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary" />
+                    Attachments
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {showBook.attachmentFile && (
+                      <a 
+                        href={`/api/files/${showBook.attachmentFile}`}
+                        target="_blank"
+                        className="flex items-center gap-4 p-4 rounded-xl border bg-accent/5 hover:bg-accent/10 transition-all group"
+                      >
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                          <FileText className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold truncate">Main Attachment</p>
+                          <p className="text-xs text-muted-foreground">{showBook.attachmentFile.split('/').pop()}</p>
+                        </div>
+                      </a>
+                    )}
+                    
+                    {Array.isArray(showBook.additionalDocuments) && showBook.additionalDocuments.map((path: string, i: number) => (
+                      <a 
+                        key={i}
+                        href={`/api/files/${path}`}
+                        target="_blank"
+                        className="flex items-center gap-4 p-4 rounded-xl border bg-muted/30 hover:bg-muted/50 transition-all group"
+                      >
+                        <div className="p-2 rounded-lg bg-muted text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                          <FileText className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold truncate">Document {i + 1}</p>
+                          <p className="text-xs text-muted-foreground">{path.split('/').pop()}</p>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
+
+          <div className="flex justify-end gap-3 border-t pt-4">
+            <Button variant="outline" onClick={() => setShowBook(null)}>Close</Button>
+            <Button asChild>
+              <Link href={showBook ? `/crud-example/${showBook.id}/edit` : '#'}>
+                <Pencil size={14} className="mr-2" />
+                Edit Book
+              </Link>
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

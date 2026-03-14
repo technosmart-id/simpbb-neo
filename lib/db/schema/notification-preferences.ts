@@ -20,7 +20,7 @@ export const notificationPreferences = mysqlTable(
     errorEnabled: boolean("error_enabled").default(true).notNull(),
     infoEnabled: boolean("info_enabled").default(true).notNull(),
     
-    updatedAt: timestamp("updated_at", { fsp: 3 }).defaultNow().onUpdateNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
   },
   (table) => [
     index("notification_preferences_userId_idx").on(table.userId),

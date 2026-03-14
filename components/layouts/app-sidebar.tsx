@@ -13,7 +13,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon, DatabaseIcon, LayoutDashboardIcon } from "lucide-react"
+import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon, DatabaseIcon, LayoutDashboardIcon, FileIcon, HardDrive } from "lucide-react"
 
 // This is sample data.
 const data = {
@@ -24,28 +24,28 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "App 1",
       logo: (
         <GalleryVerticalEndIcon
         />
       ),
-      plan: "Enterprise",
+      plan: "Kota ABC",
     },
     {
-      name: "Acme Corp.",
+      name: "App 2",
       logo: (
         <AudioLinesIcon
         />
       ),
-      plan: "Startup",
+      plan: "Kota XXX",
     },
     {
-      name: "Evil Corp.",
+      name: "App 3",
       logo: (
         <TerminalIcon
         />
       ),
-      plan: "Free",
+      plan: "Kota XYZ",
     },
   ],
   navMain: [
@@ -66,7 +66,15 @@ const data = {
       ),
     },
     {
-      title: "Playground",
+      title: "File Manager",
+      url: "/file-manager",
+      icon: (
+        <HardDrive
+        />
+      ),
+    },
+    {
+      title: "Menu",
       url: "#",
       icon: (
         <TerminalSquareIcon
@@ -75,63 +83,11 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "History",
+          title: "Sub Menu 1",
           url: "#",
         },
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: (
-        <BotIcon
-        />
-      ),
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: (
-        <BookOpenIcon
-        />
-      ),
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
+          title: "Sub Menu 2",
           url: "#",
         },
       ],

@@ -14,7 +14,7 @@ export const notifications = mysqlTable(
     type: varchar("type", { length: 50 }).default("info").notNull(), // info, success, warning, error
     link: text("link"),
     isRead: boolean("is_read").default(false).notNull(),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     index("notifications_userId_idx").on(table.userId),
