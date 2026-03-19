@@ -11,8 +11,8 @@ export const books = mysqlTable("books", {
   attachmentFile: varchar("attachment_file", { length: 512 }),
   
   // Multiple Uploads (using JSON for storage)
-  galleryImages: json("gallery_images"),
-  additionalDocuments: json("additional_documents"),
+  galleryImages: json("gallery_images").$type<string[]>(),
+  additionalDocuments: json("additional_documents").$type<string[]>(),
   
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),

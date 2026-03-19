@@ -252,8 +252,8 @@ export const router = os.router({
           publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
           coverImage: mapPath(input.coverImage),
           attachmentFile: mapPath(input.attachmentFile),
-          galleryImages: input.galleryImages?.map(mapPath) ?? [],
-          additionalDocuments: input.additionalDocuments?.map(mapPath) ?? [],
+          galleryImages: (input.galleryImages?.map(mapPath).filter((p): p is string => !!p) ?? []),
+          additionalDocuments: (input.additionalDocuments?.map(mapPath).filter((p): p is string => !!p) ?? []),
         })
         return { id: (result as { insertId: number }).insertId }
       }),
@@ -294,8 +294,8 @@ export const router = os.router({
             publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
             coverImage: mapPath(input.coverImage),
             attachmentFile: mapPath(input.attachmentFile),
-            galleryImages: input.galleryImages?.map(mapPath) ?? [],
-            additionalDocuments: input.additionalDocuments?.map(mapPath) ?? [],
+            galleryImages: (input.galleryImages?.map(mapPath).filter((p): p is string => !!p) ?? []),
+            additionalDocuments: (input.additionalDocuments?.map(mapPath).filter((p): p is string => !!p) ?? []),
             updatedAt: new Date(),
           })
           .where(eq(books.id, input.id))

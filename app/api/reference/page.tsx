@@ -22,9 +22,9 @@ export default function ReferencePage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="text-destructive">Failed to load API documentation</p>
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div className="text-center space-y-2">
+          <p className="text-destructive font-medium">Failed to load oRPC API documentation</p>
           <p className="text-sm text-muted-foreground">{error}</p>
         </div>
       </div>
@@ -34,16 +34,21 @@ export default function ReferencePage() {
   if (!spec) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading API documentation...</p>
+        <div className="flex flex-col items-center gap-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="text-sm text-muted-foreground">Loading oRPC specification...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div style={{ height: '100vh' }}>
+    <div className="h-screen overflow-hidden">
       <ApiReferenceReact
         configuration={{
           content: spec,
+          theme: 'none',
+          darkMode: true,
         }}
       />
     </div>

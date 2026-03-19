@@ -23,12 +23,7 @@ import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Pencil, Trash2, ExternalLink } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-interface Book {
-  id: number
-  title: string
-  author: string
-  publishedAt: string | Date | null
-}
+import { type Book } from '@/lib/db/schema/books'
 
 interface BookActionsProps {
   book: Book

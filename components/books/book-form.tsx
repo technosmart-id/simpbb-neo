@@ -40,9 +40,9 @@ interface BookData {
   author: string
   publishedAt: string | Date | null
   coverImage?: string | null
-  galleryImages?: string[] | any
+  galleryImages?: string[] | null
   attachmentFile?: string | null
-  additionalDocuments?: string[] | any
+  additionalDocuments?: string[] | null
 }
 
 interface BookFormProps {

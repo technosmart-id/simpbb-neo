@@ -6,9 +6,9 @@ const generator = new OpenAPIGenerator()
 export async function GET() {
   const spec = await generator.generate(router, {
     info: {
-      title: 'Neo Vision API',
+      title: 'Next.js Skeleton API',
       version: '1.0.0',
-      description: 'oRPC v1.x powered API for the Neo Vision Boilerplate.',
+      description: 'oRPC v1.x powered API for the Next.js Skeleton Boilerplate.',
     },
   })
 

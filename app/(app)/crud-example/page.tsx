@@ -18,14 +18,12 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
-import { BookForm } from "@/components/books/book-form"
 import { BookActions } from "@/components/books/book-actions"
 import {
   Plus,
   Loader2,
-  Book,
+  Book as BookIcon,
   Search,
   ArrowUpDown,
   ArrowUp,
@@ -60,19 +58,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useRouter } from 'next/navigation'
+import { type Book } from '@/lib/db/schema/books'
 
 const PAGE_SIZE = 5
 
-type Book = {
-  id: number
-  title: string
-  author: string
-  publishedAt: string | Date | null
-  coverImage?: string | null
-  galleryImages?: any
-  attachmentFile?: string | null
-  additionalDocuments?: any
-}
 
 type BooksListResponse = {
   rows: Book[]
@@ -109,9 +98,6 @@ export default function CrudExamplePage() {
 
   // Test Notification Mutation
   const testNotification = useMutation(orpc.notifications.test.mutationOptions({
-    onSuccess: () => {
-      toast.success("Test notification triggered!")
-    },
     onError: (error: Error) => {
       toast.error("Failed to trigger test: " + error.message)
     }
@@ -261,7 +247,7 @@ export default function CrudExamplePage() {
                 <TableRow>
                   <TableCell colSpan={5} className="h-56 text-center text-muted-foreground">
                     <div className="flex flex-col items-center justify-center gap-2">
-                      <Book size={48} className="opacity-10" />
+                      <BookIcon size={48} className="opacity-10" />
                       <p className="font-medium">No books found.</p>
                       <p className="text-sm">Try adjusting your search or add a new book!</p>
                     </div>
@@ -275,7 +261,7 @@ export default function CrudExamplePage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Book size={14} className="text-muted-foreground" />
+                        <BookIcon size={14} className="text-muted-foreground" />
                         <span className="font-medium">{book.title}</span>
                       </div>
                     </TableCell>

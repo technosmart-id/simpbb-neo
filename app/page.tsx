@@ -26,7 +26,7 @@ export default function Page() {
 
         <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
           <h1 className="max-w-3xl text-5xl font-extrabold tracking-tight sm:text-7xl">
-            Build your <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Neo Vision</span>
+            Build your <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Next.js Skeleton</span>
           </h1>
           <p className="mx-auto max-w-xl text-lg text-muted-foreground sm:text-xl">
             A high-performance boilerplate for modern applications. Scalable, modular, and ready for your 100+ tables.
@@ -49,27 +49,27 @@ export default function Page() {
         </div>
 
         <div className="mt-12 flex gap-8 animate-in fade-in duration-1000 delay-500">
-            <div className="flex flex-col items-center gap-1">
-                <span className="text-2xl font-bold">100+</span>
-                <span className="text-sm text-muted-foreground uppercase tracking-widest text-[10px] font-semibold">Modular Tables</span>
-            </div>
-            <div className="h-10 w-px bg-border" />
-            <div className="flex flex-col items-center gap-1">
-                <span className="text-2xl font-bold">Drizzle</span>
-                <span className="text-sm text-muted-foreground uppercase tracking-widest text-[10px] font-semibold">ORM Ready</span>
-            </div>
-            <div className="h-10 w-px bg-border" />
-            <div className="flex flex-col items-center gap-1">
-                <span className="text-2xl font-bold">Auth</span>
-                <span className="text-sm text-muted-foreground uppercase tracking-widest text-[10px] font-semibold">Secure by Default</span>
-            </div>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-2xl font-bold">100+</span>
+            <span className="text-sm text-muted-foreground uppercase tracking-widest text-[10px] font-semibold">Modular Tables</span>
+          </div>
+          <div className="h-10 w-px bg-border" />
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-2xl font-bold">Drizzle</span>
+            <span className="text-sm text-muted-foreground uppercase tracking-widest text-[10px] font-semibold">ORM Ready</span>
+          </div>
+          <div className="h-10 w-px bg-border" />
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-2xl font-bold">Auth</span>
+            <span className="text-sm text-muted-foreground uppercase tracking-widest text-[10px] font-semibold">Secure by Default</span>
+          </div>
         </div>
       </main>
 
       <footer className="absolute bottom-8 left-0 right-0 z-10 flex flex-col items-center gap-2 text-xs text-muted-foreground">
         <span>&copy; 2026 Technosmart Neo. All rights reserved.</span>
         <div className="flex items-center gap-1">
-            (Press <kbd className="rounded border bg-muted px-1">d</kbd> to toggle dark mode)
+          (Press <kbd className="rounded border bg-muted px-1">d</kbd> to toggle dark mode)
         </div>
       </footer>
     </div>

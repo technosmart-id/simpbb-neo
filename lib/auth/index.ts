@@ -157,7 +157,7 @@ export const auth = betterAuth({
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		openAPI({
-			path: "/api/auth/openapi",
+			path: "/reference",
 		}),
 
 		// NOTE: i18n plugin does NOT exist in better-auth v1.5.5

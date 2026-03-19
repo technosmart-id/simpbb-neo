@@ -126,7 +126,7 @@ export default function FileManagerPage() {
 				<div className="space-y-1">
 					<h1 className="text-2xl font-bold tracking-tight">File Explorer</h1>
 					<p className="text-muted-foreground">
-						Explore and manage your application's `uploads/` directory.
+						Explore and manage your application&apos;s `uploads/` directory.
 					</p>
 				</div>
 				<div className="flex items-center gap-3">

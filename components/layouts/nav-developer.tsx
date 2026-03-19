@@ -12,12 +12,12 @@ import { Code2Icon, BookOpenIcon, DatabaseIcon, ExternalLinkIcon } from "lucide-
 const developerLinks = [
   {
     name: "Auth API",
-    url: "/api/reference",
+    url: "/api/auth/reference",
     icon: <BookOpenIcon className="h-4 w-4" />,
   },
   {
     name: "App API",
-    url: "http://localhost:3000/api/reference",
+    url: "/api/reference",
     icon: <Code2Icon className="h-4 w-4" />,
   },
   {
