@@ -19,9 +19,21 @@ import {
 	Loader2,
 	Archive,
 	HardDrive,
+	Clock,
+	CheckCircle2,
+	XCircle,
+	Calendar,
+	Info,
 } from "lucide-react"
 import { toast } from "sonner"
 import { format } from "date-fns"
+import { Badge } from "@/components/ui/badge"
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 const PAGE_SIZE = 20
 
@@ -35,6 +47,14 @@ type BackupRow = {
 type BackupsListResponse = {
 	rows: BackupRow[]
 	total: number
+}
+
+type BackupConfig = {
+	enabled: boolean
+	retentionDays: number
+	schedule: string
+	runOnStart: boolean
+	backupDir: string
 }
 
 type DeleteVariables = { filename: string }
@@ -72,12 +92,119 @@ function parseBackupFilename(filename: string): { date: Date; label: string } {
 	}
 }
 
+function formatSchedule(schedule: string): string {
+	// Parse cron format: minute hour day month weekday
+	// Default: "0 2 * * *" = 2:00 AM daily
+	const parts = schedule.split(" ")
+	if (parts.length !== 5) return schedule
+
+	const [minute, hour, day, month, weekday] = parts
+
+	// Check for daily schedule
+	if (day === "*" && month === "*" && weekday === "*") {
+		const hourNum = parseInt(hour, 10)
+		const minuteNum = parseInt(minute, 10)
+		const formattedTime = format(
+			new Date().setHours(hourNum, minuteNum, 0, 0),
+			"h:mm a"
+		)
+		return `Daily at ${formattedTime}`
+	}
+
+	// Check for hourly schedule
+	if (hour === "*" && day === "*" && month === "*" && weekday === "*") {
+		return `Hourly at minute ${minute}`
+	}
+
+	// Check for weekly schedule
+	if (day === "*" && month === "*" && weekday !== "*") {
+		const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+		const weekdayName = weekdays[parseInt(weekday, 10)] ?? weekday
+		return `Every ${weekdayName} at ${hour}:${minute}`
+	}
+
+	// Check for monthly schedule
+	if (day !== "*" && month === "*" && weekday === "*") {
+		return `Day ${day} of each month at ${hour}:${minute}`
+	}
+
+	return schedule
+}
+
+function AutoBackupStatus({ config }: { config: BackupConfig | undefined }) {
+	if (!config) {
+		return (
+			<div className="flex items-center gap-2 text-sm text-muted-foreground">
+				<Loader2 className="w-4 h-4 animate-spin" />
+				Loading backup configuration...
+			</div>
+		)
+	}
+
+	return (
+		<div className="flex items-center gap-4 flex-wrap">
+			<div className="flex items-center gap-2">
+				{config.enabled ? (
+					<Badge className="gap-1.5 bg-green-500/10 text-green-600 dark:text-green-500 border-green-500/20">
+						<CheckCircle2 className="w-3.5 h-3.5" />
+						Auto Backup Enabled
+					</Badge>
+				) : (
+					<Badge variant="destructive" className="gap-1.5">
+						<XCircle className="w-3.5 h-3.5" />
+						Auto Backup Disabled
+					</Badge>
+				)}
+			</div>
+
+			{config.enabled && (
+				<>
+					<div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+						<Clock className="w-4 h-4" />
+						<span>{formatSchedule(config.schedule)}</span>
+					</div>
+
+					<div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+						<Calendar className="w-4 h-4" />
+						<span>Retention: {config.retentionDays} days</span>
+					</div>
+
+					{config.runOnStart && (
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<div className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-help">
+										<Info className="w-4 h-4" />
+										<span>Run on start</span>
+									</div>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Backup runs automatically when the backup daemon starts</p>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					)}
+				</>
+			)}
+
+			{!config.enabled && (
+				<div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+					<Info className="w-4 h-4" />
+					<span>Set <code className="bg-muted px-1.5 py-0.5 rounded text-xs">BACKUP_ENABLED=true</code> to enable</span>
+				</div>
+			)}
+		</div>
+	)
+}
+
 export default function BackupsPage() {
 	const orpc = useORPC()
 	const queryClient = useQueryClient()
 
 	const [page, setPage] = React.useState(1)
 	const [showCreateDialog, setShowCreateDialog] = React.useState(false)
+
+	const configQuery = useQuery(orpc.backups.getConfig.queryOptions())
 
 	const listQuery = useQuery(orpc.backups.list.queryOptions({
 		input: {
@@ -118,6 +245,16 @@ export default function BackupsPage() {
 					<Plus className="w-4 h-4 mr-2" />
 					Create Backup
 				</Button>
+			</div>
+
+			{/* Auto Backup Status Card */}
+			<div className="rounded-md border bg-card p-4">
+				<div className="flex items-center justify-between">
+					<div className="space-y-1">
+						<h3 className="text-sm font-medium">Automatic Backup Configuration</h3>
+						<AutoBackupStatus config={configQuery.data} />
+					</div>
+				</div>
 			</div>
 
 			<div className="rounded-md border bg-card overflow-hidden flex flex-col">
