@@ -88,7 +88,6 @@ const data = {
         <TerminalSquareIcon
         />
       ),
-      isActive: true,
       items: [
         {
           title: "Sub Menu 1",
