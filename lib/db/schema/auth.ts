@@ -8,6 +8,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/mysql-core";
+import { memberRoles } from "./member-roles";
 
 export const user = mysqlTable("user", {
   id: varchar("id", { length: 36 }).primaryKey(),
@@ -187,6 +188,7 @@ export const organization = mysqlTable(
     logo: text("logo"),
     createdAt: timestamp("created_at", { fsp: 3 }).notNull(),
     metadata: text("metadata"),
+    autoJoin: boolean("auto_join").default(true).notNull(),
   },
   (table) => [uniqueIndex("organization_slug_uidx").on(table.slug)],
 );
@@ -236,11 +238,14 @@ export const member = mysqlTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     role: varchar("role", { length: 255 }).default("member").notNull(),
+    // References custom org_roles table. If null, falls back to the role enum.
+    customRoleId: varchar("custom_role_id", { length: 36 }),
     createdAt: timestamp("created_at", { fsp: 3 }).notNull(),
   },
   (table) => [
     index("member_organizationId_idx").on(table.organizationId),
     index("member_userId_idx").on(table.userId),
+    index("member_custom_role_id_idx").on(table.customRoleId),
   ],
 );
 
@@ -362,7 +367,7 @@ export const teamMemberRelations = relations(teamMember, ({ one }) => ({
   }),
 }));
 
-export const memberRelations = relations(member, ({ one }) => ({
+export const memberRelations = relations(member, ({ one, many }) => ({
   organization: one(organization, {
     fields: [member.organizationId],
     references: [organization.id],
@@ -371,6 +376,7 @@ export const memberRelations = relations(member, ({ one }) => ({
     fields: [member.userId],
     references: [user.id],
   }),
+  roleAssignments: many(memberRoles),
 }));
 
 export const invitationRelations = relations(invitation, ({ one }) => ({

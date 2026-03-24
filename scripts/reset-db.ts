@@ -1,13 +1,23 @@
-import mysql from "mysql2/promise";
+import mysql from 'mysql2/promise';
 
-const connection = await mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-});
+async function main() {
+  try {
+    console.log('Resetting simpbb_neo database...');
+    const connection = await mysql.createConnection({
+      host: 'localhost',
+      user: 'root',
+      password: 'root'
+    });
+    
+    await connection.query('DROP DATABASE IF EXISTS simpbb_neo;');
+    await connection.query('CREATE DATABASE simpbb_neo;');
+    await connection.end();
+    
+    console.log('✅ Database simpbb_neo dropped and recreated successfully.');
+  } catch (error) {
+    console.error('❌ Failed to reset database:', error);
+    process.exit(1);
+  }
+}
 
-await connection.execute("DROP DATABASE IF EXISTS simpbb_neo");
-await connection.execute("CREATE DATABASE simpbb_neo");
-console.log("✅ Database dropped and recreated successfully!");
-
-await connection.end();
+main();

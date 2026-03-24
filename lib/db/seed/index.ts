@@ -1,13 +1,20 @@
+/**
+ * Seed entry point
+ * Run: npm run db:seed
+ */
+
+import { seedProd } from "./prod";
+import { seedDev } from "./dev";
+
+const IS_DEV = process.env.NODE_ENV === "development";
+
 async function main() {
-  console.log("Seed started...");
-  // Add your seeding logic here
-  // await db.insert(schema.users).values({ name: "Admin", email: "admin@example.com" });
-  console.log("Seed finished!");
-  process.exit(0);
+	await seedProd();
+	if (IS_DEV) await seedDev();
+	process.exit(0);
 }
 
 main().catch((err) => {
-  console.error("Seed failed!");
-  console.error(err);
-  process.exit(1);
+	console.error("❌ Seed failed:", err);
+	process.exit(1);
 });

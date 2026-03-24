@@ -19,6 +19,10 @@ import { cn } from "@/lib/utils"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
 
+// Type assertions for ORPC query results
+type UnreadCountResult = { count: number }
+type NotificationsListResult = { rows: any[]; total: number }
+
 export function NotificationBell() {
   const orpc = useORPC()
   const queryClient = useQueryClient()
@@ -29,7 +33,7 @@ export function NotificationBell() {
 
   // Unread Count Query
   const { data: countData } = useQuery(orpc.notifications.unreadCount.queryOptions())
-  const unreadCount = countData?.count ?? 0
+  const unreadCount = (countData as UnreadCountResult | undefined)?.count ?? 0
 
   // Notifications List Query
   const { data: listData, isLoading, refetch } = useQuery(
@@ -45,14 +49,14 @@ export function NotificationBell() {
       queryClient.invalidateQueries({ queryKey: orpc.notifications.unreadCount.key() })
       refetch()
     },
-  }))
+  })) as any
 
   const deleteMutation = useMutation(orpc.notifications.delete.mutationOptions({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orpc.notifications.unreadCount.key() })
       refetch()
     },
-  }))
+  })) as any
 
   // SSE Real-time logic
   React.useEffect(() => {
@@ -84,14 +88,18 @@ export function NotificationBell() {
     }
 
     eventSource.onerror = (error) => {
-      console.error("SSE Error:", error)
-      eventSource.close()
+      // EventSource errors are often transient (reconnection attempts)
+      // Only log if it's a real error, not just a reconnection
+      if (eventSource.readyState === EventSource.CLOSED) {
+        console.error("SSE connection closed")
+      }
+      // Note: we don't close on error here - let EventSource handle reconnection
     }
 
     return () => {
       eventSource.close()
     }
-  }, [userId, queryClient, isOpen, refetch, orpc.notifications.unreadCount])
+  }, [userId, queryClient, isOpen, refetch, orpc.notifications.unreadCount.key()])
 
   const handleMarkAllRead = () => {
     markReadMutation.mutate({})
@@ -132,7 +140,7 @@ export function NotificationBell() {
             <div className="flex items-center justify-center h-full py-10">
               <Loader2 className="size-6 animate-spin text-muted-foreground" />
             </div>
-          ) : !listData?.rows.length ? (
+          ) : !(listData as NotificationsListResult | undefined)?.rows?.length ? (
             <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
               <Bell className="size-10 text-muted-foreground/20 mb-2" />
               <p className="text-base text-muted-foreground font-medium">All caught up!</p>
@@ -140,7 +148,7 @@ export function NotificationBell() {
             </div>
           ) : (
             <div className="flex flex-col">
-              {listData.rows.map((n) => (
+              {(listData as NotificationsListResult).rows.map((n: any) => (
                 <div
                   key={n.id}
                   className={cn(

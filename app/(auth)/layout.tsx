@@ -2,9 +2,8 @@
 
 import { ModeToggle } from "@/components/mode-toggle"
 
-// Generate seed once at module level for consistency across re-renders
-const randomSeed = Math.random().toString(36).substring(7)
-const bgImage = `url("https://picsum.photos/seed/${randomSeed}/1920/1080")`
+// Use a static seed to prevent hydration mismatch
+const BG_IMAGE = "url(\"https://picsum.photos/seed/simpbb-auth/1920/1080\")"
 
 export default function AuthLayout({
   children,
@@ -14,7 +13,7 @@ export default function AuthLayout({
   return (
     <div
       className="relative min-h-screen w-full bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: bgImage }}
+      style={{ backgroundImage: BG_IMAGE }}
     >
       {/* Dark overlay for better readability */}
       <div className="absolute inset-0 bg-background/40 backdrop-blur-md" />

@@ -3,7 +3,6 @@ import * as fsSync from "fs"
 import * as path from "path"
 import { spawn } from "child_process"
 import archiver from "archiver"
-import * as crypto from "crypto"
 
 /**
  * Backup Service
@@ -138,7 +137,7 @@ export async function createDatabaseDump(
 async function executeWithRetry(
 	config: DatabaseConnectionConfig,
 	outputPath: string,
-	attempt: number
+	_attempt: number // eslint-disable-line @typescript-eslint/no-unused-vars
 ): Promise<void> {
 	// Get mysqldump path from env or use Linux default
 	const mysqldumpPath = process.env.MYSQLDUMP_PATH || "/usr/bin/mysqldump"
@@ -211,10 +210,9 @@ export async function createBackupZip(
 					zlib: { level: 6 }, // Balance between speed and compression
 				})
 
-				let totalBytes = 0
-
 				output.on("close", () => {
-					resolve(totalBytes)
+					// archive.pointer() returns the total bytes written
+					resolve(archive.pointer())
 				})
 
 				archive.on("error", (err) => {
@@ -461,7 +459,7 @@ export async function listBackups(
 						createdAt: stats.mtime,
 					})
 				}
-			} catch (e) {
+			} catch {
 				// Skip files we can't read
 			}
 		}

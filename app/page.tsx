@@ -41,7 +41,7 @@ export default function Page() {
             </Link>
           </Button>
           <Button variant="outline" size="lg" className="h-12 px-8 text-base backdrop-blur-sm" asChild>
-            <Link href="/login">
+            <Link href="/sign-in">
               Sign In
               <LogInIcon className="ml-2 size-4" />
             </Link>

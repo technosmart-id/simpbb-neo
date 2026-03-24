@@ -1,0 +1,111 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "id": "casbin-first-migration",
+  "prevId": "61483c85-a78d-4a57-8a7d-23c70fc40103",
+  "tables": {
+    "member_roles": {
+      "name": "member_roles",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "member_id": {
+          "name": "member_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role_id": {
+          "name": "role_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role_type": {
+          "name": "role_type",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "member_roles_member_id_idx": {
+          "name": "member_roles_member_id_idx",
+          "columns": ["member_id"],
+          "isUnique": false
+        },
+        "member_roles_role_id_idx": {
+          "name": "member_roles_role_id_idx",
+          "columns": ["role_id"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "member_roles_member_id_member_id_fk": {
+          "name": "member_roles_member_id_member_id_fk",
+          "tableFrom": "member_roles",
+          "tableTo": "member",
+          "columnsFrom": ["member_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "member_roles_created_by_user_id_fk": {
+          "name": "member_roles_created_by_user_id_fk",
+          "tableFrom": "member_roles",
+          "tableTo": "user",
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "member_roles_id": {
+          "name": "member_roles_id",
+          "columns": ["id"]
+        }
+      },
+      "uniqueConstraints": {
+        "unique_member_role": {
+          "name": "unique_member_role",
+          "columns": ["member_id", "role_id", "role_type"]
+        }
+      },
+      "checkConstraint": {}
+    }
+  },
+  "views": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {},
+    "indexes": {}
+  }
+}

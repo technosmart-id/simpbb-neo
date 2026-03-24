@@ -3,6 +3,10 @@
 import * as React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useORPC } from '@/lib/orpc/react'
+
+// Type assertions for ORPC query results
+type BooksListResult = { rows: any[]; total: number }
+type DeleteResult = { success: boolean }
 import {
   Table,
   TableBody,
@@ -101,7 +105,7 @@ export default function CrudExamplePage() {
     onError: (error: Error) => {
       toast.error("Failed to trigger test: " + error.message)
     }
-  }))
+  })) as any
 
   // Query State
   const [page, setPage] = React.useState(1)
@@ -123,8 +127,8 @@ export default function CrudExamplePage() {
     }
   }))
 
-  const books = listQuery.data?.rows ?? []
-  const total = listQuery.data?.total ?? 0
+  const books = (listQuery.data as BooksListResult | undefined)?.rows ?? []
+  const total = (listQuery.data as BooksListResult | undefined)?.total ?? 0
   const totalPages = Math.ceil(total / PAGE_SIZE)
   const isLoading = listQuery.isLoading
 
@@ -141,7 +145,7 @@ export default function CrudExamplePage() {
     onError: (error: Error) => {
       toast.error('Failed to delete book: ' + error.message)
     }
-  }))
+  })) as any & { variables?: DeleteVariables }
 
   const toggleSort = (column: string) => {
     setSort(prev => ({

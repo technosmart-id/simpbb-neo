@@ -16,9 +16,31 @@ import { auth } from "@/lib/auth";
 /**
  * Route configuration
  */
-const PROTECTED_ROUTES = ["/(app)"];
-const AUTH_ROUTES = ["/(auth)", "/login", "/register", "/forgot-password", "/reset-password", "/verify-email"];
+const PROTECTED_ROUTES = ["/dashboard", "/notifications", "/settings", "/file-manager", "/backups", "/crud-example", "/examples"];
+const AUTH_ROUTES = ["/sign-in", "/register", "/forgot-password", "/reset-password", "/verify-email"];
 const PUBLIC_API = ["/api/auth", "/api/reference"];
+
+/**
+ * Routes that require an active organization
+ */
+const ORG_REQUIRED_ROUTES = [
+	"/dashboard",
+	"/crud-example",
+	"/file-manager",
+	"/backups",
+	"/settings/roles",
+];
+
+/**
+ * Routes that are explicitly excluded from org requirement (user-scoped settings)
+ */
+const ORG_EXCLUDED_ROUTES = [
+	"/settings/organizations",
+	"/settings/profile",
+	"/settings/password",
+	"/settings/sessions",
+	"/settings/notifications",
+];
 
 /**
  * Check if path is an authentication page
@@ -35,18 +57,26 @@ function isPublicAPI(pathname: string): boolean {
 }
 
 /**
- * Check if path requires authentication
+ * Check if path requires an active organization
  */
-function isProtectedPath(pathname: string): boolean {
-	// Check against protected route patterns (handle route groups)
+function isOrgRequiredPath(pathname: string): boolean {
 	const normalizedPath = pathname
 		.replace(/\(app\)/g, "")
 		.replace(/\(auth\)/g, "");
 
-	return PROTECTED_ROUTES.some((route) => {
-		const normalizedRoute = route.replace(/[()]/g, "");
-		return normalizedPath.startsWith(normalizedRoute) || pathname.includes(route);
-	});
+	// Check if this is an excluded route first
+	if (ORG_EXCLUDED_ROUTES.some((route) => normalizedPath.startsWith(route))) {
+		return false;
+	}
+
+	return ORG_REQUIRED_ROUTES.some((route) => normalizedPath.startsWith(route));
+}
+
+/**
+ * Check if path requires authentication
+ */
+function isProtectedPath(pathname: string): boolean {
+	return PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 }
 
 /**
@@ -84,8 +114,21 @@ export async function proxy(request: NextRequest) {
 
 	// Redirect unauthenticated users to login
 	if (!isAuthenticated && isProtected) {
-		const redirectUrl = pathname !== "/" ? `?redirect=${encodeURIComponent(pathname)}` : "";
-		return NextResponse.redirect(new URL(`/login${redirectUrl}`, request.url));
+		const redirectUrl = pathname !== "/" ? `?callbackURL=${encodeURIComponent(pathname)}` : "";
+		return NextResponse.redirect(new URL(`/sign-in${redirectUrl}`, request.url));
+	}
+
+	// Check for active organization on org-required routes
+	if (isAuthenticated && isOrgRequiredPath(pathname)) {
+		const hasActiveOrg = !!session?.session?.activeOrganizationId;
+
+		if (!hasActiveOrg) {
+			// Redirect to create organization page
+			const url = request.nextUrl.clone();
+			url.pathname = "/settings/organizations";
+			url.searchParams.set("create", "true");
+			return NextResponse.redirect(url);
+		}
 	}
 
 	// Check admin role for admin routes

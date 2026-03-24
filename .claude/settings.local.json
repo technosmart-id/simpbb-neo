@@ -28,7 +28,20 @@
       "Bash(npx tsc:*)",
       "Bash(pkill:*)",
       "Bash(find:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "Bash(1)",
+      "Bash(wc:*)",
+      "Bash(node:*)",
+      "Bash(npm run db:seed:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npm run db:reset:*)",
+      "Bash(\"/c/Program Files/MySQL/MySQL Server 9.6/bin/mysql.exe\" -u root -proot -e \"DROP DATABASE IF EXISTS simpbb_neo; CREATE DATABASE simpbb_neo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(grep:*)",
+      "Bash(npm run db:seed:prod:*)",
+      "Bash(npx next:*)",
+      "Bash(head:*)",
+      "Bash(timeout:*)",
+      "Bash(tail:*)"
     ]
   }
 }

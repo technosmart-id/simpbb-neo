@@ -77,7 +77,7 @@ export function BookForm({ book, onSuccess }: BookFormProps) {
     onError: (error: Error) => {
       toast.error('Failed to create book: ' + error.message)
     }
-  }))
+  })) as any
 
   const updateMutation = useMutation(orpc.books.update.mutationOptions({
     onSuccess: () => {
@@ -88,7 +88,7 @@ export function BookForm({ book, onSuccess }: BookFormProps) {
     onError: (error: Error) => {
       toast.error('Failed to update book: ' + error.message)
     }
-  }))
+  })) as any
 
   const isPending = createMutation.isPending || updateMutation.isPending
 

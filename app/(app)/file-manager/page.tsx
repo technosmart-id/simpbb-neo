@@ -74,7 +74,7 @@ export default function FileManagerPage() {
 		onError: (error: Error) => {
 			toast.error(`Delete failed: ${error.message}`)
 		}
-	}))
+	})) as any
 
 	const createFolderMutation = useMutation(orpc.files.createFolder.mutationOptions({
 		onSuccess: () => {
@@ -86,11 +86,11 @@ export default function FileManagerPage() {
 		onError: (error: Error) => {
 			toast.error(`Failed to create folder: ${error.message}`)
 		}
-	}))
+	})) as any
 
 	const isLoading = listQuery.isLoading || statsQuery.isLoading
-	const items = (listQuery.data ?? []).filter(item => !item.name.startsWith("."))
-	const stats = statsQuery.data ?? { totalSize: 0, fileCount: 0, limit: 100 * 1024 * 1024 * 1024 }
+	const items = (listQuery.data as FileMetadata[] ?? []).filter(item => !item.name.startsWith("."))
+	const stats = (statsQuery.data as { totalSize: number; fileCount: number; limit: number } | undefined) ?? { totalSize: 0, fileCount: 0, limit: 100 * 1024 * 1024 * 1024 }
 
 	const handleRefresh = () => {
 		listQuery.refetch()
@@ -130,11 +130,11 @@ export default function FileManagerPage() {
 					</p>
 				</div>
 				<div className="flex items-center gap-3">
-					{!statsQuery.isLoading && statsQuery.data && (
-						<StorageInfoBar 
-							totalSize={statsQuery.data.totalSize} 
-							fileCount={statsQuery.data.fileCount} 
-							variant="minimal" 
+					{!statsQuery.isLoading && (
+						<StorageInfoBar
+							totalSize={stats.totalSize}
+							fileCount={stats.fileCount}
+							variant="minimal"
 						/>
 					)}
 				</div>

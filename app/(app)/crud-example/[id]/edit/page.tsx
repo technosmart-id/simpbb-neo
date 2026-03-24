@@ -8,11 +8,22 @@ import { ChevronLeft, Loader2 } from "lucide-react"
 import { useQuery } from '@tanstack/react-query'
 import { useORPC } from '@/lib/orpc/react'
 
+type BookData = {
+  id: number
+  title: string
+  author: string
+  publishedAt: Date | null
+  coverImage: string | null
+  attachmentFile: string | null
+  galleryImages: string[] | null
+  additionalDocuments: string[] | null
+}
+
 export default function CrudEditPage() {
   const router = useRouter()
   const params = useParams()
   const orpc = useORPC()
-  
+
   const id = typeof params.id === 'string' ? parseInt(params.id) : null
 
   const { data: book, isLoading, isError } = useQuery(orpc.books.get.queryOptions({
@@ -56,9 +67,9 @@ export default function CrudEditPage() {
             <Loader2 className="animate-spin text-muted-foreground" size={32} />
           </div>
         ) : book ? (
-          <BookForm 
-            book={book} 
-            onSuccess={() => router.push('/crud-example')} 
+          <BookForm
+            book={book as BookData}
+            onSuccess={() => router.push('/crud-example')}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">

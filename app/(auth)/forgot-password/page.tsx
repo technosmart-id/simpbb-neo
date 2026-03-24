@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
 									</Field>
 									<Field>
 										<Link
-											href="/login"
+											href="/sign-in"
 											className="text-sm text-muted-foreground hover:underline"
 										>
 											Back to login

@@ -5,15 +5,22 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1773345083459,
-      "tag": "0000_perfect_zemo",
+      "when": 1774029652034,
+      "tag": "0000_warm_jack_power",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "5",
-      "when": 1773448828719,
-      "tag": "0001_outgoing_chimera",
+      "when": 1774198235331,
+      "tag": "0001_strange_bloodstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1742688000000,
+      "tag": "0002_casbin_first_migration",
       "breakpoints": true
     }
   ]

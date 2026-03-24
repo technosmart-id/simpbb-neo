@@ -173,9 +173,63 @@ CREATE TABLE `books` (
 	`title` varchar(255) NOT NULL,
 	`author` varchar(255) NOT NULL,
 	`published_at` timestamp,
+	`organization_id` varchar(36),
+	`created_by_id` varchar(36),
+	`cover_image` varchar(512),
+	`attachment_file` varchar(512),
+	`gallery_images` json,
+	`additional_documents` json,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `books_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `casbin_rule` (
+	`id` varchar(36) NOT NULL,
+	`ptype` varchar(255) NOT NULL,
+	`v0` varchar(255),
+	`v1` varchar(255),
+	`v2` varchar(255),
+	`v3` varchar(255),
+	`v4` varchar(255),
+	`v5` text,
+	CONSTRAINT `casbin_rule_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `notifications` (
+	`id` varchar(36) NOT NULL,
+	`user_id` varchar(36) NOT NULL,
+	`title` varchar(255) NOT NULL,
+	`message` text NOT NULL,
+	`type` varchar(50) NOT NULL DEFAULT 'info',
+	`link` text,
+	`is_read` boolean NOT NULL DEFAULT false,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `notifications_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `notification_preferences` (
+	`id` varchar(36) NOT NULL,
+	`user_id` varchar(36) NOT NULL,
+	`in_app_enabled` boolean NOT NULL DEFAULT true,
+	`toasts_enabled` boolean NOT NULL DEFAULT true,
+	`success_enabled` boolean NOT NULL DEFAULT true,
+	`warning_enabled` boolean NOT NULL DEFAULT true,
+	`error_enabled` boolean NOT NULL DEFAULT true,
+	`info_enabled` boolean NOT NULL DEFAULT true,
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `notification_preferences_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `resource_ownership` (
+	`id` varchar(36) NOT NULL,
+	`resource_type` varchar(100) NOT NULL,
+	`resource_id` varchar(36) NOT NULL,
+	`owner_id` varchar(36) NOT NULL,
+	`organization_id` varchar(36) NOT NULL,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `resource_ownership_id` PRIMARY KEY(`id`),
+	CONSTRAINT `resource_ownership_unique_idx` UNIQUE(`resource_type`,`resource_id`,`owner_id`)
 );
 --> statement-breakpoint
 ALTER TABLE `account` ADD CONSTRAINT `account_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -193,6 +247,10 @@ ALTER TABLE `team` ADD CONSTRAINT `team_organization_id_organization_id_fk` FORE
 ALTER TABLE `team_member` ADD CONSTRAINT `team_member_team_id_team_id_fk` FOREIGN KEY (`team_id`) REFERENCES `team`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `team_member` ADD CONSTRAINT `team_member_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `two_factor` ADD CONSTRAINT `two_factor_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `books` ADD CONSTRAINT `books_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `notifications` ADD CONSTRAINT `notifications_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `notification_preferences` ADD CONSTRAINT `notification_preferences_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `resource_ownership` ADD CONSTRAINT `resource_ownership_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX `account_userId_idx` ON `account` (`user_id`);--> statement-breakpoint
 CREATE INDEX `invitation_organizationId_idx` ON `invitation` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `invitation_email_idx` ON `invitation` (`email`);--> statement-breakpoint
@@ -209,4 +267,12 @@ CREATE INDEX `teamMember_teamId_idx` ON `team_member` (`team_id`);--> statement-
 CREATE INDEX `teamMember_userId_idx` ON `team_member` (`user_id`);--> statement-breakpoint
 CREATE INDEX `twoFactor_secret_idx` ON `two_factor` (`secret`);--> statement-breakpoint
 CREATE INDEX `twoFactor_userId_idx` ON `two_factor` (`user_id`);--> statement-breakpoint
-CREATE INDEX `verification_identifier_idx` ON `verification` (`identifier`);
+CREATE INDEX `verification_identifier_idx` ON `verification` (`identifier`);--> statement-breakpoint
+CREATE INDEX `books_organization_id_idx` ON `books` (`organization_id`);--> statement-breakpoint
+CREATE INDEX `books_created_by_id_idx` ON `books` (`created_by_id`);--> statement-breakpoint
+CREATE INDEX `notifications_userId_idx` ON `notifications` (`user_id`);--> statement-breakpoint
+CREATE INDEX `notifications_createdAt_idx` ON `notifications` (`created_at`);--> statement-breakpoint
+CREATE INDEX `notification_preferences_userId_idx` ON `notification_preferences` (`user_id`);--> statement-breakpoint
+CREATE INDEX `resource_ownership_resource_idx` ON `resource_ownership` (`resource_type`,`resource_id`);--> statement-breakpoint
+CREATE INDEX `resource_ownership_owner_idx` ON `resource_ownership` (`owner_id`);--> statement-breakpoint
+CREATE INDEX `resource_ownership_org_idx` ON `resource_ownership` (`organization_id`);

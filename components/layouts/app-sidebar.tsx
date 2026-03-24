@@ -1,11 +1,13 @@
 "use client"
 
 import * as React from "react"
+import { useEffect, useState } from "react"
+import { authClient } from "@/lib/auth/client"
 
 import { NavMain } from "@/components/layouts/nav-main"
 import { NavDeveloper } from "@/components/layouts/nav-developer"
 import { NavUser } from "@/components/layouts/nav-user"
-import { TeamSwitcher } from "@/components/layouts/team-switcher"
+import { OrganizationSwitcher } from "@/components/layouts/organization-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -13,107 +15,100 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon, DatabaseIcon, LayoutDashboardIcon, FileIcon, HardDrive, Archive } from "lucide-react"
+import { AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon, DatabaseIcon, LayoutDashboardIcon, FileIcon, HardDrive, Archive, Building2, Shield } from "lucide-react"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "App 1",
-      logo: (
-        <GalleryVerticalEndIcon
-        />
-      ),
-      plan: "Kota ABC",
-    },
-    {
-      name: "App 2",
-      logo: (
-        <AudioLinesIcon
-        />
-      ),
-      plan: "Kota XXX",
-    },
-    {
-      name: "App 3",
-      logo: (
-        <TerminalIcon
-        />
-      ),
-      plan: "Kota XYZ",
-    },
-  ],
-  navMain: [
+interface SessionUser {
+  name: string
+  email: string
+  avatar: string | null
+  role?: string | null
+}
+
+interface NavItem {
+  title: string
+  url: string
+  icon: React.ReactNode
+  items?: {
+    title: string
+    url: string
+  }[]
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = useState<SessionUser>({
+    name: "Loading...",
+    email: "",
+    avatar: null,
+  })
+  const [navMain, setNavMain] = useState<NavItem[]>([
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: (
-        <LayoutDashboardIcon
-        />
-      ),
+      icon: <LayoutDashboardIcon />,
     },
     {
       title: "CRUD Example",
       url: "/crud-example",
-      icon: (
-        <DatabaseIcon
-        />
-      ),
+      icon: <DatabaseIcon />,
     },
     {
       title: "File Manager",
       url: "/file-manager",
-      icon: (
-        <HardDrive
-        />
-      ),
+      icon: <HardDrive />,
     },
     {
       title: "Backups",
       url: "/backups",
-      icon: (
-        <Archive
-        />
-      ),
+      icon: <Archive />,
+    },
+  ])
+
+  useEffect(() => {
+    // Fetch session data on mount
+    authClient.getSession({
+      fetchOptions: {
+        onSuccess: (ctx) => {
+          const sessionUser = ctx.data?.user
+          if (sessionUser) {
+            setUser({
+              name: sessionUser.name,
+              email: sessionUser.email,
+              avatar: sessionUser.image,
+              role: sessionUser.role,
+            })
+          }
+        },
+      },
+    })
+  }, [])
+
+  const orgSettings = [
+    {
+      title: "Organizations",
+      url: "/settings/organizations",
+      icon: <Building2 />,
     },
     {
-      title: "Menu",
-      url: "#",
-      icon: (
-        <TerminalSquareIcon
-        />
-      ),
-      items: [
-        {
-          title: "Sub Menu 1",
-          url: "#",
-        },
-        {
-          title: "Sub Menu 2",
-          url: "#",
-        },
-      ],
+      title: "Roles",
+      url: "/settings/roles",
+      icon: <Shield />,
     },
-  ],
-}
+  ]
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <OrganizationSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMain} />
         <NavDeveloper />
+        <div className="mt-4">
+          <NavMain items={orgSettings} />
+        </div>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

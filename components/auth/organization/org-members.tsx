@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { authClient } from "@/lib/auth/client";
+import { orpcClient } from "@/lib/orpc/client";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -26,7 +28,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, UserPlus, Shield, UserX } from "lucide-react";
+import { MoreHorizontal, UserPlus, Shield, UserX, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import {
 	Dialog,
@@ -49,90 +51,65 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface OrgMember {
 	id: string;
-	role: string;
+	role: string | null;
+	globalRole: string | null;
 	user?: {
-		name: string;
-		email: string;
+		name?: string | null;
+		email?: string | null;
 	};
+	organizationRoles: {
+		id: string;
+		roleId: string;
+		roleType: "system" | "custom";
+		roleName?: string;
+	}[];
 }
-
 type OrgRole = "member" | "admin" | "owner";
-
 export function OrgMembers({ organizationId }: { organizationId: string }) {
 	const [members, setMembers] = useState<OrgMember[]>([]);
 	const [loading, setLoading] = useState(true);
+	
 	const [inviteOpen, setInviteOpen] = useState(false);
 	const [inviteEmail, setInviteEmail] = useState("");
 	const [inviteRole, setInviteRole] = useState<OrgRole>("member");
 	const [inviting, setInviting] = useState(false);
 
 	const fetchMembers = useCallback(async () => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const res = await (authClient.organization as any).listMembers({
-			organizationId,
-		});
-		if (res.data) {
-			setMembers(res.data as OrgMember[]);
+		try {
+			setLoading(true);
+			const res = await (orpcClient as any).organizations.listMembers({ organizationId });
+			if (res) {
+				setMembers(res);
+			}
+		} catch (error) {
+			console.error("Failed to fetch members:", error);
 		}
 		setLoading(false);
 	}, [organizationId]);
 
 	useEffect(() => {
 		fetchMembers();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [organizationId]);
+	}, [fetchMembers]);
 
 	const inviteMember = async () => {
-		setInviting(true);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const res = await (authClient.organization as any).inviteMember({
-			organizationId,
-			email: inviteEmail,
-			role: inviteRole,
-		});
-
-		if (res.error) {
-			toast.error(res.error.message || "Failed to invite member");
-		} else {
-			toast.success("Invitation sent!");
-			setInviteOpen(false);
-			setInviteEmail("");
-			fetchMembers();
-		}
-		setInviting(false);
+		toast.info("To add members, use the database seed or contact an admin");
+		setInviteOpen(false);
 	};
 
 	const removeMember = async (memberId: string) => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const res = await (authClient.organization as any).removeMember({
-			organizationId,
-			memberIdOrEmail: memberId,
-		});
-
-		if (res.error) {
-			toast.error(res.error.message || "Failed to remove member");
-		} else {
+		try {
+			await (orpcClient as any).organizations.removeMember({
+				organizationId,
+				memberId,
+			});
 			toast.success("Member removed");
 			fetchMembers();
-		}
-	};
-
-	const updateMemberRole = async (memberId: string, role: OrgRole) => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const res = await (authClient.organization as any).updateMemberRole({
-			organizationId,
-			memberIdOrEmail: memberId,
-			role,
-		});
-
-		if (res.error) {
-			toast.error(res.error.message || "Failed to update role");
-		} else {
-			toast.success("Role updated");
-			fetchMembers();
+		} catch (error: any) {
+			toast.error(error.message || "Failed to remove member");
 		}
 	};
 
@@ -145,24 +122,13 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 			.slice(0, 2);
 	};
 
-	const getRoleBadge = (role: string) => {
-		const variants: Record<string, "default" | "secondary"> = {
-			owner: "default",
-			admin: "default",
-			member: "secondary",
-		};
-		return (
-			<Badge variant={variants[role] || "secondary"}>{role}</Badge>
-		);
-	};
-
 	return (
 		<Card>
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div>
 						<CardTitle>Members</CardTitle>
-						<CardDescription>Manage organization members</CardDescription>
+						<CardDescription>Manage organization members and their roles</CardDescription>
 					</div>
 					<Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
 						<DialogTrigger asChild>
@@ -175,7 +141,7 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 							<DialogHeader>
 								<DialogTitle>Invite Member</DialogTitle>
 								<DialogDescription>
-									Send an invitation to join this organization
+									Add a member to this organization
 								</DialogDescription>
 							</DialogHeader>
 							<FieldGroup>
@@ -200,8 +166,8 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 										</SelectContent>
 									</Select>
 								</Field>
-								<Button onClick={inviteMember} disabled={inviting}>
-									{inviting ? "Sending..." : "Send Invite"}
+								<Button onClick={inviteMember} disabled={inviting || !inviteEmail}>
+									{inviting ? "Adding..." : "Add Member"}
 								</Button>
 							</FieldGroup>
 						</DialogContent>
@@ -218,7 +184,8 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 						<TableHeader>
 							<TableRow>
 								<TableHead>Member</TableHead>
-								<TableHead>Role</TableHead>
+								<TableHead>Global Role</TableHead>
+								<TableHead>Roles</TableHead>
 								<TableHead className="text-right">Actions</TableHead>
 							</TableRow>
 						</TableHeader>
@@ -240,7 +207,24 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 											</div>
 										</div>
 									</TableCell>
-									<TableCell>{getRoleBadge(member.role)}</TableCell>
+									<TableCell>
+										<Badge variant="outline" className="capitalize">
+											{member.globalRole || "User"}
+										</Badge>
+									</TableCell>
+									<TableCell>
+										<div className="flex flex-wrap gap-1">
+											{member.organizationRoles.length > 0 ? (
+												member.organizationRoles.map((r, i) => (
+													<Badge key={i} variant={r.roleType === "system" ? "default" : "secondary"}>
+														{r.roleName || r.roleId}
+													</Badge>
+												))
+											) : (
+												<span className="text-muted-foreground text-xs">None</span>
+											)}
+										</div>
+									</TableCell>
 									<TableCell className="text-right">
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
@@ -249,17 +233,11 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 												</Button>
 											</DropdownMenuTrigger>
 											<DropdownMenuContent align="end">
-												<DropdownMenuItem
-													onClick={() => updateMemberRole(member.id, "admin")}
-												>
-													<Shield className="mr-2 h-4 w-4" />
-													Make Admin
-												</DropdownMenuItem>
-												<DropdownMenuItem
-													onClick={() => updateMemberRole(member.id, "member")}
-												>
-													<UserPlus className="mr-2 h-4 w-4" />
-													Make Member
+												<DropdownMenuItem asChild>
+													<Link href={`/settings/members/${member.id}/roles`}>
+														<Settings2 className="mr-2 h-4 w-4" />
+														Manage Roles
+													</Link>
 												</DropdownMenuItem>
 												<DropdownMenuItem
 													className="text-destructive"
@@ -277,6 +255,8 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 					</Table>
 				)}
 			</CardContent>
+
+			{/* Manage Roles Dialog Removed */}
 		</Card>
 	);
 }

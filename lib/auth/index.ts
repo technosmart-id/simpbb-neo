@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "../db";
 import * as schema from "../db/schema";
+import { eq } from "drizzle-orm";
 
 // Plugin imports - importing from better-auth/plugins
 import {
@@ -43,6 +44,33 @@ export const auth = betterAuth({
 		provider: "mysql",
 		schema,
 	}),
+	databaseHooks: {
+		user: {
+			create: {
+				after: async (user) => {
+					// Find all organizations with autoJoin enabled
+					const autoJoinOrgs = await db.select()
+						.from(schema.organization)
+						.where(eq(schema.organization.autoJoin, true));
+
+					if (autoJoinOrgs.length > 0) {
+						// Add user to each organization as a 'member'
+						await Promise.all(autoJoinOrgs.map(org => 
+							db.insert(schema.member).values({
+								id: crypto.randomUUID(),
+								organizationId: org.id,
+								userId: user.id,
+								role: "member",
+								createdAt: new Date(),
+							}).catch(err => {
+								console.error(`Failed to auto-join user ${user.id} to org ${org.id}:`, err);
+							})
+						));
+					}
+				}
+			}
+		}
+	},
 
 	// Advanced email/password with rate limiting and email verification
 	emailAndPassword: {
@@ -124,7 +152,12 @@ export const auth = betterAuth({
 		// 5. Admin - Admin panel and user management
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		admin(),
+		admin({
+			// Default role for new users
+			defaultRole: "user",
+			// Role that grants admin access
+			adminRole: "admin",
+		}),
 
 		// NOTE: apiKey plugin does NOT exist in better-auth v1.5.5
 		// Use bearer token authentication instead
@@ -145,12 +178,10 @@ export const auth = betterAuth({
 			// Removing custom roles config for now
 		}),
 
-		// 8. Captcha - Bot protection (reCAPTCHA/hCaptcha/Cloudflare)
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
+		// 8. Captcha
 		captcha({
 			provider: "google-recaptcha",
-			secretKey: process.env.RECAPTCHA_SECRET_KEY || "",
+			secretKey: process.env.RECAPTCHA_SECRET_KEY!,
 		}),
 
 		// 9. OpenAPI - API documentation
@@ -206,3 +237,6 @@ export const auth = betterAuth({
 		cookiePrefix: "simpbb",
 	},
 });
+
+export type Session = typeof auth.$Infer.Session;
+export type User = typeof auth.$Infer.Session["user"];
