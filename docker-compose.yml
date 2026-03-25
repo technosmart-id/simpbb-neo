@@ -1,0 +1,63 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: simpbb-neo-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: simpbb_neo
+      MYSQL_USER: simpbb
+      MYSQL_PASSWORD: simpbbpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    image: node:22-alpine
+    container_name: simpbb-neo-migrate
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: mysql://simpbb:simpbbpassword@db:3306/simpbb_neo
+    command: >
+      sh -c "
+        npm install --prefer-offline --ignore-scripts 2>/dev/null || npm install --ignore-scripts &&
+        npx drizzle-kit migrate --config drizzle.local.config.ts
+      "
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - tools
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: simpbb-neo-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      DATABASE_URL: mysql://simpbb:simpbbpassword@db:3306/simpbb_neo
+      BETTER_AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_BETTER_AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
+
+volumes:
+  db_data:
+  uploads_data:

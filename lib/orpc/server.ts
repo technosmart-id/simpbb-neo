@@ -1,7 +1,6 @@
-import { os as osBase } from "@orpc/server"
 import { z } from "zod"
 import { db } from "@/lib/db"
-import { books, notifications, notificationPreferences, member, organization, session, user, orgRoles } from "@/lib/db/schema"
+import { notifications, notificationPreferences, member, organization, session, user, orgRoles } from "@/lib/db/schema"
 import { eq, desc, asc, sql, like, or, and, inArray } from "drizzle-orm"
 import { auth } from "@/lib/auth"
 
@@ -16,6 +15,29 @@ import { initializeOrgPolicies, getAuthorizationService } from "@/lib/services/a
 import { AuthorizationError } from "@/lib/services/authorization"
 import * as fs from "fs/promises"
 import * as path from "path"
+
+// Domain routers
+import { wilayahRouter } from "./routers/wilayah"
+import { wilayahCrudRouter } from "./routers/wilayah-crud"
+import { referensiRouter } from "./routers/referensi"
+import { klasifikasiRouter } from "./routers/klasifikasi"
+import { klasifikasiCrudRouter } from "./routers/klasifikasi-crud"
+import { konfigurasiRouter } from "./routers/konfigurasi"
+import { penggunaRouter } from "./routers/pengguna"
+import { groupAksesRouter } from "./routers/group-akses"
+import { logRouter } from "./routers/log"
+import { objekPajakRouter } from "./routers/objek-pajak"
+import { lspopRouter } from "./routers/lspop"
+import { spptRouter } from "./routers/sppt"
+import { pembayaranRouter } from "./routers/pembayaran"
+import { pelayananRouter } from "./routers/pelayanan"
+import { dashboardRouter } from "./routers/dashboard"
+import { tunggakanRouter } from "./routers/tunggakan"
+import { updateMasalRouter } from "./routers/update-masal"
+import { pemekaranRouter } from "./routers/pemekaran"
+
+// Base oRPC setup
+import { os as osBase } from "@orpc/server"
 
 // Helper functions for inline auth checks (replacing broken middleware pattern)
 
@@ -522,6 +544,26 @@ export const router = os.router({
       return { success: true }
     }),
 
+  // Domain routers
+  wilayah: wilayahRouter,
+  wilayahCrud: wilayahCrudRouter,
+  referensi: referensiRouter,
+  klasifikasi: klasifikasiRouter,
+  klasifikasiCrud: klasifikasiCrudRouter,
+  konfigurasi: konfigurasiRouter,
+  pengguna: penggunaRouter,
+  groupAkses: groupAksesRouter,
+  log: logRouter,
+  objekPajak: objekPajakRouter,
+  lspop: lspopRouter,
+  sppt: spptRouter,
+  pembayaran: pembayaranRouter,
+  pelayanan: pelayananRouter,
+  dashboard: dashboardRouter,
+  tunggakan: tunggakanRouter,
+  updateMasal: updateMasalRouter,
+  pemekaran: pemekaranRouter,
+
   notifications: os.router({
     list: os
       .input(z.object({
@@ -664,197 +706,6 @@ export const router = os.router({
           })
           .where(eq(notificationPreferences.userId, userId))
 
-        return { success: true }
-      }),
-  }),
-
-  books: os.router({
-    list: os
-      .input(z.object({
-        limit: z.number().int().min(1).max(100).default(10),
-        offset: z.number().int().min(0).default(0),
-        search: z.string().optional(),
-        sortBy: z.enum(['id', 'title', 'author', 'publishedAt', 'createdAt']).default('createdAt'),
-        sortOrder: z.enum(['asc', 'desc']).default('desc'),
-      }))
-      .handler(async ({ input, context }) => {
-        const { organizationId } = await requireAuth(context, { resource: "books", action: "read", requireOrg: true })
-
-        const filters = input.search
-          ? or(
-              like(books.title, `%${input.search}%`),
-              like(books.author, `%${input.search}%`)
-            )
-          : undefined
-
-        // Always filter by organization
-        const orgFilters = filters
-          ? and(filters, eq(books.organizationId, organizationId!))
-          : eq(books.organizationId, organizationId!)
-
-        const [totalResult] = await db.select({ count: sql<number>`count(*)` })
-          .from(books)
-          .where(orgFilters)
-
-        const orderBy = input.sortOrder === 'desc'
-          ? desc(books[input.sortBy])
-          : asc(books[input.sortBy])
-
-        const rows = await db.select()
-          .from(books)
-          .where(orgFilters)
-          .orderBy(orderBy)
-          .limit(input.limit)
-          .offset(input.offset)
-
-        return {
-          rows,
-          total: totalResult?.count ?? 0,
-        }
-      }),
-
-    get: os
-      .input(z.object({ id: z.number() }))
-      .handler(async ({ input, context }) => {
-        const { organizationId } = await requireAuth(context, { resource: "books", action: "read", requireOrg: true })
-
-        const [book] = await db.select()
-          .from(books)
-          .where(
-            and(
-              eq(books.id, input.id),
-              eq(books.organizationId, organizationId!),
-            ),
-          )
-        return book ?? null
-      }),
-
-    create: os
-      .input(z.object({
-        title: z.string().min(1),
-        author: z.string().min(1),
-        publishedAt: z.string().optional().nullable(),
-        coverImage: z.string().optional().nullable(),
-        attachmentFile: z.string().optional().nullable(),
-        galleryImages: z.array(z.string()).optional().nullable(),
-        additionalDocuments: z.array(z.string()).optional().nullable(),
-      }))
-      .handler(async ({ input, context }) => {
-        const { session, organizationId } = await requireAuth(context, { resource: "books", action: "create", requireOrg: true })
-
-        // Collect all temp paths to move
-        const tempPaths = [
-          input.coverImage,
-          input.attachmentFile,
-          ...(input.galleryImages ?? []),
-          ...(input.additionalDocuments ?? []),
-        ].filter((p): p is string => !!p && p.startsWith('temp/'))
-
-        if (tempPaths.length > 0) {
-          await StorageService.moveToUploads(tempPaths)
-          await StorageService.cleanupTemp()
-        }
-
-        // Map paths to their final destination
-        const mapPath = (p: string | null | undefined) =>
-          p?.startsWith('temp/') ? p.replace('temp/', 'files/') : p
-
-        const [result] = await db.insert(books).values({
-          title: input.title,
-          author: input.author,
-          publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
-          coverImage: mapPath(input.coverImage),
-          attachmentFile: mapPath(input.attachmentFile),
-          galleryImages: (input.galleryImages?.map(mapPath).filter((p): p is string => !!p) ?? []),
-          additionalDocuments: (input.additionalDocuments?.map(mapPath).filter((p): p is string => !!p) ?? []),
-          organizationId: organizationId!,
-          createdById: session.user.id,
-        })
-        return { id: (result as { insertId: number }).insertId }
-      }),
-
-    update: os
-      .input(z.object({
-        id: z.number(),
-        title: z.string().min(1),
-        author: z.string().min(1),
-        publishedAt: z.string().optional().nullable(),
-        coverImage: z.string().optional().nullable(),
-        attachmentFile: z.string().optional().nullable(),
-        galleryImages: z.array(z.string()).optional().nullable(),
-        additionalDocuments: z.array(z.string()).optional().nullable(),
-      }))
-      .handler(async ({ input, context }) => {
-        const { organizationId } = await requireAuth(context, { resource: "books", action: "update", requireOrg: true })
-
-        // Verify the book belongs to the user's org
-        const [book] = await db.select()
-          .from(books)
-          .where(
-            and(
-              eq(books.id, input.id),
-              eq(books.organizationId, organizationId!),
-            ),
-          )
-          .limit(1)
-
-        if (!book) {
-          throw new Error("Book not found")
-        }
-
-        // Collect all temp paths to move
-        const tempPaths = [
-          input.coverImage,
-          input.attachmentFile,
-          ...(input.galleryImages ?? []),
-          ...(input.additionalDocuments ?? []),
-        ].filter((p): p is string => !!p && p.startsWith('temp/'))
-
-        if (tempPaths.length > 0) {
-          await StorageService.moveToUploads(tempPaths)
-          await StorageService.cleanupTemp()
-        }
-
-        // Map paths to their final destination
-        const mapPath = (p: string | null | undefined) =>
-          p?.startsWith('temp/') ? p.replace('temp/', 'files/') : p
-
-        await db.update(books)
-          .set({
-            title: input.title,
-            author: input.author,
-            publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
-            coverImage: mapPath(input.coverImage),
-            attachmentFile: mapPath(input.attachmentFile),
-            galleryImages: (input.galleryImages?.map(mapPath).filter((p): p is string => !!p) ?? []),
-            additionalDocuments: (input.additionalDocuments?.map(mapPath).filter((p): p is string => !!p) ?? []),
-            updatedAt: new Date(),
-          })
-          .where(eq(books.id, input.id))
-        return { success: true }
-      }),
-
-    delete: os
-      .input(z.object({ id: z.number() }))
-      .handler(async ({ input, context }) => {
-        const { organizationId } = await requireAuth(context, { resource: "books", action: "delete", requireOrg: true })
-
-        // Verify the book belongs to the user's org
-        const [book] = await db.select()
-          .from(books)
-          .where(
-            and(
-              eq(books.id, input.id),
-              eq(books.organizationId, organizationId!),
-            ),
-          )
-          .limit(1)
-
-        if (!book) {
-          throw new Error("Book not found")
-        }
-
-        await db.delete(books).where(eq(books.id, input.id))
         return { success: true }
       }),
   }),

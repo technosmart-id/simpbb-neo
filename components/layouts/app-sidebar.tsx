@@ -9,13 +9,38 @@ import { NavDeveloper } from "@/components/layouts/nav-developer"
 import { NavUser } from "@/components/layouts/nav-user"
 import { OrganizationSwitcher } from "@/components/layouts/organization-switcher"
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-} from "@/components/ui/sidebar"
-import { AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon, DatabaseIcon, LayoutDashboardIcon, FileIcon, HardDrive, Archive, Building2, Shield } from "lucide-react"
+  AudioLinesIcon,
+  TerminalIcon,
+  TerminalSquareIcon,
+  BotIcon,
+  BookOpenIcon,
+  Settings2Icon,
+  FrameIcon,
+  PieChartIcon,
+  MapIcon as MapIconLucide,
+  DatabaseIcon,
+  LayoutDashboardIcon,
+  FileIcon,
+  HardDrive,
+  Archive,
+  Building2,
+  Shield,
+  FileText,
+  ClipboardList,
+  CreditCard,
+  Printer,
+  AlertTriangle,
+  Search,
+  BarChart3,
+  BookOpen,
+  Settings,
+  Users,
+  Globe,
+  Map as MapIcon,
+  RefreshCw,
+  GitBranch,
+  ScrollText,
+} from "lucide-react"
 
 interface SessionUser {
   name: string
@@ -40,16 +65,102 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     email: "",
     avatar: null,
   })
-  const [navMain, setNavMain] = useState<NavItem[]>([
+
+  const [navMain] = useState<NavItem[]>([
     {
       title: "Dashboard",
       url: "/dashboard",
       icon: <LayoutDashboardIcon />,
     },
     {
-      title: "CRUD Example",
-      url: "/crud-example",
-      icon: <DatabaseIcon />,
+      title: "SPOP",
+      url: "/spop",
+      icon: <FileText />,
+    },
+    {
+      title: "LSPOP",
+      url: "/lspop",
+      icon: <Building2 />,
+    },
+    {
+      title: "Pelayanan",
+      url: "/pelayanan",
+      icon: <ClipboardList />,
+    },
+    {
+      title: "Pembayaran",
+      url: "/pembayaran",
+      icon: <CreditCard />,
+    },
+    {
+      title: "Cetak SPPT",
+      url: "/cetak-sppt",
+      icon: <Printer />,
+    },
+    {
+      title: "Tunggakan",
+      url: "/tunggakan",
+      icon: <AlertTriangle />,
+    },
+    {
+      title: "Info OP",
+      url: "/info-op",
+      icon: <Search />,
+    },
+    {
+      title: "Laporan",
+      url: "#",
+      icon: <BarChart3 />,
+      items: [
+        { title: "Pembayaran", url: "/laporan/pembayaran" },
+        { title: "Realisasi", url: "/laporan/realisasi" },
+        { title: "Tunggakan", url: "/laporan/tunggakan" },
+        { title: "Mutasi", url: "/laporan/mutasi" },
+        { title: "Penetapan", url: "/laporan/penetapan" },
+        { title: "Pengurangan", url: "/laporan/pengurangan" },
+        { title: "DHKP", url: "/laporan/dhkp" },
+      ],
+    },
+    {
+      title: "DHKP",
+      url: "/dhkp",
+      icon: <BookOpen />,
+    },
+    {
+      title: "Update Masal",
+      url: "/update-masal",
+      icon: <RefreshCw />,
+    },
+    {
+      title: "Pemekaran",
+      url: "/pemekaran",
+      icon: <GitBranch />,
+    },
+    {
+      title: "Peta",
+      url: "/peta",
+      icon: <MapIcon />,
+    },
+    {
+      title: "Pengaturan Utama",
+      url: "#",
+      icon: <Settings />,
+      items: [
+        { title: "Referensi Wilayah", url: "/pengaturan/referensi" },
+        { title: "Klasifikasi", url: "/pengaturan/klasifikasi" },
+        { title: "Tarif PBB", url: "/pengaturan/tarif" },
+        { title: "Jenis SPPT", url: "/pengaturan/jenis-sppt" },
+        { title: "Fasilitas", url: "/pengaturan/fasilitas" },
+        { title: "Jalan", url: "/pengaturan/jalan" },
+        { title: "Konfigurasi", url: "/pengaturan/konfigurasi" },
+        { title: "Pengguna", url: "/pengaturan/pengguna" },
+        { title: "Group Akses", url: "/pengaturan/group-akses" },
+      ],
+    },
+    {
+      title: "Log Aktivitas",
+      url: "/log",
+      icon: <ScrollText />,
     },
     {
       title: "File Manager",

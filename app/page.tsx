@@ -1,76 +1,90 @@
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { LayoutDashboardIcon, LogInIcon, SparklesIcon } from "lucide-react"
-import { ModeToggle } from "@/components/mode-toggle"
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+import { Button } from "@/components/ui/button"
+import { LogIn, Building2, MapPin, FileText, BarChart3 } from "lucide-react"
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (session) redirect("/dashboard")
+
   return (
-    <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background font-sans antialiased">
-      {/* Theme Toggle */}
-      <div className="absolute top-4 right-4 z-50">
-        <ModeToggle />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950 flex flex-col">
+      {/* Header strip */}
+      <div className="bg-red-600 h-2 w-full" />
 
-      {/* Background Decor */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute -top-[10%] -left-[10%] h-[40%] w-[40%] rounded-full bg-primary/20 blur-[120px]" />
-        <div className="absolute top-[40%] -right-[10%] h-[30%] w-[30%] rounded-full bg-secondary/20 blur-[100px]" />
-        <div className="absolute -bottom-[10%] left-[20%] h-[40%] w-[40%] rounded-full bg-accent/20 blur-[120px]" />
-      </div>
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">
+        {/* Logo / emblem area */}
+        <div className="flex flex-col items-center gap-6 text-center">
+          <div className="relative">
+            <div className="flex size-24 items-center justify-center rounded-full border-4 border-yellow-400/60 bg-white/10 backdrop-blur-sm shadow-2xl">
+              <Building2 className="size-12 text-yellow-400" strokeWidth={1.5} />
+            </div>
+            <div className="absolute -bottom-1 -right-1 flex size-8 items-center justify-center rounded-full bg-red-600 border-2 border-white/20">
+              <MapPin className="size-4 text-white" strokeWidth={2} />
+            </div>
+          </div>
 
-      <main className="relative z-10 flex flex-col items-center gap-8 px-6 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-4 py-1.5 text-sm font-medium backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <SparklesIcon className="size-4 text-primary" />
-          <span>Something revolutionary is coming</span>
-        </div>
+          {/* System identity */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-400/80">
+              Badan Pendapatan Daerah
+            </p>
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+              SIM-PBB
+            </h1>
+            <p className="text-base text-blue-200 max-w-sm">
+              Sistem Informasi Manajemen<br />
+              <span className="font-semibold text-white">Pajak Bumi dan Bangunan</span>
+            </p>
+          </div>
 
-        <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
-          <h1 className="max-w-3xl text-5xl font-extrabold tracking-tight sm:text-7xl">
-            Build your <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Next.js Skeleton</span>
-          </h1>
-          <p className="mx-auto max-w-xl text-lg text-muted-foreground sm:text-xl">
-            A high-performance boilerplate for modern applications. Scalable, modular, and ready for your 100+ tables.
+          {/* Divider */}
+          <div className="flex items-center gap-3 w-48">
+            <div className="flex-1 h-px bg-white/20" />
+            <div className="size-1.5 rounded-full bg-yellow-400/60" />
+            <div className="flex-1 h-px bg-white/20" />
+          </div>
+
+          {/* Feature pills */}
+          <div className="flex flex-wrap justify-center gap-2 max-w-xs">
+            {[
+              { icon: FileText, label: "SPPT & SPOP" },
+              { icon: BarChart3, label: "Laporan & DHKP" },
+              { icon: MapPin, label: "Peta Objek Pajak" },
+            ].map(({ icon: Icon, label }) => (
+              <span
+                key={label}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-blue-100 backdrop-blur-sm"
+              >
+                <Icon className="size-3 text-yellow-400" />
+                {label}
+              </span>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <Button
+            size="lg"
+            className="h-12 px-10 text-base bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold shadow-lg shadow-yellow-400/20 border-0"
+            asChild
+          >
+            <Link href="/login">
+              <LogIn className="mr-2 size-4" />
+              Masuk ke Sistem
+            </Link>
+          </Button>
+
+          <p className="text-xs text-blue-300/60">
+            Akses terbatas untuk petugas yang berwenang
           </p>
         </div>
+      </div>
 
-        <div className="flex flex-col items-center gap-4 sm:flex-row animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-          <Button size="lg" className="h-12 px-8 text-base shadow-lg shadow-primary/20" asChild>
-            <Link href="/dashboard">
-              Go to Dashboard
-              <LayoutDashboardIcon className="ml-2 size-4" />
-            </Link>
-          </Button>
-          <Button variant="outline" size="lg" className="h-12 px-8 text-base backdrop-blur-sm" asChild>
-            <Link href="/sign-in">
-              Sign In
-              <LogInIcon className="ml-2 size-4" />
-            </Link>
-          </Button>
-        </div>
-
-        <div className="mt-12 flex gap-8 animate-in fade-in duration-1000 delay-500">
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold">100+</span>
-            <span className="text-sm text-muted-foreground uppercase tracking-widest text-[10px] font-semibold">Modular Tables</span>
-          </div>
-          <div className="h-10 w-px bg-border" />
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold">Drizzle</span>
-            <span className="text-sm text-muted-foreground uppercase tracking-widest text-[10px] font-semibold">ORM Ready</span>
-          </div>
-          <div className="h-10 w-px bg-border" />
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold">Auth</span>
-            <span className="text-sm text-muted-foreground uppercase tracking-widest text-[10px] font-semibold">Secure by Default</span>
-          </div>
-        </div>
-      </main>
-
-      <footer className="absolute bottom-8 left-0 right-0 z-10 flex flex-col items-center gap-2 text-xs text-muted-foreground">
-        <span>&copy; 2026 Technosmart Neo. All rights reserved.</span>
-        <div className="flex items-center gap-1">
-          (Press <kbd className="rounded border bg-muted px-1">d</kbd> to toggle dark mode)
-        </div>
+      {/* Footer */}
+      <footer className="text-center py-4 text-[11px] text-blue-400/50 border-t border-white/5">
+        &copy; {new Date().getFullYear()} Badan Pendapatan Daerah &mdash; SIM-PBB v4.0
       </footer>
     </div>
   )

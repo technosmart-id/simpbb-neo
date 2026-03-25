@@ -71,3 +71,74 @@ Additional personality traits:
 - You react dramatically when encountering nested loops, global state, or unclear naming.
 
 Despite all sarcasm, you always provide useful technical guidance.
+
+---
+
+## Project: SIM-PBB Neo
+
+Property Tax Management System (Sistem Informasi Manajemen Pajak Bumi dan Bangunan) — migrating a legacy VB.NET/WinForms application to Next.js 16 App Router.
+
+### Tech Stack
+- **Framework**: Next.js 16 (App Router), TypeScript
+- **Database**: MySQL via Drizzle ORM (30 tables, 3 views)
+- **Auth**: Better Auth with 13 plugins
+- **API**: oRPC v1.x + React Query (type-safe RPC)
+- **UI**: shadcn/ui (80+ components), Tailwind CSS, `components/ui/field.tsx` system
+- **Route groups**: `(auth)` for login pages, `(app)` for the main app with sidebar
+
+### Architecture Rules
+- **oRPC context**: `os` is defined ONLY in `lib/orpc/context.ts`. All routers import from `"../context"` — NEVER from `"../server"` (circular dependency).
+- **oRPC routers**: Each domain has its own file in `lib/orpc/routers/`. All composed in `lib/orpc/server.ts`.
+- **oRPC client**: `useORPC()` hook from `lib/orpc/react.tsx`. Use `.queryOptions()` with React Query.
+- **Forms**: Use `components/ui/field.tsx` (`Field`, `FieldLabel`, `FieldMessage`) for consistent form fields.
+- **Data tables**: Use `components/data-table/data-table.tsx` — server-side pagination, filters via URL search params.
+- **Drizzle inserts**: Always explicitly list columns when inserting — never spread input objects. Date fields must be converted: `new Date(input.dateString)`.
+- **Drizzle dates in filters**: Always wrap string dates in `new Date()` before passing to `gte`/`lte`.
+- **NOP**: 18-digit property ID (PP.DD.KKK.LLL.BBB.UUUU.J). Use `lib/utils/nop.ts` utilities.
+
+### Domain Schemas (30 tables)
+- `wilayah`: `ref_propinsi`, `ref_dati2`, `ref_kecamatan`, `ref_kelurahan`, `ref_jalan`
+- `referensi`: `ref_kategori`, `ref_jns_pelayanan`
+- `klasifikasi`: `kelas_bumi`, `kelas_bangunan`, `tarif`, `jenis_sppt`, `fasilitas`
+- `konfigurasi`: `konfigurasi` (key-value system config)
+- `pengguna`: `login`, `group_akses`
+- `objek-pajak`: `dat_subjek_pajak`, `dat_objek_pajak`
+- `lspop`: `dat_lspop`, `dat_lspop_fasilitas`
+- `sppt`: `sppt`, `histori_sppt`, `histori_sppt_batal`
+- `pembayaran`: `pembayaran_sppt`
+- `pelayanan`: `dat_pelayanan`, `dat_lampiran_kolektif`, `dat_mutasi_berkas`
+- `pemekaran`: `dat_pemekaran`
+- `op-bersama`: `dat_op_induk`, `dat_op_anggota`
+- `log`: `log_aktivitas`
+
+### oRPC Routers Available
+`wilayah`, `wilayahCrud`, `referensi`, `klasifikasi`, `klasifikasiCrud`, `konfigurasi`, `pengguna`, `groupAkses`, `log`, `objekPajak`, `lspop`, `sppt`, `pembayaran`, `pelayanan`, `dashboard`, `tunggakan`, `notifications`, `files`, `backups`
+
+### Key Business Rules
+- **BR-01**: NJOP = NJOP_Bumi + NJOP_Bangunan
+- **BR-02**: NJOPTKP: only 1 per taxpayer/year, from config
+- **BR-05**: PBB_Terhutang = Tarif × (NJOP - NJOPTKP)
+- **BR-08**: Recalculate SPPT increments siklus, saves to histori_sppt
+- **BR-10**: Denda = 2%/month from due date, max 48%
+- **BR-11**: SPPT with payments cannot be deleted
+- **BR-12**: Buildings (LSPOP) are soft-deleted only
+- **BR-14**: SPOP/LSPOP changes should trigger SPPT recalculation
+
+### Implementation Status (as of 2026-03-21)
+- ✅ Phase 1: Foundation — NOP utils, calculators, auth guard, 16 oRPC routers, all UI primitives, sidebar
+- ✅ Phase 2: Pengaturan CRUD pages — referensi, klasifikasi, tarif, jenis-sppt, fasilitas, jalan, konfigurasi
+- ✅ Phase 3: User & access management pages — pengguna, group-akses, log
+- ✅ Phase 4 (partial): SPOP/LSPOP list pages — router complete, form pages (baru/edit) NOT YET built
+- ✅ Phase 5 (partial): SPPT/Pembayaran list pages — routers complete, baru pages NOT YET built
+- ✅ Phase 6 (partial): Pelayanan list page — router complete, detail/baru/verifikasi NOT YET built
+- ✅ Phase 7: Dashboard, Info OP, Tunggakan pages
+- ⬜ Phase 8: Laporan hub + 4 reports done, PDF/Excel generation NOT YET built
+- ⬜ Phase 9: DHKP, update-masal, pemekaran — placeholder pages only
+- ⬜ Phase 10: GIS map — placeholder only
+
+### Reference Files
+- `app/(app)/backups/page.tsx` — DataTable + CRUD page pattern reference
+- `lib/orpc/server.ts` — Router composition reference
+- `components/ui/field.tsx` — Form field component reference
+- `components/layouts/app-sidebar.tsx` — Navigation reference
+- `lib/orpc/react.tsx` — oRPC client hooks reference
