@@ -155,47 +155,52 @@ export const penghapusanRouter = os.router({
         .from(sppt)
         .where(and(...spptConditions))
 
-      // Insert penghapusan header
-      const [result] = await db.insert(datPenghapusan).values({
-        kdPropinsi: input.kdPropinsi,
-        kdDati2: input.kdDati2,
-        kdKecamatan: input.kdKecamatan,
-        kdKelurahan: input.kdKelurahan,
-        kdBlok: input.kdBlok,
-        noUrut: input.noUrut,
-        kdJnsOp: input.kdJnsOp,
-        jenisPenghapusan: input.jenisPenghapusan,
-        alasan: input.alasan,
-        status: "pending",
-        userPengaju: context.session.user.id,
-        tglPengajuan: new Date(),
+      // Insert penghapusan header + snapshot in a single transaction
+      const userId = context.session.user.id
+      const insertId = await db.transaction(async (tx) => {
+        const [result] = await tx.insert(datPenghapusan).values({
+          kdPropinsi: input.kdPropinsi,
+          kdDati2: input.kdDati2,
+          kdKecamatan: input.kdKecamatan,
+          kdKelurahan: input.kdKelurahan,
+          kdBlok: input.kdBlok,
+          noUrut: input.noUrut,
+          kdJnsOp: input.kdJnsOp,
+          jenisPenghapusan: input.jenisPenghapusan,
+          alasan: input.alasan,
+          status: "pending",
+          userPengaju: userId,
+          tglPengajuan: new Date(),
+        })
+
+        const newId = (result as { insertId: number }).insertId
+
+        // Snapshot SPPT rows into dat_penghapusan_sppt
+        if (spptRows.length > 0) {
+          await tx.insert(datPenghapusanSppt).values(
+            spptRows.map((s) => ({
+              idPenghapusan: newId,
+              kdPropinsi: s.kdPropinsi,
+              kdDati2: s.kdDati2,
+              kdKecamatan: s.kdKecamatan,
+              kdKelurahan: s.kdKelurahan,
+              kdBlok: s.kdBlok,
+              noUrut: s.noUrut,
+              kdJnsOp: s.kdJnsOp,
+              thnPajakSppt: String(s.thnPajakSppt),
+              namaWp: s.nmWp ?? null,
+              njopBumiSppt: s.njopBumi !== null ? Number(s.njopBumi) : null,
+              njopBngSppt: s.njopBng !== null ? Number(s.njopBng) : null,
+              pbbYgHarusDibayarSppt:
+                s.pbbYgHarusDibayarSppt !== null
+                  ? Number(s.pbbYgHarusDibayarSppt)
+                  : null,
+            })),
+          )
+        }
+
+        return newId
       })
-
-      const insertId = (result as { insertId: number }).insertId
-
-      // Snapshot SPPT rows into dat_penghapusan_sppt
-      if (spptRows.length > 0) {
-        await db.insert(datPenghapusanSppt).values(
-          spptRows.map((s) => ({
-            idPenghapusan: insertId,
-            kdPropinsi: s.kdPropinsi,
-            kdDati2: s.kdDati2,
-            kdKecamatan: s.kdKecamatan,
-            kdKelurahan: s.kdKelurahan,
-            kdBlok: s.kdBlok,
-            noUrut: s.noUrut,
-            kdJnsOp: s.kdJnsOp,
-            thnPajakSppt: String(s.thnPajakSppt),
-            namaWp: s.nmWp ?? null,
-            njopBumiSppt: s.njopBumi !== null ? Number(s.njopBumi) : null,
-            njopBngSppt: s.njopBng !== null ? Number(s.njopBng) : null,
-            pbbYgHarusDibayarSppt:
-              s.pbbYgHarusDibayarSppt !== null
-                ? Number(s.pbbYgHarusDibayarSppt)
-                : null,
-          })),
-        )
-      }
 
       return { success: true, id: insertId }
     }),
@@ -235,33 +240,36 @@ export const penghapusanRouter = os.router({
         eq(sppt.statusPembayaranSppt, "0"),
       )
 
-      // Execute deletion based on jenis
-      if (request.jenisPenghapusan === 1) {
-        // Fasum: set JNS_BUMI='4', delete unpaid SPPT
-        await db.update(spop).set({ jnsBumi: "4" }).where(nopWhere)
-        await db.delete(sppt).where(spptWhere)
-      } else if (request.jenisPenghapusan === 6) {
-        // Kadaluarsa: delete only unpaid SPPT older than 5 years
-        const currentYear = new Date().getFullYear()
-        await db.delete(sppt).where(
-          and(spptWhere, lt(sppt.thnPajakSppt, currentYear - 5)),
-        )
-      } else {
-        // Others (2–5): set JNS_TRANSAKSI_OP='3', delete unpaid SPPT
-        await db.update(spop).set({ jnsTransaksiOp: "3" }).where(nopWhere)
-        await db.delete(sppt).where(spptWhere)
-      }
+      // Execute deletion and status update atomically
+      await db.transaction(async (tx) => {
+        // TODO: archive to histori_sppt_batal before deletion (legacy system behavior)
+        if (request.jenisPenghapusan === 1) {
+          // Fasum: set JNS_BUMI='4', delete unpaid SPPT
+          await tx.update(spop).set({ jnsBumi: "4" }).where(nopWhere)
+          await tx.delete(sppt).where(spptWhere)
+        } else if (request.jenisPenghapusan === 6) {
+          // Kadaluarsa: delete only unpaid SPPT older than 5 years
+          const currentYear = new Date().getFullYear()
+          await tx.delete(sppt).where(
+            and(spptWhere, lt(sppt.thnPajakSppt, currentYear - 5)),
+          )
+        } else {
+          // Others (2–5): set JNS_TRANSAKSI_OP='3', delete unpaid SPPT
+          await tx.update(spop).set({ jnsTransaksiOp: "3" }).where(nopWhere)
+          await tx.delete(sppt).where(spptWhere)
+        }
 
-      // Update request status to approved
-      await db
-        .update(datPenghapusan)
-        .set({
-          status: "approved",
-          userApprover: context.session!.user.id,
-          tglApproval: new Date(),
-          catatanApprover: input.catatan ?? null,
-        })
-        .where(eq(datPenghapusan.id, input.id))
+        // Update request status to approved
+        await tx
+          .update(datPenghapusan)
+          .set({
+            status: "approved",
+            userApprover: context.session!.user.id,
+            tglApproval: new Date(),
+            catatanApprover: input.catatan ?? null,
+          })
+          .where(eq(datPenghapusan.id, input.id))
+      })
 
       return { success: true }
     }),
