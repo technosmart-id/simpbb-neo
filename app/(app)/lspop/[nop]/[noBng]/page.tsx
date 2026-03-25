@@ -101,6 +101,11 @@ const KD_LANGIT = [
   { kode: '5', nama: 'Tanpa Langit-langit' },
 ]
 
+const JNS_JPB7 = [
+  { kode: '1', nama: 'Melati' },
+  { kode: '2', nama: 'Berbintang' },
+]
+
 type FormState = {
   kdJpb: string
   luasBng: number
@@ -114,6 +119,29 @@ type FormState = {
   kdLantai: string
   kdLangitLangit: string
   nilaiSistemBng: number
+  // JPB-03 (Industri/Gudang)
+  tingKolomJpb3: number
+  lbrBentJpb3: number
+  dayaDukungLantaiJpb3: number
+  kelilingDindingJpb3: number
+  luasMezzanineJpb3: number
+  // JPB-02/09 (Komersial/Kantor)
+  klsJpb2: number
+  // JPB-04 (Apartemen)
+  klsJpb4: number
+  // JPB-05 (Hotel)
+  klsJpb5: number
+  // JPB-06 (Parkir)
+  klsJpb6: number
+  // JPB-07 (Hotel Berbintang)
+  jnsJpb7: string
+  bintangJpb7: number
+  jmlKmrJpb7: number
+  luasKmrJpb7DgnAcSent: string
+  luasKmrLainJpb7DgnAcSent: string
+  // JPB-13/16 (Olahraga)
+  klsJpb13: number
+  klsJpb16: number
 }
 
 const DEFAULT_FORM: FormState = {
@@ -129,6 +157,29 @@ const DEFAULT_FORM: FormState = {
   kdLantai: '2',
   kdLangitLangit: '2',
   nilaiSistemBng: 0,
+  // JPB-03
+  tingKolomJpb3: 0,
+  lbrBentJpb3: 0,
+  dayaDukungLantaiJpb3: 0,
+  kelilingDindingJpb3: 0,
+  luasMezzanineJpb3: 0,
+  // JPB-02/09
+  klsJpb2: 0,
+  // JPB-04
+  klsJpb4: 0,
+  // JPB-05
+  klsJpb5: 0,
+  // JPB-06
+  klsJpb6: 0,
+  // JPB-07
+  jnsJpb7: '1',
+  bintangJpb7: 0,
+  jmlKmrJpb7: 0,
+  luasKmrJpb7DgnAcSent: '',
+  luasKmrLainJpb7DgnAcSent: '',
+  // JPB-13/16
+  klsJpb13: 0,
+  klsJpb16: 0,
 }
 
 function SelectField({
@@ -307,6 +358,29 @@ export default function LspopBangunanPage() {
       kdLantai: d.kdLantai ?? '2',
       kdLangitLangit: d.kdLangitLangit ?? '2',
       nilaiSistemBng: d.nilaiSistemBng ?? 0,
+      // JPB-03
+      tingKolomJpb3: d.tingKolomJpb3 ?? 0,
+      lbrBentJpb3: d.lbrBentJpb3 ?? 0,
+      dayaDukungLantaiJpb3: d.dayaDukungLantaiJpb3 ?? 0,
+      kelilingDindingJpb3: d.kelilingDindingJpb3 ?? 0,
+      luasMezzanineJpb3: d.luasMezzanineJpb3 ?? 0,
+      // JPB-02/09
+      klsJpb2: d.klsJpb2 ?? 0,
+      // JPB-04
+      klsJpb4: d.klsJpb4 ?? 0,
+      // JPB-05
+      klsJpb5: d.klsJpb5 ?? 0,
+      // JPB-06
+      klsJpb6: d.klsJpb6 ?? 0,
+      // JPB-07
+      jnsJpb7: d.jnsJpb7 ?? '1',
+      bintangJpb7: d.bintangJpb7 ?? 0,
+      jmlKmrJpb7: d.jmlKmrJpb7 ?? 0,
+      luasKmrJpb7DgnAcSent: d.luasKmrJpb7DgnAcSent ?? '',
+      luasKmrLainJpb7DgnAcSent: d.luasKmrLainJpb7DgnAcSent ?? '',
+      // JPB-13/16
+      klsJpb13: d.klsJpb13 ?? 0,
+      klsJpb16: d.klsJpb16 ?? 0,
     })
   }, [buildingQuery.data])
 
@@ -485,6 +559,256 @@ export default function LspopBangunanPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* JPB-03: Industri / Gudang */}
+      {form.kdJpb === '03' && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Parameter JPB-03: Industri / Gudang</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label>Tinggi Kolom (cm)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.tingKolomJpb3 || ''}
+                  onChange={(e) => set('tingKolomJpb3')(Number(e.target.value))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Lebar Bentang (cm)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.lbrBentJpb3 || ''}
+                  onChange={(e) => set('lbrBentJpb3')(Number(e.target.value))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Daya Dukung Lantai (kg/m²)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.dayaDukungLantaiJpb3 || ''}
+                  onChange={(e) => set('dayaDukungLantaiJpb3')(Number(e.target.value))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Keliling Dinding (m)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.kelilingDindingJpb3 || ''}
+                  onChange={(e) => set('kelilingDindingJpb3')(Number(e.target.value))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Luas Mezzanine (m²)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.luasMezzanineJpb3 || ''}
+                  onChange={(e) => set('luasMezzanineJpb3')(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* JPB-02/09: Perdagangan / Kantor */}
+      {(form.kdJpb === '02' || form.kdJpb === '09') && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">
+              Parameter JPB-{form.kdJpb === '02' ? '02: Perdagangan' : '09: Kantor'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label>Kelas JPB</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.klsJpb2 || ''}
+                  onChange={(e) => set('klsJpb2')(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* JPB-04: Apartemen */}
+      {form.kdJpb === '04' && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Parameter JPB-04: Apartemen</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label>Kelas JPB</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.klsJpb4 || ''}
+                  onChange={(e) => set('klsJpb4')(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* JPB-05: Hotel */}
+      {form.kdJpb === '05' && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Parameter JPB-05: Hotel</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label>Kelas JPB</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.klsJpb5 || ''}
+                  onChange={(e) => set('klsJpb5')(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* JPB-06: Parkir */}
+      {form.kdJpb === '06' && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Parameter JPB-06: Parkir</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label>Kelas JPB</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.klsJpb6 || ''}
+                  onChange={(e) => set('klsJpb6')(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* JPB-07: Hotel Berbintang */}
+      {form.kdJpb === '07' && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Parameter JPB-07: Hotel Berbintang</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <SelectField
+                label="Jenis Hotel"
+                value={form.jnsJpb7}
+                onChange={set('jnsJpb7')}
+                options={JNS_JPB7}
+              />
+              <div className="space-y-1">
+                <Label>Jumlah Bintang</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  max={5}
+                  value={form.bintangJpb7 || ''}
+                  onChange={(e) => set('bintangJpb7')(Number(e.target.value))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Jumlah Kamar</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.jmlKmrJpb7 || ''}
+                  onChange={(e) => set('jmlKmrJpb7')(Number(e.target.value))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Luas Kamar dgn AC Sentral (m²)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  value={form.luasKmrJpb7DgnAcSent}
+                  onChange={(e) => set('luasKmrJpb7DgnAcSent')(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Luas Kamar Lain dgn AC Sentral (m²)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  value={form.luasKmrLainJpb7DgnAcSent}
+                  onChange={(e) => set('luasKmrLainJpb7DgnAcSent')(e.target.value)}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* JPB-13: Olahraga */}
+      {form.kdJpb === '13' && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Parameter JPB-13: Olahraga</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label>Kelas JPB</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.klsJpb13 || ''}
+                  onChange={(e) => set('klsJpb13')(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* JPB-16: Olahraga (Stadion) */}
+      {form.kdJpb === '16' && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Parameter JPB-16: Olahraga (Stadion)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label>Kelas JPB</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.klsJpb16 || ''}
+                  onChange={(e) => set('klsJpb16')(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Nilai */}
       <Card>
