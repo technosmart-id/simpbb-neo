@@ -26,6 +26,45 @@ function nopWhere(table: typeof datOpBangunan, input: z.infer<typeof nopInput>) 
   )
 }
 
+async function calculateNilaiSistemBng(input: {
+  kdPropinsi: string
+  kdDati2: string
+  kdKecamatan: string
+  kdKelurahan: string
+  kdBlok: string
+  noUrut: string
+  kdJnsOp: string
+  noBng: number
+  kdJpb?: string | null
+  luasBng: number
+  jmlLantaiBng: number
+}): Promise<number> {
+  try {
+    // Step 1: sync cav_sismiop internal state
+    await db.execute(sql`
+      CALL cav_sismiop.\`insert\`(
+        ${input.kdPropinsi}, ${input.kdDati2}, ${input.kdKecamatan},
+        ${input.kdKelurahan}, ${input.kdBlok}, ${input.noUrut},
+        ${input.kdJnsOp}, ${input.noBng}
+      )
+    `)
+    // Step 2: calculate building value
+    const result = await db.execute(sql`
+      SELECT cav_sismiop.HITUNG_BNG(
+        ${input.kdPropinsi}, ${input.kdDati2}, ${input.kdKecamatan},
+        ${input.kdKelurahan}, ${input.kdBlok}, ${input.noUrut},
+        ${input.kdJnsOp}, ${input.noBng},
+        ${input.kdJpb ?? '01'}, ${input.luasBng}, ${input.jmlLantaiBng},
+        YEAR(NOW())
+      ) AS nilai
+    `)
+    return Number((result[0] as unknown as Array<{ nilai: unknown }>)[0]?.nilai ?? 0)
+  } catch {
+    // If proc doesn't exist in this environment, return 0 gracefully
+    return 0
+  }
+}
+
 export const lspopRouter = os.router({
   // List buildings for a NOP
   listByNop: os
@@ -60,12 +99,38 @@ export const lspopRouter = os.router({
       kdDinding: z.string().optional(),
       kdLantai: z.string().optional(),
       kdLangitLangit: z.string().optional(),
-      nilaiSistemBng: z.number().default(0),
+      nilaiIndividu: z.number().default(0),
+      // JPB-specific fields
+      tingKolomJpb3: z.number().optional(),
+      lbrBentJpb3: z.number().optional(),
+      dayaDukungLantaiJpb3: z.number().optional(),
+      kelilingDindingJpb3: z.number().optional(),
+      luasMezzanineJpb3: z.number().optional(),
+      klsJpb2: z.number().optional(),
+      klsJpb4: z.number().optional(),
+      klsJpb5: z.number().optional(),
+      klsJpb6: z.number().optional(),
+      jnsJpb7: z.string().optional(),
+      bintangJpb7: z.number().optional(),
+      jmlKmrJpb7: z.number().optional(),
+      luasKmrJpb7DgnAcSent: z.string().optional(),
+      luasKmrLainJpb7DgnAcSent: z.string().optional(),
+      klsJpb13: z.number().optional(),
+      klsJpb16: z.number().optional(),
     }))
     .handler(async ({ input }) => {
       await db.insert(datOpBangunan).values({
-        ...input,
+        kdPropinsi: input.kdPropinsi,
+        kdDati2: input.kdDati2,
+        kdKecamatan: input.kdKecamatan,
+        kdKelurahan: input.kdKelurahan,
+        kdBlok: input.kdBlok,
+        noUrut: input.noUrut,
+        kdJnsOp: input.kdJnsOp,
+        noBng: input.noBng,
         kdJpb: input.kdJpb ?? null,
+        luasBng: input.luasBng,
+        jmlLantaiBng: input.jmlLantaiBng,
         thnDibangunBng: input.thnDibangunBng ?? null,
         thnRenovasiBng: input.thnRenovasiBng ?? null,
         kondisiBng: input.kondisiBng ?? null,
@@ -74,8 +139,49 @@ export const lspopRouter = os.router({
         kdDinding: input.kdDinding ?? null,
         kdLantai: input.kdLantai ?? null,
         kdLangitLangit: input.kdLangitLangit ?? null,
+        nilaiSistemBng: 0,
+        nilaiIndividu: input.nilaiIndividu,
+        tingKolomJpb3: input.tingKolomJpb3 ?? null,
+        lbrBentJpb3: input.lbrBentJpb3 ?? null,
+        dayaDukungLantaiJpb3: input.dayaDukungLantaiJpb3 ?? null,
+        kelilingDindingJpb3: input.kelilingDindingJpb3 ?? null,
+        luasMezzanineJpb3: input.luasMezzanineJpb3 ?? null,
+        klsJpb2: input.klsJpb2 ?? null,
+        klsJpb4: input.klsJpb4 ?? null,
+        klsJpb5: input.klsJpb5 ?? null,
+        klsJpb6: input.klsJpb6 ?? null,
+        jnsJpb7: input.jnsJpb7 ?? null,
+        bintangJpb7: input.bintangJpb7 ?? null,
+        jmlKmrJpb7: input.jmlKmrJpb7 ?? null,
+        luasKmrJpb7DgnAcSent: input.luasKmrJpb7DgnAcSent ?? null,
+        luasKmrLainJpb7DgnAcSent: input.luasKmrLainJpb7DgnAcSent ?? null,
+        klsJpb13: input.klsJpb13 ?? null,
+        klsJpb16: input.klsJpb16 ?? null,
         aktif: 1,
       })
+
+      // Wire HITUNG_BNG — only if nilaiIndividu is not set
+      if (!input.nilaiIndividu) {
+        const nilaiSistemBng = await calculateNilaiSistemBng({
+          kdPropinsi: input.kdPropinsi,
+          kdDati2: input.kdDati2,
+          kdKecamatan: input.kdKecamatan,
+          kdKelurahan: input.kdKelurahan,
+          kdBlok: input.kdBlok,
+          noUrut: input.noUrut,
+          kdJnsOp: input.kdJnsOp,
+          noBng: input.noBng,
+          kdJpb: input.kdJpb,
+          luasBng: input.luasBng,
+          jmlLantaiBng: input.jmlLantaiBng,
+        })
+        if (nilaiSistemBng > 0) {
+          await db.update(datOpBangunan)
+            .set({ nilaiSistemBng })
+            .where(and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, input.noBng)))
+        }
+      }
+
       return { success: true }
     }),
 
@@ -94,19 +200,81 @@ export const lspopRouter = os.router({
       kdDinding: z.string().optional(),
       kdLantai: z.string().optional(),
       kdLangitLangit: z.string().optional(),
-      nilaiSistemBng: z.number().optional(),
+      // nilaiSistemBng intentionally omitted — controlled exclusively by HITUNG_BNG
+      nilaiIndividu: z.number().optional(),
+      tingKolomJpb3: z.number().optional(),
+      lbrBentJpb3: z.number().optional(),
+      dayaDukungLantaiJpb3: z.number().optional(),
+      kelilingDindingJpb3: z.number().optional(),
+      luasMezzanineJpb3: z.number().optional(),
+      klsJpb2: z.number().optional(),
+      klsJpb4: z.number().optional(),
+      klsJpb5: z.number().optional(),
+      klsJpb6: z.number().optional(),
+      jnsJpb7: z.string().optional(),
+      bintangJpb7: z.number().optional(),
+      jmlKmrJpb7: z.number().optional(),
+      luasKmrJpb7DgnAcSent: z.string().optional(),
+      luasKmrLainJpb7DgnAcSent: z.string().optional(),
+      klsJpb13: z.number().optional(),
+      klsJpb16: z.number().optional(),
     }))
     .handler(async ({ input }) => {
-      const { kdPropinsi, kdDati2, kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, noBng, ...updates } = input
-      const setValues: Record<string, any> = {}
-      for (const [k, v] of Object.entries(updates)) {
-        if (v !== undefined) setValues[k] = v
+      const { noBng, ...rest } = input
+      const nopParts = {
+        kdPropinsi: input.kdPropinsi,
+        kdDati2: input.kdDati2,
+        kdKecamatan: input.kdKecamatan,
+        kdKelurahan: input.kdKelurahan,
+        kdBlok: input.kdBlok,
+        noUrut: input.noUrut,
+        kdJnsOp: input.kdJnsOp,
       }
-      if (Object.keys(setValues).length === 0) return { success: true }
 
-      await db.update(datOpBangunan).set(setValues).where(
-        and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)),
-      )
+      // Build set object explicitly — pick only defined keys
+      const setValues: Partial<typeof datOpBangunan.$inferInsert> = {}
+      const mappable = ['kdJpb','luasBng','jmlLantaiBng','thnDibangunBng','thnRenovasiBng',
+        'kondisiBng','jnsKonstruksiBng','jnsAtapBng','kdDinding','kdLantai','kdLangitLangit',
+        'nilaiIndividu','tingKolomJpb3','lbrBentJpb3','dayaDukungLantaiJpb3',
+        'kelilingDindingJpb3','luasMezzanineJpb3','klsJpb2','klsJpb4','klsJpb5','klsJpb6',
+        'jnsJpb7','bintangJpb7','jmlKmrJpb7','luasKmrJpb7DgnAcSent','luasKmrLainJpb7DgnAcSent',
+        'klsJpb13','klsJpb16'] as const
+      for (const key of mappable) {
+        if (key in rest && (rest as Record<string, unknown>)[key] !== undefined) {
+          (setValues as Record<string, unknown>)[key] = (rest as Record<string, unknown>)[key]
+        }
+      }
+
+      if (Object.keys(setValues).length > 0) {
+        await db.update(datOpBangunan)
+          .set(setValues)
+          .where(and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)))
+      }
+
+      // Re-calculate HITUNG_BNG unless nilaiIndividu is overriding
+      const [current] = await db.select({
+        nilaiIndividu: datOpBangunan.nilaiIndividu,
+        luasBng: datOpBangunan.luasBng,
+        jmlLantaiBng: datOpBangunan.jmlLantaiBng,
+        kdJpb: datOpBangunan.kdJpb,
+      }).from(datOpBangunan)
+        .where(and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)))
+
+      if (current && !current.nilaiIndividu) {
+        const nilaiSistemBng = await calculateNilaiSistemBng({
+          ...nopParts,
+          noBng,
+          kdJpb: current.kdJpb,
+          luasBng: current.luasBng,
+          jmlLantaiBng: current.jmlLantaiBng,
+        })
+        if (nilaiSistemBng > 0) {
+          await db.update(datOpBangunan)
+            .set({ nilaiSistemBng })
+            .where(and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)))
+        }
+      }
+
       return { success: true }
     }),
 
