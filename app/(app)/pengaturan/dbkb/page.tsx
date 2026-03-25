@@ -15,9 +15,7 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
-import { Save, TrendingUp } from 'lucide-react'
-
-const KATEGORI = ['A1', 'A2', 'A3', 'B'] as const
+import { Loader2, Save, TrendingUp } from 'lucide-react'
 
 type Row = {
   id: number
@@ -37,7 +35,11 @@ export default function DbkbPage() {
   const [dirtyValues, setDirtyValues] = useState<Record<number, string>>({})
   const [pctIncrease, setPctIncrease] = useState('')
 
-  const { data: rows = [] } = useQuery(
+  const { data: kategoriList = [], isLoading: isKategoriLoading } = useQuery(
+    orpc.dbkb.listKategori.queryOptions()
+  )
+
+  const { data: rows = [], isLoading } = useQuery(
     orpc.dbkb.list.queryOptions({ input: { thnBerlaku: year } })
   )
 
@@ -48,6 +50,7 @@ export default function DbkbPage() {
       setDirtyValues({})
       qc.invalidateQueries({ queryKey: orpc.dbkb.list.queryOptions({ input: { thnBerlaku: year } }).queryKey })
     },
+    onError: (err: Error) => toast.error(err.message),
   })
 
   const massMutation = useMutation({
@@ -57,6 +60,7 @@ export default function DbkbPage() {
       setDirtyValues({})
       qc.invalidateQueries({ queryKey: orpc.dbkb.list.queryOptions({ input: { thnBerlaku: year } }).queryKey })
     },
+    onError: (err: Error) => toast.error(err.message),
   })
 
   function handleSaveAll() {
@@ -69,14 +73,16 @@ export default function DbkbPage() {
   }
 
   function getRowsByKategori(k: string): Row[] {
-    return (rows as Row[]).filter((r) => r.kategori === k)
+    return rows.filter((r) => r.kategori === k)
   }
 
+  const defaultTab = kategoriList[0]?.kategori ?? ''
+
   return (
-    <div className="p-6 space-y-4">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">DBKB — Daftar Biaya Komponen Bangunan</h1>
+          <h1 className="text-2xl font-bold tracking-tight">DBKB — Daftar Biaya Komponen Bangunan</h1>
           <p className="text-sm text-muted-foreground">Referensi biaya komponen untuk kalkulasi NJOP bangunan</p>
         </div>
         <div className="flex items-center gap-2">
@@ -112,6 +118,7 @@ export default function DbkbPage() {
               <AlertDialogFooter>
                 <AlertDialogCancel>Batal</AlertDialogCancel>
                 <AlertDialogAction
+                  disabled={massMutation.isPending || !pctIncrease || isNaN(Number(pctIncrease))}
                   onClick={() =>
                     massMutation.mutate({
                       pctIncrease: Number(pctIncrease),
@@ -131,50 +138,74 @@ export default function DbkbPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="A1">
-        <TabsList>
-          {KATEGORI.map((k) => (
-            <TabsTrigger key={k} value={k}>
-              Kategori {k}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        {KATEGORI.map((k) => (
-          <TabsContent key={k} value={k}>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-24">Kode</TableHead>
-                  <TableHead>Nama Komponen</TableHead>
-                  <TableHead className="w-40 text-right">Nilai Awal (Rp)</TableHead>
-                  <TableHead className="w-48 text-right">Nilai Baru (Rp)</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {getRowsByKategori(k).map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell className="font-mono">{row.kodeMaterial}</TableCell>
-                    <TableCell>{row.namaMaterial}</TableCell>
-                    <TableCell className="text-right font-mono">
-                      {Number(row.nilaiAwal).toLocaleString('id-ID')}
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        className="text-right font-mono"
-                        value={dirtyValues[row.id] ?? row.nilaiBaru}
-                        onChange={(e) =>
-                          setDirtyValues((prev) => ({ ...prev, [row.id]: e.target.value }))
-                        }
-                      />
-                    </TableCell>
+      {isKategoriLoading ? (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Memuat kategori...
+        </div>
+      ) : (
+        <Tabs defaultValue={defaultTab}>
+          <TabsList>
+            {kategoriList.map((k) => (
+              <TabsTrigger key={k.kategori} value={k.kategori}>
+                Kategori {k.kategori}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {kategoriList.map((k) => (
+            <TabsContent key={k.kategori} value={k.kategori}>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-24">Kode</TableHead>
+                    <TableHead>Nama Komponen</TableHead>
+                    <TableHead className="w-40 text-right">Nilai Awal (Rp)</TableHead>
+                    <TableHead className="w-48 text-right">Nilai Baru (Rp)</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TabsContent>
-        ))}
-      </Tabs>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Memuat...
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : getRowsByKategori(k.kategori).length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                        Tidak ada data
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    getRowsByKategori(k.kategori).map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell className="font-mono">{row.kodeMaterial}</TableCell>
+                        <TableCell>{row.namaMaterial}</TableCell>
+                        <TableCell className="text-right font-mono">
+                          {Number(row.nilaiAwal).toLocaleString('id-ID')}
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            className="text-right font-mono"
+                            value={dirtyValues[row.id] ?? row.nilaiBaru}
+                            onChange={(e) =>
+                              setDirtyValues((prev) => ({ ...prev, [row.id]: e.target.value }))
+                            }
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
     </div>
   )
 }
