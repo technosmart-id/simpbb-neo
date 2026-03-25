@@ -138,6 +138,7 @@ const data = {
         { title: "Fasilitas", url: "/pengaturan/fasilitas" },
         { title: "Jalan", url: "/pengaturan/jalan" },
         { title: "Konfigurasi", url: "/pengaturan/konfigurasi" },
+        { title: "DBKB", url: "/pengaturan/dbkb" },
         { title: "Pengguna", url: "/pengaturan/pengguna" },
         { title: "Group Akses", url: "/pengaturan/group-akses" },
       ],
