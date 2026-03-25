@@ -58,7 +58,8 @@ async function calculateNilaiSistemBng(input: {
         YEAR(NOW())
       ) AS nilai
     `)
-    return Number((result[0] as unknown as Array<{ nilai: unknown }>)[0]?.nilai ?? 0)
+    const rows = result[0] as unknown as Array<{ nilai: unknown }>
+    return Number(rows[0]?.nilai ?? 0)
   } catch {
     // If proc doesn't exist in this environment, return 0 gracefully
     return 0
@@ -161,7 +162,7 @@ export const lspopRouter = os.router({
       })
 
       // Wire HITUNG_BNG — only if nilaiIndividu is not set
-      if (!input.nilaiIndividu) {
+      if (!input.nilaiIndividu || input.nilaiIndividu === 0) {
         const nilaiSistemBng = await calculateNilaiSistemBng({
           kdPropinsi: input.kdPropinsi,
           kdDati2: input.kdDati2,
@@ -260,7 +261,7 @@ export const lspopRouter = os.router({
       }).from(datOpBangunan)
         .where(and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)))
 
-      if (current && !current.nilaiIndividu) {
+      if (current && (!current.nilaiIndividu || current.nilaiIndividu === 0)) {
         const nilaiSistemBng = await calculateNilaiSistemBng({
           ...nopParts,
           noBng,
