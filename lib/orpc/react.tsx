@@ -1,25 +1,25 @@
 'use client'
 
-import { createORPCReactQueryUtils } from '@orpc/react-query'
+import { createORPCReactQueryUtils, type RouterUtils } from '@orpc/react-query'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createContext, useContext, useState, ReactNode } from 'react'
-import { orpcClient } from './client'
+import { orpcClient, type AppRouter } from './client'
+import type { RouterClient } from '@orpc/server'
 
 // Workaround for circular type dependency issues
 // The types are inferred at runtime, so we use 'any' here
 // but the runtime behavior is fully type-safe
 let _utils: any = null
 
-function getUtils() {
+function getUtils(): RouterUtils<RouterClient<AppRouter>> {
 	if (!_utils) {
 		_utils = createORPCReactQueryUtils(orpcClient)
 	}
 	return _utils
 }
 
-// Export the utils with 'any' type to avoid TypeScript errors
-// The actual types are inferred correctly at runtime
-export const ORPCContext = createContext<any>(undefined)
+// Export the utils with correct type to restore type safety in the UI
+export const ORPCContext = createContext<RouterUtils<RouterClient<AppRouter>> | undefined>(undefined)
 
 export function useORPC() {
 	const orpc = useContext(ORPCContext)

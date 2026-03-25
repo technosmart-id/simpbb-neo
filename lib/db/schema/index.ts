@@ -4,6 +4,7 @@ export * from "./member-roles";
 export * from "./notifications";
 export * from "./notification-preferences";
 export * from "./org-roles";
+export * from "./books";
 export * from "./resource-ownership";
 
 // SIM-PBB Domain Schema

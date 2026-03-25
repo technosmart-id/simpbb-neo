@@ -14,10 +14,10 @@ import {
 
 const routeLabels: Record<string, string> = {
   dashboard: "Dashboard",
-  "crud-example": "Books CRUD Example",
   notifications: "Notifications",
   settings: "Account Settings",
   ar: "AR Unit",
+  "crud-example": "Books CRUD Example",
 }
 
 function isId(segment: string) {

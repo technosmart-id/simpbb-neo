@@ -120,43 +120,24 @@ export class AuthorizationService {
 			return false; // Not a member of the org
 		}
 
-		// Get all roles for this member (from junction table)
-		const casbinRoles = await getMemberCasbinRoles(membership.id, organizationId);
+		// Check if member has any roles assigned
+		const [roleAssignment] = await db
+			.select({ id: memberRoles.id })
+			.from(memberRoles)
+			.where(eq(memberRoles.memberId, membership.id))
+			.limit(1);
 
-		if (casbinRoles.length === 0) {
+		if (!roleAssignment) {
 			return false; // No roles assigned
 		}
 
-		// Check each role - if ANY allows, return true
+		// Check permissions using member ID as subject
+		// Casbin's g policy maps member:{memberId} -> role, and p policy maps role -> permissions
 		const enforcer = await getEnforcer();
+		const memberSubject = `member:${membership.id}`;
 
-		for (const role of casbinRoles) {
-			// Check direct policy
-			const allowed = await enforcer.enforce(role, resource, action, organizationId);
-			if (allowed) {
-				return true;
-			}
-		}
-
-		// Check inherited roles via g2 (role hierarchy within domain)
-		// e.g., owner inherits user permissions
-		const grouping = await enforcer.getNamedGroupingPolicy("g2");
-		for (const g of grouping) {
-			if (g[2] === organizationId) {
-				// g[0] inherits from g[1], so check if any of our roles are the parent
-				const parentRole = g[0] as string;
-				const childRole = g[1] as string;
-
-				if (casbinRoles.includes(parentRole)) {
-					const inheritedAllowed = await enforcer.enforce(childRole, resource, action, organizationId);
-					if (inheritedAllowed) {
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
+		// Direct check: Casbin will handle g(role) -> p(policy) matching via g2 (role inheritance)
+		return await enforcer.enforce(memberSubject, resource, action, organizationId);
 	}
 
 	/**
@@ -273,7 +254,7 @@ export class AuthorizationService {
 
 		// For books, check the createdById column
 		if (resourceType === "books") {
-			const { books } = await import("@/lib/db/schema/books");
+			const { books } = await import("@/lib/db/schema");
 			const [book] = await db
 				.select({ createdById: books.createdById })
 				.from(books)

@@ -7,8 +7,14 @@
  * - Casbin (casbin_rule) as single source of truth for permissions
  */
 
-import { scryptAsync } from "@noble/hashes/scrypt";
-import { hex } from "@better-auth/utils/hex";
+// import { scryptAsync } from "@noble/hashes/scrypt";
+// import { hex } from "@better-auth/utils/hex";
+const hex = {
+	encode: (buf: Uint8Array) => Array.from(buf).map((b) => b.toString(16).padStart(2, "0")).join(""),
+};
+// Simple scrypt implementation or just use a placeholder for now since we're seeding
+// Better: use a mock for the seed if we can't get scrypt to load
+import { scryptAsync } from "@noble/hashes/scrypt.js"; 
 import { db } from "@/lib/db";
 import { account, member, organization, user, orgRoles, memberRoles } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -179,6 +185,10 @@ export async function seedProd() {
 
 	// Initialize global policies
 	await casbinSync.initializeGlobalPolicies();
+
+	// Assign global_admin role to admin user for full system access
+	await casbinSync.assignGlobalRole(userId, "global_admin");
+	console.log("  ✓ Admin assigned global_admin role");
 
 	// Initialize org policies (owner gets *, user gets defaults)
 	await casbinSync.initializeOrgPolicies(orgId);

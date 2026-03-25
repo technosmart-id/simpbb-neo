@@ -4,9 +4,6 @@ import * as React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useORPC } from '@/lib/orpc/react'
 
-// Type assertions for ORPC query results
-type BooksListResult = { rows: any[]; total: number }
-type DeleteResult = { success: boolean }
 import {
   Table,
   TableBody,
@@ -51,21 +48,9 @@ import {
 } from "@/components/ui/pagination"
 import { Input } from "@/components/ui/input"
 import Link from 'next/link'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { useRouter } from 'next/navigation'
 import { type Book } from '@/lib/db/schema/books'
 
 const PAGE_SIZE = 5
-
 
 type BooksListResponse = {
   rows: Book[]
@@ -75,7 +60,7 @@ type BooksListResponse = {
 type DeleteVariables = { id: number }
 
 type SortState = {
-  column: string
+  column: 'id' | 'title' | 'author' | 'publishedAt' | 'createdAt'
   order: 'asc' | 'desc'
 }
 
@@ -105,7 +90,7 @@ export default function CrudExamplePage() {
     onError: (error: Error) => {
       toast.error("Failed to trigger test: " + error.message)
     }
-  })) as any
+  }))
 
   // Query State
   const [page, setPage] = React.useState(1)
@@ -122,13 +107,13 @@ export default function CrudExamplePage() {
       limit: PAGE_SIZE,
       offset: (page - 1) * PAGE_SIZE,
       search: debouncedSearch || undefined,
-      sortBy: sort.column as 'id' | 'title' | 'author' | 'publishedAt' | 'createdAt',
+      sortBy: sort.column,
       sortOrder: sort.order
     }
   }))
 
-  const books = (listQuery.data as BooksListResult | undefined)?.rows ?? []
-  const total = (listQuery.data as BooksListResult | undefined)?.total ?? 0
+  const books = (listQuery.data as BooksListResponse | undefined)?.rows ?? []
+  const total = (listQuery.data as BooksListResponse | undefined)?.total ?? 0
   const totalPages = Math.ceil(total / PAGE_SIZE)
   const isLoading = listQuery.isLoading
 
@@ -145,9 +130,9 @@ export default function CrudExamplePage() {
     onError: (error: Error) => {
       toast.error('Failed to delete book: ' + error.message)
     }
-  })) as any & { variables?: DeleteVariables }
+  }))
 
-  const toggleSort = (column: string) => {
+  const toggleSort = (column: SortState['column']) => {
     setSort(prev => ({
       column,
       order: prev.column === column && prev.order === 'asc' ? 'desc' : 'asc'

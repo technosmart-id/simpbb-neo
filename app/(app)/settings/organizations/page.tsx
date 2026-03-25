@@ -86,7 +86,7 @@ interface Organization {
 	id: string
 	name: string
 	slug: string
-	createdAt: Date | string
+	createdAt?: Date | string
 	logo?: string | null
 	autoJoin?: boolean
 }
@@ -96,7 +96,7 @@ interface OrgMember {
 	role: string | null
 	globalRole: string | null
 	user?: {
-		id: string
+		id?: string
 		name: string
 		email: string
 	}
@@ -137,15 +137,11 @@ interface OrganizationClient {
 		error?: { message?: string }
 		data?: any
 	}>
-	listMembers: (opts: { query: { organizationId: string } }) => Promise<{
-		data?: { members: OrgMember[] }
-	}>
-	updateMemberRole: (opts: { memberIdOrEmail: string; role: string }) => Promise<{
-		error?: { message?: string }
-	}>
-	removeMember: (opts: { memberIdOrEmail: string }) => Promise<{
-		error?: { message?: string }
-	}>
+	listMembers: (opts: { organizationId: string }) => Promise<OrgMember[]>
+	updateMemberRole: (opts: { organizationId: string; memberId: string; role: string }) => Promise<{ success: boolean }>
+	addMember: (opts: { organizationId: string; email: string; role: string }) => Promise<{ success: boolean }>
+	updateSettings: (opts: { organizationId: string; autoJoin: boolean }) => Promise<{ success: boolean }>
+    removeMember: (opts: { organizationId: string; memberId: string }) => Promise<{ success: boolean }>
 }
 
 interface AdminClient {
@@ -222,21 +218,30 @@ export default function OrganizationsSettingsPage() {
 	const fetchOrganizations = useCallback(async () => {
 		try {
 			setLoading(true)
-			const res = await (orpcClient as any).organizations.list()
+			const client = orpcClient as unknown as {
+				organizations: {
+					list: () => Promise<{
+						organizations: Organization[];
+						activeOrganizationId: string | null
+					}>
+				}
+			}
+			const res = await client.organizations.list()
 
 			if (res) {
 				const orgList = res.organizations || []
 				setOrganizations(orgList)
 
 				const activeId = res.activeOrganizationId || orgList[0]?.id
-				const active = activeId ? orgList.find((o: any) => o.id === activeId) || orgList[0] || null : orgList[0] || null
+				const active = activeId ? orgList.find((o: Organization) => o.id === activeId) || orgList[0] || null : orgList[0] || null
 				setActiveOrg(active)
 			} else {
 				setOrganizations([])
 				setActiveOrg(null)
 			}
-		} catch {
-			toast.error("Failed to fetch organizations")
+		} catch (err: unknown) {
+			const error = err as Error
+			toast.error(error.message || "Failed to fetch organizations")
 		} finally {
 			setLoading(false)
 		}
@@ -246,7 +251,12 @@ export default function OrganizationsSettingsPage() {
 		if (!activeOrg) return
 		setLoadingMembers(true)
 		try {
-			const res = await (orpcClient as any).organizations.listMembers({ organizationId: activeOrg.id })
+			const client = orpcClient as unknown as {
+				organizations: {
+					listMembers: (opts: { organizationId: string }) => Promise<OrgMember[]>
+				}
+			}
+			const res = await client.organizations.listMembers({ organizationId: activeOrg.id })
 			if (res) {
 				setMembers(res)
 			}
@@ -355,18 +365,51 @@ export default function OrganizationsSettingsPage() {
 	}
 
 	const removeMember = async (memberId: string) => {
+		if (!activeOrg) return
 		try {
-			const orgClient = (authClient as AuthClientWithOrg).organization
-			const res = await orgClient.removeMember({ memberIdOrEmail: memberId })
-			if (res.error) {
-				toast.error(res.error.message || "Failed to remove member")
-			} else {
+			const client = orpcClient as { 
+				organizations: { 
+					removeMember: (opts: { organizationId: string; memberId: string }) => Promise<{ success: boolean }> 
+				} 
+			}
+			const res = await client.organizations.removeMember({ 
+				organizationId: activeOrg.id,
+				memberId 
+			})
+			if (res.success) {
 				toast.success("Member removed")
 				setShowDelete(null)
 				await fetchMembers()
 			}
-		} catch {
-			toast.error("Failed to remove member")
+		} catch (err: unknown) {
+			const error = err as Error
+			toast.error(error.message || "Failed to remove member")
+		}
+	}
+
+	const updateMemberRole = async (memberId: string, role: string) => {
+		if (!activeOrg) return
+		setUpdatingRole(true)
+		try {
+			const client = orpcClient as { 
+				organizations: { 
+					updateMemberRole: (opts: { organizationId: string; memberId: string; role: string }) => Promise<{ success: boolean }> 
+				} 
+			}
+			const res = await client.organizations.updateMemberRole({
+				organizationId: activeOrg.id,
+				memberId,
+				role
+			})
+			if (res.success) {
+				toast.success("Role updated")
+				await fetchMembers()
+			}
+		} catch (err: unknown) {
+			const error = err as Error
+			toast.error(error.message || "Failed to update role")
+		} finally {
+			setUpdatingRole(false)
 		}
 	}
 
@@ -412,7 +455,12 @@ export default function OrganizationsSettingsPage() {
 		if (!newMemberEmail || !activeOrg) return
 		setAddingMember(true)
 		try {
-			const res = await (orpcClient as any).organizations.addMember({
+			const client = orpcClient as { 
+				organizations: { 
+					addMember: (opts: { organizationId: string; email: string; role: string }) => Promise<{ success: boolean }> 
+				} 
+			}
+			const res = await client.organizations.addMember({
 				organizationId: activeOrg.id,
 				email: newMemberEmail,
 				role: newMemberRole
@@ -423,8 +471,9 @@ export default function OrganizationsSettingsPage() {
 				setNewMemberEmail("")
 				await fetchMembers()
 			}
-		} catch (err: any) {
-			toast.error(err.message || "Failed to add member")
+		} catch (err: unknown) {
+			const error = err as Error
+			toast.error(error.message || "Failed to add member")
 		} finally {
 			setAddingMember(false)
 		}
@@ -434,7 +483,12 @@ export default function OrganizationsSettingsPage() {
 		if (!activeOrg) return
 		setUpdatingSettings(true)
 		try {
-			const res = await (orpcClient as any).organizations.updateSettings({
+			const client = orpcClient as { 
+				organizations: { 
+					updateSettings: (opts: { organizationId: string; autoJoin: boolean }) => Promise<{ success: boolean }> 
+				} 
+			}
+			const res = await client.organizations.updateSettings({
 				organizationId: activeOrg.id,
 				autoJoin: enabled
 			})
@@ -444,8 +498,9 @@ export default function OrganizationsSettingsPage() {
 				// Update in organizations list too
 				setOrganizations(prev => prev.map(o => o.id === activeOrg.id ? { ...o, autoJoin: enabled } : o))
 			}
-		} catch (err: any) {
-			toast.error(err.message || "Failed to update settings")
+		} catch (err: unknown) {
+			const error = err as Error
+			toast.error(error.message || "Failed to update settings")
 		} finally {
 			setUpdatingSettings(false)
 		}
@@ -626,7 +681,7 @@ export default function OrganizationsSettingsPage() {
 									</div>
 									<div className="flex items-center gap-2">
 										<Clock className="h-4 w-4" />
-										<span>Joined {new Date(activeOrg.createdAt).toLocaleDateString()}</span>
+										<span>Joined {activeOrg.createdAt ? new Date(activeOrg.createdAt).toLocaleDateString() : "N/A"}</span>
 									</div>
 								</div>
 

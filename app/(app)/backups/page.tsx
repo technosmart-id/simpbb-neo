@@ -38,7 +38,6 @@ type BackupConfigResult = {
 	runOnStart: boolean
 	backupDir: string
 }
-type CreateBackupResult = { success: boolean; backupPath?: string; size?: number; duration?: number }
 type DeleteBackupResult = { success: boolean }
 import {
 	Tooltip,
@@ -56,10 +55,6 @@ type BackupRow = {
 	createdAt: Date
 }
 
-type BackupsListResponse = {
-	rows: BackupRow[]
-	total: number
-}
 
 type BackupConfig = {
 	enabled: boolean
@@ -238,10 +233,10 @@ export default function BackupsPage() {
 		onError: (error: Error) => {
 			toast.error('Failed to delete backup: ' + error.message)
 		}
-	})) as any
+	}))
 
 	const handleDelete = (filename: string) => {
-		(deleteMutation as any).mutate({ filename })
+		deleteMutation.mutate({ filename })
 	}
 
 	return (

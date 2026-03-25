@@ -12,43 +12,43 @@
     {
       "idx": 1,
       "version": "5",
-      "when": 1774198235331,
-      "tag": "0001_outgoing_chimera",
+      "when": 1774198235332,
+      "tag": "0001_strange_bloodstrike",
       "breakpoints": true
     },
     {
       "idx": 2,
-      "version": "5",
-      "when": 1774198235332,
-      "tag": "0002_strange_bloodstrike",
+      "version": "7",
+      "when": 1742688000000,
+      "tag": "0002_casbin_first_migration",
       "breakpoints": true
     },
     {
       "idx": 3,
-      "version": "7",
-      "when": 1742688000000,
-      "tag": "0003_casbin_first_migration",
+      "version": "5",
+      "when": 1774002551876,
+      "tag": "0003_simpbb-legacy-schema",
       "breakpoints": true
     },
     {
       "idx": 4,
       "version": "5",
-      "when": 1774002551876,
-      "tag": "0004_simpbb-legacy-schema",
+      "when": 1774002551877,
+      "tag": "0004_create_views",
       "breakpoints": true
     },
     {
       "idx": 5,
       "version": "5",
-      "when": 1774002551877,
-      "tag": "0005_create_views",
+      "when": 1774404425433,
+      "tag": "0005_far_orphan",
       "breakpoints": true
     },
     {
       "idx": 6,
       "version": "5",
-      "when": 1774404425433,
-      "tag": "0006_far_orphan",
+      "when": 1774423328144,
+      "tag": "0006_solid_proudstar",
       "breakpoints": true
     }
   ]

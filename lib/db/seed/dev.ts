@@ -7,10 +7,14 @@
  * - Casbin (casbin_rule) as single source of truth for permissions
  */
 
-import { scryptAsync } from "@noble/hashes/scrypt";
-import { hex } from "@better-auth/utils/hex";
+// import { scryptAsync } from "@noble/hashes/scrypt";
+// import { hex } from "@better-auth/utils/hex";
+const hex = {
+	encode: (buf: Uint8Array) => Array.from(buf).map((b) => b.toString(16).padStart(2, "0")).join(""),
+};
+import { scryptAsync } from "@noble/hashes/scrypt.js";
 import { db } from "@/lib/db";
-import { account, books, member, organization, user, orgRoles, memberRoles } from "@/lib/db/schema";
+import { account, member, organization, user, orgRoles, memberRoles } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { getCasbinSyncService } from "@/lib/services/casbin-sync";
 import { ORG_ROLES } from "@/lib/services/authorization-constants";
@@ -128,32 +132,6 @@ export async function seedDev() {
 		});
 	}
 
-	// Sample books
-	const existingBooks = await db.select().from(books).where(eq(books.organizationId, orgId)).limit(1);
-
-	if (!existingBooks.length) {
-		console.log("📚 Seeding sample books...");
-
-		const samples = [
-			{ title: "The Pragmatic Programmer", author: "Andrew Hunt" },
-			{ title: "Clean Code", author: "Robert C. Martin" },
-			{ title: "Design Patterns", author: "Gang of Four" },
-		];
-
-		for (const book of samples) {
-			await db.insert(books).values({
-				title: book.title,
-				author: book.author,
-				organizationId: orgId,
-				createdById: userId,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			});
-		}
-
-		console.log(`  ✓ Created ${samples.length} sample books`);
-	}
-
 	// Create default User role metadata
 	const existingUserRole = await db.select().from(orgRoles)
 		.where(and(eq(orgRoles.organizationId, orgId), eq(orgRoles.slug, "user")))
@@ -182,6 +160,10 @@ export async function seedDev() {
 
 	// Initialize global policies
 	await casbinSync.initializeGlobalPolicies();
+
+	// Assign global_admin role to admin user for full system access
+	await casbinSync.assignGlobalRole(userId, "global_admin");
+	console.log("  ✓ Admin assigned global_admin role");
 
 	// Initialize org policies
 	await casbinSync.initializeOrgPolicies(orgId);

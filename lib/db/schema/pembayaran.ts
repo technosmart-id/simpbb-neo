@@ -35,6 +35,7 @@ export const pembayaranSppt = mysqlTable(
   },
   (table) => [
     primaryKey({
+      name: "pk_pembayaran_sppt",
       columns: [
         table.kdPropinsi,
         table.kdDati2,

@@ -16,13 +16,11 @@ import { ORG_ROLES, GLOBAL_ROLES, RESOURCES, ACTIONS, type OrgRole, type GlobalR
 const ROLE_CONFIG = {
 	org: {
 		[ORG_ROLES.OWNER]: { icon: Crown, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10" },
-		[ORG_ROLES.ADMIN]: { icon: Shield, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10" },
-		[ORG_ROLES.MEMBER]: { icon: User, color: "text-green-600 dark:text-green-400", bg: "bg-green-500/10" },
-		[ORG_ROLES.VIEWER]: { icon: Eye, color: "text-slate-600 dark:text-slate-400", bg: "bg-slate-500/10" },
+		[ORG_ROLES.USER]: { icon: User, color: "text-green-600 dark:text-green-400", bg: "bg-green-500/10" },
 	},
 	global: {
 		[GLOBAL_ROLES.GLOBAL_ADMIN]: { icon: Crown, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10" },
-		[GLOBAL_ROLES.GLOBAL_MODERATOR]: { icon: ShieldAlert, color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-500/10" },
+		[GLOBAL_ROLES.GLOBAL_MODERATOR]: { icon: Shield, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10" },
 		[GLOBAL_ROLES.GLOBAL_USER]: { icon: User, color: "text-green-600 dark:text-green-400", bg: "bg-green-500/10" },
 	},
 } as const
@@ -63,7 +61,7 @@ function PermissionsPageContent() {
 	const [canEdit, setCanEdit] = useState(false)
 
 	const [selectedScope, setSelectedScope] = useState<Scope>(scopeParam || "org")
-	const [selectedRole, setSelectedRole] = useState<RoleKey>((roleParam as RoleKey) || ORG_ROLES.MEMBER)
+	const [selectedRole, setSelectedRole] = useState<RoleKey>((roleParam as RoleKey) || ORG_ROLES.USER)
 	const [permissions, setPermissions] = useState<PermissionMatrix>({})
 
 	useEffect(() => {
@@ -78,7 +76,7 @@ function PermissionsPageContent() {
 					if (memberRes.ok) {
 						const data = await memberRes.json()
 						const userRole = data.role as OrgRole
-						setCanEdit(userRole === ORG_ROLES.OWNER || userRole === ORG_ROLES.ADMIN)
+						setCanEdit(userRole === ORG_ROLES.OWNER)
 					}
 				}
 			} finally {
@@ -239,14 +237,11 @@ function PermissionsPageContent() {
 									{isOrgScope ? (
 										<>
 											<SelectItem value={ORG_ROLES.OWNER}>{ORG_ROLE_INFO[ORG_ROLES.OWNER].label}</SelectItem>
-											<SelectItem value={ORG_ROLES.ADMIN}>{ORG_ROLE_INFO[ORG_ROLES.ADMIN].label}</SelectItem>
-											<SelectItem value={ORG_ROLES.MEMBER}>{ORG_ROLE_INFO[ORG_ROLES.MEMBER].label}</SelectItem>
-											<SelectItem value={ORG_ROLES.VIEWER}>{ORG_ROLE_INFO[ORG_ROLES.VIEWER].label}</SelectItem>
+											<SelectItem value={ORG_ROLES.USER}>{ORG_ROLE_INFO[ORG_ROLES.USER].label}</SelectItem>
 										</>
 									) : (
 										<>
 											<SelectItem value={GLOBAL_ROLES.GLOBAL_ADMIN}>{GLOBAL_ROLE_INFO[GLOBAL_ROLES.GLOBAL_ADMIN].label}</SelectItem>
-											<SelectItem value={GLOBAL_ROLES.GLOBAL_MODERATOR}>{GLOBAL_ROLE_INFO[GLOBAL_ROLES.GLOBAL_MODERATOR].label}</SelectItem>
 											<SelectItem value={GLOBAL_ROLES.GLOBAL_USER}>{GLOBAL_ROLE_INFO[GLOBAL_ROLES.GLOBAL_USER].label}</SelectItem>
 										</>
 									)}

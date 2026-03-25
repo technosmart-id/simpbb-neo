@@ -32,8 +32,14 @@ export default function PetaPage() {
     enabled: !!searchNop,
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const spop = spopQuery.data as any
+  interface SpopData {
+    jlnOp?: string | null;
+    luasBumi?: string | number | null;
+    wp?: { nmWp?: string | null } | null;
+    koordinat?: string | null;
+  }
+
+  const spop = spopQuery.data as SpopData | undefined
 
   // Default center: Indonesia
   const [mapCenter, setMapCenter] = React.useState<[number, number]>([-2.5, 118.0])

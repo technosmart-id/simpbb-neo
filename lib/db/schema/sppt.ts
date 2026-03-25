@@ -68,6 +68,7 @@ export const sppt = mysqlTable(
   },
   (table) => [
     primaryKey({
+      name: "pk_sppt",
       columns: [
         table.kdPropinsi,
         table.kdDati2,
@@ -132,7 +133,7 @@ export const spptKhusus = mysqlTable(
     keterangan: varchar("KETERANGAN", { length: 200 }),
   },
   (table) => [
-    nopPrimaryKey(table),
+    nopPrimaryKey("pk_sppt_khusus", table),
     foreignKey({
       name: "fk_sppt_khusus_jenis",
       columns: [table.jenisSppt],
@@ -158,6 +159,7 @@ export const statusPbb = mysqlTable(
   },
   (table) => [
     primaryKey({
+      name: "pk_status_pbb",
       columns: [
         table.kdPropinsi,
         table.kdDati2,

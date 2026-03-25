@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { member, orgRoles, user, memberRoles } from "@/lib/db/schema"
-import { eq, and } from "drizzle-orm"
+import { eq, and, count } from "drizzle-orm"
 import { getCasbinSyncService } from "@/lib/services/casbin-sync"
 
 /**
@@ -275,7 +275,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
 	// Check if any members have this role assigned (using junction table)
 	const [membersWithRole] = await db
-		.select({ count: memberRoles.id })
+		.select({ count: count() })
 		.from(memberRoles)
 		.where(
 			and(
@@ -283,9 +283,8 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 				eq(memberRoles.roleType, "custom")
 			)
 		)
-		.limit(1)
 
-	if (membersWithRole && membersWithRole.count > 0) {
+	if (membersWithRole && Number(membersWithRole.count) > 0) {
 		return NextResponse.json({
 			error: `Cannot delete role assigned to ${membersWithRole.count} member(s)`,
 		}, { status: 400 })

@@ -7,29 +7,12 @@
 
 import { AuthorizationError, getAuthorizationService } from "@/lib/services/authorization"
 
-type Session = {
-	session: {
-		id: string
-		userId: string
-		activeOrganizationId?: string | null
-	}
-	user: {
-		id: string
-		name: string
-		email: string
-	}
-} | null
-
-type ORPCContext = {
-	session: Session
-	organizationId?: string | null
-	userRoles?: string[]
-}
+import { Context } from "./base"
 
 // oRPC middleware signature - next is a function that takes optional input
 type MiddlewareNext = (input?: unknown) => Promise<unknown>
 
-type MiddlewareFn = (opts: { context: ORPCContext; input?: unknown }, next: MiddlewareNext) => Promise<unknown>
+type MiddlewareFn = (opts: { context: Context; input?: unknown }, next: MiddlewareNext) => Promise<unknown>
 
 /**
  * Authorization options for middleware
@@ -47,14 +30,7 @@ export interface AuthzOptions {
   resourceIdExtractor?: (input: unknown) => string | number | undefined
 }
 
-/**
- * Extended context type with authorization metadata
- */
-export interface AuthzContext {
-  session: Session | null
-  organizationId?: string | null
-  userRoles?: string[]
-}
+// Removed redundant AuthzContext in favor of base.ts Context
 
 /**
  * Create authorization middleware for ORPC routes
@@ -113,8 +89,9 @@ export function withAuth(options: AuthzOptions): MiddlewareFn {
     // 4. Add authorization metadata to context
     const userRoles = orgId
       ? await authService.getUserRoles(userId, orgId)
-      : ["global"] // Global users have the "global" role
-    opts.context.organizationId = orgId
+      : [{ id: "global", roleId: "global", roleType: "system", name: "Global" }]
+    
+    opts.context.organizationId = orgId ?? undefined
     opts.context.userRoles = userRoles
 
     return next()
@@ -160,12 +137,15 @@ export function withAdmin(requireOrg = false): MiddlewareFn {
       organizationId,
     )
 
-    const isAdmin = userRoles.some((r) => r === "owner" || r === "admin")
+    const isAdmin = userRoles.some((r) => {
+      const roleId = typeof r === "string" ? r : r.roleId
+      return roleId === "owner" || roleId === "admin"
+    })
 
     if (!isAdmin) {
       throw new AuthorizationError("Admin access required")
     }
-
+    
     opts.context.organizationId = organizationId
     opts.context.userRoles = userRoles
 

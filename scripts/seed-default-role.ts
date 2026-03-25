@@ -38,16 +38,13 @@ async function main() {
 			.where(eq(member.organizationId, org.id))
 			.limit(1)
 
-		const roleId = crypto.randomUUID()
-
 		await db.insert(orgRoles).values({
-			id: roleId,
+			id: crypto.randomUUID(),
 			organizationId: org.id,
 			name: "User",
 			slug: "user",
 			description: "Default member role with standard permissions",
 			isDefaultRole: true,
-			permissions: JSON.stringify(DEFAULT_USER_PERMISSIONS),
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			createdBy: ownerMember?.userId || org.id, // Fallback to org ID if no members

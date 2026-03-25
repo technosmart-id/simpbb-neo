@@ -25,6 +25,7 @@ export type OrgRole = typeof ORG_ROLES[keyof typeof ORG_ROLES];
  */
 export const GLOBAL_ROLES = {
 	GLOBAL_ADMIN: "global_admin",
+	GLOBAL_MODERATOR: "global_moderator",
 	GLOBAL_USER: "global_user",
 } as const;
 
@@ -65,6 +66,11 @@ export const GLOBAL_ROLE_INFO = {
 		label: "Global Admin",
 		description: "Full system access across all organizations",
 		color: "default" as const,
+	},
+	[GLOBAL_ROLES.GLOBAL_MODERATOR]: {
+		label: "Global Moderator",
+		description: "System-wide monitoring and moderation",
+		color: "secondary" as const,
 	},
 	[GLOBAL_ROLES.GLOBAL_USER]: {
 		label: "Global User",

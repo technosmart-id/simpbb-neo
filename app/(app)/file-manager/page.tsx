@@ -33,14 +33,11 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import {
-	FileIcon,
 	ImageIcon,
 	Trash2,
-	Download,
 	ExternalLink,
 	RefreshCw,
 	FileText,
-	HardDrive,
 	Box,
 	FolderIcon,
 	ChevronRight,
@@ -64,7 +61,6 @@ export default function FileManagerPage() {
 		input: { path: currentPath }
 	}))
 	const statsQuery = useQuery(orpc.files.stats.queryOptions())
-
 	const deleteMutation = useMutation(orpc.files.delete.mutationOptions({
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: orpc.files.key() })
@@ -74,7 +70,7 @@ export default function FileManagerPage() {
 		onError: (error: Error) => {
 			toast.error(`Delete failed: ${error.message}`)
 		}
-	})) as any
+	}))
 
 	const createFolderMutation = useMutation(orpc.files.createFolder.mutationOptions({
 		onSuccess: () => {
@@ -86,7 +82,7 @@ export default function FileManagerPage() {
 		onError: (error: Error) => {
 			toast.error(`Failed to create folder: ${error.message}`)
 		}
-	})) as any
+	}))
 
 	const isLoading = listQuery.isLoading || statsQuery.isLoading
 	const items = (listQuery.data as FileMetadata[] ?? []).filter(item => !item.name.startsWith("."))

@@ -24,15 +24,7 @@ const bookSchema = z.object({
   additionalDocuments: z.array(z.string()),
 })
 
-type BookFormValues = {
-  title: string
-  author: string
-  publishedAt?: string | null
-  coverImage?: string | null
-  galleryImages: string[]
-  attachmentFile?: string | null
-  additionalDocuments: string[]
-}
+type BookFormValues = z.infer<typeof bookSchema>
 
 interface BookData {
   id: number
@@ -77,7 +69,7 @@ export function BookForm({ book, onSuccess }: BookFormProps) {
     onError: (error: Error) => {
       toast.error('Failed to create book: ' + error.message)
     }
-  })) as any
+  }))
 
   const updateMutation = useMutation(orpc.books.update.mutationOptions({
     onSuccess: () => {
@@ -88,7 +80,7 @@ export function BookForm({ book, onSuccess }: BookFormProps) {
     onError: (error: Error) => {
       toast.error('Failed to update book: ' + error.message)
     }
-  })) as any
+  }))
 
   const isPending = createMutation.isPending || updateMutation.isPending
 

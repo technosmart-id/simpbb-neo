@@ -46,9 +46,18 @@ export class DrizzleAdapter implements Adapter {
       .from(casbinRule)
 
     for (const rule of rules) {
-      const line = this.ruleToLine(rule)
-      if (line && model.loadPolicyLine) {
-        model.loadPolicyLine(line)
+      const ruleArray = this.ruleToArray(rule)
+      if (ruleArray && ruleArray.length > 0) {
+        // Casbin 5.x expects arrays for loadPolicyLine
+        const ptype = ruleArray[0]
+        const ruleData = ruleArray.slice(1)
+
+        const sec = ptype === "p" ? "p" : "g"
+        const assertion = model.model.get(sec)?.get(ptype)
+
+        if (assertion) {
+          assertion.policy.push(ruleData)
+        }
       }
     }
   }
@@ -60,22 +69,19 @@ export class DrizzleAdapter implements Adapter {
     // Delete all existing policies
     await db.delete(casbinRule)
 
-    // Get policies from model
-    const pSection = model.model.get("p")
-    const gSection = model.model.get("g")
+    const sections = ["p", "g"]
+    for (const sec of sections) {
+      const section = model.model.get(sec)
+      if (!section) continue
 
-    const pRules = pSection?.policyList || []
-    const gRules = gSection?.policyList || []
-
-    const lines = [
-      ...pRules.map((rule: string[]) => this.ruleArrayToLine(rule)),
-      ...gRules.map((rule: string[]) => this.ruleArrayToLine(rule)),
-    ].filter(Boolean) as string[]
-
-    for (const line of lines) {
-      const rule = this.lineToRule(line)
-      if (rule) {
-        await db.insert(casbinRule).values(rule)
+      for (const [ptype, assertion] of section) {
+        for (const rule of assertion.policy) {
+          const line = this.filterRuleToLine(ptype, rule)
+          const record = this.lineToRule(line)
+          if (record) {
+            await db.insert(casbinRule).values(record)
+          }
+        }
       }
     }
 
@@ -156,6 +162,25 @@ export class DrizzleAdapter implements Adapter {
   }
 
   /**
+   * Convert a database rule to an array
+   */
+  private ruleToArray(rule: CasbinRuleRecord): string[] {
+    const parts: string[] = [rule.ptype]
+    const values = [rule.v0, rule.v1, rule.v2, rule.v3, rule.v4, rule.v5]
+    
+    let lastIndex = values.length - 1
+    while (lastIndex >= 0 && (values[lastIndex] === null || values[lastIndex] === undefined)) {
+      lastIndex--
+    }
+
+    for (let i = 0; i <= lastIndex; i++) {
+      parts.push(values[i] ?? "")
+    }
+
+    return parts
+  }
+
+  /**
    * Convert a policy rule array to a line string
    */
   private ruleArrayToLine(rule: string[]): string {
@@ -166,18 +191,18 @@ export class DrizzleAdapter implements Adapter {
    * Convert a policy line string to a database rule
    */
   private lineToRule(line: string): CasbinRuleRecord | null {
-    const parts = line.split(", ").map((s) => s.trim())
-    if (parts.length === 0) return null
+    const parts = line.split(",").map((s) => s.trim())
+    if (parts.length === 0 || !parts[0]) return null
 
     return {
       id: crypto.randomUUID(),
       ptype: parts[0],
-      v0: parts[1] || null,
-      v1: parts[2] || null,
-      v2: parts[3] || null,
-      v3: parts[4] || null,
-      v4: parts[5] || null,
-      v5: parts[6] || null,
+      v0: parts[1] ?? null,
+      v1: parts[2] ?? null,
+      v2: parts[3] ?? null,
+      v3: parts[4] ?? null,
+      v4: parts[5] ?? null,
+      v5: parts[6] ?? null,
     }
   }
 
@@ -186,7 +211,8 @@ export class DrizzleAdapter implements Adapter {
    */
   private filterRuleToLine(ptype: string, rule: string[]): string {
     const parts = [ptype, ...rule]
-    return parts.filter(Boolean).join(", ")
+    // Filter out null/undefined but KEEP empty strings which are used for global domains
+    return parts.filter(p => p !== null && p !== undefined).join(", ")
   }
 
   /**

@@ -25,6 +25,11 @@ const developerLinks = [
     url: "https://local.drizzle.studio/",
     icon: <DatabaseIcon className="h-4 w-4" />,
   },
+  {
+    name: "Books CRUD",
+    url: "/crud-example",
+    icon: <Code2Icon className="h-4 w-4" />,
+  },
 ]
 
 export function NavDeveloper() {

@@ -85,7 +85,7 @@ export const spop = mysqlTable(
     nipPemeriksaOp: varchar("NIP_PEMERIKSA_OP", { length: 40 }),
   },
   (table) => [
-    nopPrimaryKey(table),
+    nopPrimaryKey("pk_spop", table),
     foreignKey({
       name: "fk_spop_subjek",
       columns: [table.subjekPajakId],

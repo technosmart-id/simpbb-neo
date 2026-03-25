@@ -26,7 +26,10 @@ export const refDati2 = mysqlTable(
     nmDati2: varchar("NM_DATI2", { length: 30 }).notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.kdPropinsi, table.kdDati2] }),
+    primaryKey({
+      name: "pk_ref_dati2",
+      columns: [table.kdPropinsi, table.kdDati2],
+    }),
     foreignKey({
       name: "fk_dati2_propinsi",
       columns: [table.kdPropinsi],
@@ -48,6 +51,7 @@ export const refKecamatan = mysqlTable(
   },
   (table) => [
     primaryKey({
+      name: "pk_ref_kecamatan",
       columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan],
     }),
     foreignKey({
@@ -76,6 +80,7 @@ export const refKelurahan = mysqlTable(
   },
   (table) => [
     primaryKey({
+      name: "pk_ref_kelurahan",
       columns: [
         table.kdPropinsi,
         table.kdDati2,

@@ -59,8 +59,9 @@ type NopColumnsRecord = Record<string, any> & {
 
 // ─── NOP Primary Key Helper ───────────────────────────────────────
 
-export function nopPrimaryKey(table: NopColumnsRecord) {
+export function nopPrimaryKey(name: string, table: NopColumnsRecord) {
   return primaryKey({
+    name,
     columns: [
       table.kdPropinsi,
       table.kdDati2,

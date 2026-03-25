@@ -15,6 +15,7 @@ import { PERMISSION_RESOURCES, RESOURCES } from "@/lib/services/authorization-co
 
 interface CrudPermissions {
 	[key: string]: {
+		[action: string]: boolean | undefined
 		create?: boolean
 		read?: boolean
 		update?: boolean
@@ -60,9 +61,9 @@ export function CrudPermissionEditor({ permissions, onChange, readonly = false }
 		})
 	}
 
-	const getAvailableActions = (resource: string): string[] => {
+	const getAvailableActions = (resource: string): readonly string[] => {
 		const resourceConfig = PERMISSION_RESOURCES[resource as keyof typeof PERMISSION_RESOURCES]
-		return resourceConfig?.actions || ["create", "read", "update", "delete"]
+		return resourceConfig?.actions || (["create", "read", "update", "delete"] as const)
 	}
 
 	const getActionLabel = (action: string): string => {

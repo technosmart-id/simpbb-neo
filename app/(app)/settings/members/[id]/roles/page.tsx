@@ -41,8 +41,17 @@ export default function MemberRolesPage({ params }: { params: Promise<{ id: stri
 	const [saving, setSaving] = useState(false)
 	const [activeOrgId, setActiveOrgId] = useState<string | null>(null)
 	
-	const [member, setMember] = useState<any>(null)
-	const [availableCustomRoles, setAvailableCustomRoles] = useState<any[]>([])
+	const [member, setMember] = useState<{
+		id: string;
+		user?: { name?: string | null; email: string };
+		organizationRoles?: { roleId: string; roleType: "system" | "custom" }[];
+	} | null>(null)
+	const [availableCustomRoles, setAvailableCustomRoles] = useState<{
+		id: string;
+		name: string;
+		description?: string | null;
+		permissions?: Record<string, Record<string, boolean>>;
+	}[]>([])
 	const [stagedRoles, setStagedRoles] = useState<{roleId: string, roleType: "system" | "custom"}[]>([])
 
 	useEffect(() => {
@@ -57,7 +66,14 @@ export default function MemberRolesPage({ params }: { params: Promise<{ id: stri
 				setActiveOrgId(orgId)
 
 				// Fetch member details
-				const members = await (orpcClient as any).organizations.listMembers({ organizationId: orgId })
+				const client = orpcClient as unknown as {
+					organizations: {
+						listMembers: (opts: { organizationId: string }) => Promise<any[]>;
+						listAvailableRoles: (opts: { organizationId: string }) => Promise<any[]>;
+						manageMemberRoles: (opts: { organizationId: string; memberId: string; roles: any[] }) => Promise<{ success: boolean }>;
+					}
+				}
+				const members = await client.organizations.listMembers({ organizationId: orgId })
 				const targetMember = members?.find((m: any) => m.id === memberId)
 				
 				if (!targetMember) {
@@ -69,7 +85,7 @@ export default function MemberRolesPage({ params }: { params: Promise<{ id: stri
 				setStagedRoles(targetMember.organizationRoles?.map((r: any) => ({ roleId: r.roleId, roleType: r.roleType })) || [])
 
 				// Fetch custom roles with permissions
-				const roles = await (orpcClient as any).organizations.listAvailableRoles({ organizationId: orgId })
+				const roles = await client.organizations.listAvailableRoles({ organizationId: orgId })
 				setAvailableCustomRoles(roles || [])
 			} catch (err) {
 				toast.error("Failed to load member data")
@@ -97,7 +113,12 @@ export default function MemberRolesPage({ params }: { params: Promise<{ id: stri
 		
 		setSaving(true)
 		try {
-			await (orpcClient as any).organizations.manageMemberRoles({
+			const client = orpcClient as unknown as {
+				organizations: {
+					manageMemberRoles: (opts: { organizationId: string; memberId: string; roles: any[] }) => Promise<{ success: boolean }>;
+				}
+			}
+			await client.organizations.manageMemberRoles({
 				organizationId: activeOrgId,
 				memberId,
 				roles: stagedRoles,

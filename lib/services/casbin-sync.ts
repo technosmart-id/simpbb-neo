@@ -43,6 +43,7 @@ export interface PermissionMap {
 		read?: boolean;
 		update?: boolean;
 		delete?: boolean;
+		[action: string]: boolean | undefined;
 	};
 }
 
@@ -83,7 +84,7 @@ async function clearRolePolicies(roleId: string, orgId: string): Promise<void> {
 	}
 
 	// Remove all role assignments (g policies) for this custom role
-	const groupings = await enforcer.getFilteredNamedGroupingPolicy("g", casbinRoleId, "", orgId);
+	const groupings = await enforcer.getFilteredNamedGroupingPolicy("g", 1, casbinRoleId, "", orgId);
 	for (const grouping of groupings) {
 		await enforcer.removeNamedGroupingPolicy("g", ...grouping);
 	}
@@ -183,7 +184,7 @@ export class CasbinSyncService {
 	 */
 	async removeGlobalRole(userId: string): Promise<void> {
 		const enforcer = await getEnforcer();
-		const groupings = await enforcer.getFilteredNamedGroupingPolicy("g", userId, "", "");
+		const groupings = await enforcer.getFilteredNamedGroupingPolicy("g", 0, userId, "", "");
 
 		for (const grouping of groupings) {
 			await enforcer.removeNamedGroupingPolicy("g", ...grouping);
@@ -238,7 +239,7 @@ export class CasbinSyncService {
 		}
 
 		// Role hierarchy: owner inherits user permissions (though owner has * anyway)
-		await enforcer.addNamedGroupingPolicy("g2", "owner", "user", orgId);
+		await enforcer.addNamedGroupingPolicy("g", "owner", "user", orgId);
 	}
 
 	/**
@@ -267,31 +268,9 @@ export class CasbinSyncService {
 		}
 
 		// Global role hierarchy
-		await enforcer.addNamedGroupingPolicy("g2", "global_admin", "global_user", "");
+		await enforcer.addNamedGroupingPolicy("g", "global_admin", "global_user", "");
 	}
 
-	/**
-	 * Migrate existing org_roles permissions to Casbin
-	 * Call this during the migration to sync existing permissions
-	 */
-	async migrateOrgRolePermissions(): Promise<void> {
-		const roles = await db.select({
-			id: orgRoles.id,
-			organizationId: orgRoles.organizationId,
-			permissions: orgRoles.permissions,
-		}).from(orgRoles);
-
-		for (const role of roles) {
-			if (role.permissions) {
-				try {
-					const permissions = JSON.parse(role.permissions) as PermissionMap;
-					await this.createRolePermissions(role.id, permissions, role.organizationId);
-				} catch (e) {
-					console.error(`Failed to migrate permissions for role ${role.id}:`, e);
-				}
-			}
-		}
-	}
 }
 
 // Singleton instance

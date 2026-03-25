@@ -152,16 +152,28 @@ export async function GET(request: NextRequest, context: RouteContext) {
 					slug: orgRoles.slug,
 					description: orgRoles.description,
 					isDefaultRole: orgRoles.isDefaultRole,
-					permissions: orgRoles.permissions,
 				})
 				.from(orgRoles)
 				.where(eq(orgRoles.id, memberData.customRoleId))
 				.limit(1)
 
 			if (role) {
+				// Permissions are in Casbin now, but for UI compatibility 
+				// we can fetch the policies for this role
+				const authService = getAuthorizationService()
+				const policies = await authService.getOrgPolicies(memberData.organizationId)
+				const rolePolicies = policies.filter(p => p.role === `custom:${role.id}`)
+				
+				// Reconstruct a simple permissions matrix if needed by UI
+				const permissions: Record<string, Record<string, boolean>> = {}
+				for (const p of rolePolicies) {
+					if (!permissions[p.resource]) permissions[p.resource] = {}
+					permissions[p.resource][p.action] = p.effect === "allow"
+				}
+
 				customRole = {
 					...role,
-					permissions: JSON.parse(role.permissions),
+					permissions
 				}
 			}
 		}

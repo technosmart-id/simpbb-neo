@@ -1,81 +1,55 @@
 'use client'
 
-import * as React from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import React from 'react'
 import { BookForm } from "@/components/books/book-form"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, Loader2 } from "lucide-react"
-import { useQuery } from '@tanstack/react-query'
-import { useORPC } from '@/lib/orpc/react'
+import { useRouter, useParams } from "next/navigation"
+import { useQuery } from "@tanstack/react-query"
+import { useORPC } from "@/lib/orpc/react"
+import { Loader2 } from "lucide-react"
 
-type BookData = {
-  id: number
-  title: string
-  author: string
-  publishedAt: Date | null
-  coverImage: string | null
-  attachmentFile: string | null
-  galleryImages: string[] | null
-  additionalDocuments: string[] | null
-}
-
-export default function CrudEditPage() {
+export default function EditBookPage() {
   const router = useRouter()
   const params = useParams()
+  const id = parseInt(params.id as string)
   const orpc = useORPC()
 
-  const id = typeof params.id === 'string' ? parseInt(params.id) : null
-
-  const { data: book, isLoading, isError } = useQuery(orpc.books.get.queryOptions({
-    input: { id: id ?? 0 },
+  const { data: book, isLoading } = useQuery(orpc.books.get.queryOptions({
+    input: { id }
   }))
 
-  if (id === null || isError) {
+  if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
-        <p className="text-destructive font-medium">Book not found or invalid ID</p>
-        <Button variant="outline" onClick={() => router.push('/crud-example')}>
-          Back to list
-        </Button>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="animate-spin text-primary" size={48} />
+      </div>
+    )
+  }
+
+  if (!book) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <h2 className="text-2xl font-bold">Book not found</h2>
+        <p className="text-muted-foreground">The book you are looking for does not exist or you don't have access.</p>
+        <button onClick={() => router.push('/crud-example')} className="text-primary hover:underline">
+          Go back to library
+        </button>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="w-fit -ml-2 text-muted-foreground hover:text-foreground"
-          onClick={() => router.back()}
-        >
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Back to list
-        </Button>
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Edit Book</h1>
-          <p className="text-muted-foreground">
-            Update the details of the selected book.
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div className="space-y-0.5">
+        <h2 className="text-2xl font-bold tracking-tight">Edit Book</h2>
+        <p className="text-muted-foreground">
+          Modify the details for <strong>{book.title}</strong>.
+        </p>
       </div>
-
-      <div className="rounded-xl border bg-card p-6 shadow-sm min-h-[300px] flex flex-col">
-        {isLoading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="animate-spin text-muted-foreground" size={32} />
-          </div>
-        ) : book ? (
-          <BookForm
-            book={book as BookData}
-            onSuccess={() => router.push('/crud-example')}
-          />
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
-            Book not found
-          </div>
-        )}
+      <div className="max-w-4xl p-8 rounded-xl border bg-card/50 shadow-sm">
+        <BookForm 
+          book={book} 
+          onSuccess={() => router.push('/crud-example')} 
+        />
       </div>
     </div>
   )

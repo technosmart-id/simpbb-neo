@@ -94,6 +94,7 @@ export const datOpBangunan = mysqlTable(
   },
   (table) => [
     primaryKey({
+      name: "pk_op_bangunan",
       columns: [
         table.kdPropinsi,
         table.kdDati2,
@@ -121,6 +122,7 @@ export const datFasilitasBangunan = mysqlTable(
   },
   (table) => [
     primaryKey({
+      name: "pk_fasilitas_bangunan",
       columns: [
         table.kdPropinsi,
         table.kdDati2,

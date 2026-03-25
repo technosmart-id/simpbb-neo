@@ -10,7 +10,16 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 
-type NotificationsListResult = { rows: any[]; total: number }
+type Notification = {
+	id: string
+	title: string
+	message: string
+	isRead: boolean
+	createdAt: string | Date
+	link?: string | null
+}
+
+type NotificationsListResult = { rows: Notification[]; total: number }
 
 export default function NotificationsPage() {
 	const orpc = useORPC()
@@ -23,7 +32,7 @@ export default function NotificationsPage() {
 	)
 
 	const notifications = (listData as NotificationsListResult | undefined)?.rows || []
-	const unreadCount = notifications.filter((n: any) => !n.isRead).length
+	const unreadCount = notifications.filter((n: Notification) => !n.isRead).length
 
 	return (
 		<div className="space-y-6">
@@ -60,7 +69,7 @@ export default function NotificationsPage() {
 					) : (
 						<ScrollArea className="h-[600px]">
 							<div className="divide-y">
-								{notifications.map((n: any) => (
+								{notifications.map((n: Notification) => (
 									<div
 										key={n.id}
 										className={`p-4 hover:bg-muted/50 transition-colors ${!n.isRead ? "bg-muted/30" : ""}`}

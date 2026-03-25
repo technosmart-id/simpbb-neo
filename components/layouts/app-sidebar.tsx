@@ -9,18 +9,8 @@ import { NavDeveloper } from "@/components/layouts/nav-developer"
 import { NavUser } from "@/components/layouts/nav-user"
 import { OrganizationSwitcher } from "@/components/layouts/organization-switcher"
 import {
-  AudioLinesIcon,
-  TerminalIcon,
-  TerminalSquareIcon,
-  BotIcon,
-  BookOpenIcon,
-  Settings2Icon,
-  FrameIcon,
-  PieChartIcon,
   MapIcon as MapIconLucide,
-  DatabaseIcon,
   LayoutDashboardIcon,
-  FileIcon,
   HardDrive,
   Archive,
   Building2,
@@ -34,13 +24,19 @@ import {
   BarChart3,
   BookOpen,
   Settings,
-  Users,
-  Globe,
   Map as MapIcon,
   RefreshCw,
   GitBranch,
   ScrollText,
 } from "lucide-react"
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+} from "@/components/ui/sidebar"
 
 interface SessionUser {
   name: string

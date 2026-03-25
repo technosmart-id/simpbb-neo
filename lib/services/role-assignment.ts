@@ -185,16 +185,20 @@ export async function assignRoleToMember(params: {
 	}
 
 	// Insert into junction table
+	const newId = crypto.randomUUID();
+	await db.insert(memberRoles).values({
+		id: newId,
+		memberId,
+		roleId,
+		roleType,
+		createdBy: assignedBy,
+	});
+
 	const [assignment] = await db
-		.insert(memberRoles)
-		.values({
-			id: crypto.randomUUID(),
-			memberId,
-			roleId,
-			roleType,
-			createdBy: assignedBy,
-		})
-		.returning();
+		.select()
+		.from(memberRoles)
+		.where(eq(memberRoles.id, newId))
+		.limit(1);
 
 	// Sync to Casbin
 	const casbinSync = getCasbinSyncService();
@@ -206,11 +210,11 @@ export async function assignRoleToMember(params: {
 	);
 
 	return {
-		id: assignment.id,
-		memberId: assignment.memberId,
-		roleId: assignment.roleId,
-		roleType: assignment.roleType as "system" | "custom",
-		createdAt: assignment.createdAt,
+		id: assignment!.id,
+		memberId: assignment!.memberId,
+		roleId: assignment!.roleId,
+		roleType: assignment!.roleType as "system" | "custom",
+		createdAt: assignment!.createdAt,
 	};
 }
 
@@ -329,88 +333,6 @@ export async function memberHasRole(
 	return !!assignment;
 }
 
-/**
- * Migrate existing member roles to the junction table
- * Called during migration to populate member_roles from member table
- */
-export async function migrateMemberRoles(): Promise<void> {
-	// Get all members with their legacy role assignments
-	const members = await db
-		.select({
-			id: member.id,
-			role: member.role,
-			customRoleId: member.customRoleId,
-			userId: member.userId,
-			createdAt: member.createdAt,
-		})
-		.from(member);
-
-	const casbinSync = getCasbinSyncService();
-
-	for (const m of members) {
-		// Always add the system role
-		const systemRoleId = m.role || ORG_ROLES.USER;
-		const hasSystemRole = await memberHasRole(m.id, systemRoleId, "system");
-
-		if (!hasSystemRole) {
-			await db.insert(memberRoles).values({
-				id: crypto.randomUUID(),
-				memberId: m.id,
-				roleId: systemRoleId,
-				roleType: "system",
-				createdBy: m.userId, // Use their own user ID as creator
-				createdAt: m.createdAt,
-			});
-
-			// Also sync to Casbin - need orgId
-			const [memberData] = await db
-				.select({ organizationId: member.organizationId })
-				.from(member)
-				.where(eq(member.id, m.id))
-				.limit(1);
-
-			if (memberData) {
-				await casbinSync.assignRoleToMember(
-					m.id,
-					systemRoleId,
-					"system",
-					memberData.organizationId,
-				);
-			}
-		}
-
-		// Add custom role if exists
-		if (m.customRoleId) {
-			const hasCustomRole = await memberHasRole(m.id, m.customRoleId, "custom");
-
-			if (!hasCustomRole) {
-				await db.insert(memberRoles).values({
-					id: crypto.randomUUID(),
-					memberId: m.id,
-					roleId: m.customRoleId,
-					roleType: "custom",
-					createdBy: m.userId,
-					createdAt: m.createdAt,
-				});
-
-				const [memberData] = await db
-					.select({ organizationId: member.organizationId })
-					.from(member)
-					.where(eq(member.id, m.id))
-					.limit(1);
-
-				if (memberData) {
-					await casbinSync.assignRoleToMember(
-						m.id,
-						m.customRoleId,
-						"custom",
-						memberData.organizationId,
-					);
-				}
-			}
-		}
-	}
-}
 
 /**
  * Set roles for a member (replaces all existing roles)
