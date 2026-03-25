@@ -16,6 +16,7 @@ export * from "./sppt";
 export * from "./pembayaran";
 export * from "./pelayanan";
 export * from "./pemekaran";
+export * from "./penghapusan";
 export * from "./log";
 export * from "./dbkb";
 export * from "./views";
