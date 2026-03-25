@@ -36,6 +36,7 @@ import { dashboardRouter } from "./routers/dashboard"
 import { tunggakanRouter } from "./routers/tunggakan"
 import { updateMasalRouter } from "./routers/update-masal"
 import { pemekaranRouter } from "./routers/pemekaran"
+import { dbkbRouter } from "./routers/dbkb"
 
 export const router = os.router({
   hello: os
@@ -65,6 +66,7 @@ export const router = os.router({
   tunggakan: tunggakanRouter,
   updateMasal: updateMasalRouter,
   pemekaran: pemekaranRouter,
+  dbkb: dbkbRouter,
 
   notifications: os.router({
     list: os
