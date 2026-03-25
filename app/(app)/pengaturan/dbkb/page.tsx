@@ -46,7 +46,7 @@ export default function DbkbPage() {
     onSuccess: () => {
       toast.success('Nilai baru berhasil disimpan')
       setDirtyValues({})
-      qc.invalidateQueries({ queryKey: orpc.dbkb.list.queryOptions({ input: {} }).queryKey })
+      qc.invalidateQueries({ queryKey: orpc.dbkb.list.queryOptions({ input: { thnBerlaku: year } }).queryKey })
     },
   })
 
@@ -55,7 +55,7 @@ export default function DbkbPage() {
     onSuccess: () => {
       toast.success('Update masal berhasil')
       setDirtyValues({})
-      qc.invalidateQueries({ queryKey: orpc.dbkb.list.queryOptions({ input: {} }).queryKey })
+      qc.invalidateQueries({ queryKey: orpc.dbkb.list.queryOptions({ input: { thnBerlaku: year } }).queryKey })
     },
   })
 
