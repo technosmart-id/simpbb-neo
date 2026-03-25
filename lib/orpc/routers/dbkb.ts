@@ -35,11 +35,13 @@ export const dbkbRouter = os.router({
       })),
     }))
     .handler(async ({ input }) => {
-      for (const { id, nilaiBaru } of input.updates) {
-        await db.update(materialBangunan)
-          .set({ nilaiBaru })
-          .where(eq(materialBangunan.id, id))
-      }
+      await Promise.all(
+        input.updates.map(({ id, nilaiBaru }) =>
+          db.update(materialBangunan)
+            .set({ nilaiBaru })
+            .where(eq(materialBangunan.id, id))
+        )
+      )
       return { success: true, updated: input.updates.length }
     }),
 
