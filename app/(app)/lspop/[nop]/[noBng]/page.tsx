@@ -628,6 +628,7 @@ export default function LspopBangunanPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {/* JPB-02/09: Both use klsJpb2 — same "kelas komersial" DB column per legacy schema */}
               <div className="space-y-1">
                 <Label>Kelas JPB</Label>
                 <Input
