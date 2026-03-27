@@ -141,7 +141,7 @@ export default function PenghapusanPage() {
                 <TableCell>
                   {row.status === 'pending' && (
                     <div className="flex gap-1">
-                      <AlertDialog open={approveId === row.id} onOpenChange={(o) => !o && setApproveId(null)}>
+                      <AlertDialog open={approveId === row.id} onOpenChange={(o) => { if (!o) { setApproveId(null); setCatatan('') } }}>
                         <AlertDialogTrigger asChild>
                           <Button size="icon" variant="outline" onClick={() => setApproveId(row.id)}>
                             <CheckCircle2 className="h-4 w-4 text-green-600" />
@@ -168,7 +168,7 @@ export default function PenghapusanPage() {
                         </AlertDialogContent>
                       </AlertDialog>
 
-                      <AlertDialog open={rejectId === row.id} onOpenChange={(o) => !o && setRejectId(null)}>
+                      <AlertDialog open={rejectId === row.id} onOpenChange={(o) => { if (!o) { setRejectId(null); setCatatan('') } }}>
                         <AlertDialogTrigger asChild>
                           <Button size="icon" variant="outline" onClick={() => setRejectId(row.id)}>
                             <XCircle className="h-4 w-4 text-red-600" />
