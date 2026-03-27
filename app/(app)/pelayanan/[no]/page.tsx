@@ -242,6 +242,12 @@ export default function PelayananDetailPage() {
         {!isLoading && data && (
           <div className="ml-auto flex items-center gap-2">
             <PelayananBadge status={data.statusPelayanan} />
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/pelayanan/${data.noPelayanan}/berita-acara`}>
+                <FileText className="w-4 h-4 mr-2" />
+                Cetak Berita Acara
+              </Link>
+            </Button>
             <AdvanceStatusButton noPelayanan={data.noPelayanan} currentStatus={data.statusPelayanan} />
           </div>
         )}
