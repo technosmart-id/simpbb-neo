@@ -35,6 +35,7 @@ import {
   ScrollText,
   HardDrive,
   Archive,
+  Trash2,
 } from "lucide-react"
 
 // This is sample data — should be replaced with Better Auth session data
@@ -120,6 +121,11 @@ const data = {
       title: "Pemekaran",
       url: "/pemekaran",
       icon: <GitBranch />,
+    },
+    {
+      title: "Penghapusan",
+      url: "/penghapusan",
+      icon: <Trash2 />,
     },
     {
       title: "Peta",
