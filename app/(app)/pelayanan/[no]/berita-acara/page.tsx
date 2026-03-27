@@ -1,7 +1,7 @@
 import { BeritaAcaraClient } from './client'
 import { db } from '@/lib/db'
-import { pelayanan, pelayananDokumen, konfigurasi as konfigurasiTable } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { pelayanan, pelayananDokumen, konfigurasi as konfigurasiTable, historiMutasi } from '@/lib/db/schema'
+import { eq, desc } from 'drizzle-orm'
 import { formatNop } from '@/lib/utils/nop'
 import { notFound } from 'next/navigation'
 import type { BeritaAcaraData } from '@/lib/utils/pdf/berita-acara-generator'
@@ -57,6 +57,13 @@ export default async function BeritaAcaraPage({
     ada: dokumenRows.some((d) => d.dokumenId === Number(id)),
   }))
 
+  const [mutasiRow] = await db
+    .select()
+    .from(historiMutasi)
+    .where(eq(historiMutasi.noPelayanan, no))
+    .orderBy(desc(historiMutasi.tglMutasi))
+    .limit(1)
+
   // Get instansi config — konfigurasi PK column is `nama`
   const [nmRow] = await db
     .select()
@@ -110,6 +117,14 @@ export default async function BeritaAcaraPage({
       ttdKananNip: pel.ttdKananNip ?? '',
     },
     dokumen,
+    mutasi: mutasiRow ? {
+      ltSebelum: Number(mutasiRow.ltSebelum ?? 0),
+      lbSebelum: Number(mutasiRow.lbSebelum ?? 0),
+      pbbSebelum: Number(mutasiRow.pbbSebelum ?? 0),
+      ltSesudah: Number(mutasiRow.ltSesudah ?? 0),
+      lbSesudah: Number(mutasiRow.lbSesudah ?? 0),
+      pbbSesudah: Number(mutasiRow.pbbSesudah ?? 0),
+    } : undefined,
     instansi: {
       nmInstansi: nmRow ? blobToString(nmRow.nilai) || 'Badan Pendapatan Daerah' : 'Badan Pendapatan Daerah',
       alamatInstansi: alamatRow ? blobToString(alamatRow.nilai) : '',
