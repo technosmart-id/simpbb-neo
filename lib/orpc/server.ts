@@ -328,11 +328,12 @@ export const router = os.router({
           throw new Error("Unauthorized")
         }
 
-        const backupDir = process.env.BACKUP_DIR || path.join(process.cwd(), "backups")
-        const filePath = path.join(backupDir, input.filename)
+        const backupDir = path.resolve(process.env.BACKUP_DIR || path.join(process.cwd(), "backups"))
+        const safeFilename = path.basename(input.filename)
+        const filePath = path.join(backupDir, safeFilename)
 
         // Security check: ensure filename is just a filename, not a path
-        if (input.filename.includes("..") || input.filename.includes("/") || input.filename.includes("\\")) {
+        if (safeFilename !== input.filename || !filePath.startsWith(backupDir)) {
           throw new Error("Invalid filename")
         }
 

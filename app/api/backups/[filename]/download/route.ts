@@ -15,18 +15,19 @@ export async function GET(
 	try {
 		const { filename } = await params
 
+		const backupDir = path.resolve(process.env.BACKUP_DIR || path.join(process.cwd(), "backups"))
+		const safeFilename = path.basename(filename)
+		const filePath = path.join(backupDir, safeFilename)
+
 		// Security check: prevent path traversal attacks
-		if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
+		if (safeFilename !== filename || !filePath.startsWith(backupDir)) {
 			return NextResponse.json({ error: "Invalid filename" }, { status: 400 })
 		}
 
 		// Additional check: only allow .zip files with expected naming pattern
-		if (!filename.startsWith("backup-") || !filename.endsWith(".zip")) {
+		if (!safeFilename.startsWith("backup-") || !safeFilename.endsWith(".zip")) {
 			return NextResponse.json({ error: "Invalid backup file" }, { status: 400 })
 		}
-
-		const backupDir = process.env.BACKUP_DIR || path.join(process.cwd(), "backups")
-		const filePath = path.join(backupDir, filename)
 
 		try {
 			const fileBuffer = await fs.readFile(filePath)
