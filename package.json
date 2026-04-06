@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "test": "node --experimental-strip-types --test lib/auth/permissions.test.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
