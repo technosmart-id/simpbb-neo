@@ -3,6 +3,7 @@ import { os } from "../context"
 import { db } from "@/lib/db"
 import { pbbUserProfile, groupAkses, akses } from "@/lib/db/schema"
 import { eq, like, sql, and, desc } from "drizzle-orm"
+import { hashPassword } from "@/lib/utils/password"
 
 export const penggunaRouter = os.router({
   list: os
@@ -85,9 +86,11 @@ export const penggunaRouter = os.router({
         throw new Error("Username sudah digunakan")
       }
 
+      const hashedPassword = await hashPassword(input.password)
+
       const result = await db.insert(pbbUserProfile).values({
         username: input.username,
-        password: input.password, // TODO: hash password
+        password: hashedPassword,
         hakAkses: input.hakAkses,
         nip: input.nip ?? null,
         nama: input.nama ?? null,
@@ -149,10 +152,10 @@ export const penggunaRouter = os.router({
   resetPassword: os
     .input(z.object({ id: z.number(), newPassword: z.string().min(6) }))
     .handler(async ({ input }) => {
-      // TODO: hash password
+      const hashedPassword = await hashPassword(input.newPassword)
       await db
         .update(pbbUserProfile)
-        .set({ password: input.newPassword, failedAttempts: 0, lockedUntil: null })
+        .set({ password: hashedPassword, failedAttempts: 0, lockedUntil: null })
         .where(eq(pbbUserProfile.id, input.id))
       return { success: true }
     }),
