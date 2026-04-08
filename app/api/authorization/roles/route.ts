@@ -69,7 +69,7 @@ export async function PATCH(request: NextRequest) {
 	// Check if the target is an owner - only owners can change owner roles
 	if (targetMember.role === "owner" || role === "owner") {
 		const requesterRoles = await authService.getUserRoles(session.user.id, organizationId)
-		if (!requesterRoles.includes("owner")) {
+			if (!requesterRoles.some((r) => r.roleId === "owner" && r.roleType === "system")) {
 			return NextResponse.json({ error: "Only owners can assign or remove the owner role" }, { status: 403 })
 		}
 	}

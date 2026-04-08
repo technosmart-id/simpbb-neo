@@ -33,7 +33,8 @@ export function CrudPermissionEditor({ permissions, onChange, readonly = false }
 		if (readonly) return
 
 		const resourcePerms = permissions[resource] || {}
-		const currentValue = resourcePerms[action] || false
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const currentValue = (resourcePerms as any)[action] || false
 
 		onChange({
 			...permissions,
@@ -44,33 +45,14 @@ export function CrudPermissionEditor({ permissions, onChange, readonly = false }
 		})
 	}
 
-	const setAll = (resource: string, value: boolean) => {
-		if (readonly) return
-
-		const resourceConfig = PERMISSION_RESOURCES[resource as keyof typeof PERMISSION_RESOURCES]
-		const newPerms: Record<string, boolean> = {}
-
-		for (const action of resourceConfig.actions) {
-			newPerms[action] = value
-		}
-
-		onChange({
-			...permissions,
-			[resource]: newPerms,
-		})
-	}
-
 	const getAvailableActions = (resource: string): string[] => {
 		const resourceConfig = PERMISSION_RESOURCES[resource as keyof typeof PERMISSION_RESOURCES]
-		return resourceConfig?.actions || ["create", "read", "update", "delete"]
-	}
-
-	const getActionLabel = (action: string): string => {
-		return action.charAt(0).toUpperCase() + action.slice(1)
+		return [...(resourceConfig?.actions || ["create", "read", "update", "delete"])]
 	}
 
 	const getPermissionValue = (resource: string, action: string): boolean => {
-		return permissions[resource]?.[action] || false
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		return (permissions[resource] as any)?.[action] || false
 	}
 
 	return (

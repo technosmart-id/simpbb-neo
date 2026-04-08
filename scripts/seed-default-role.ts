@@ -47,7 +47,6 @@ async function main() {
 			slug: "user",
 			description: "Default member role with standard permissions",
 			isDefaultRole: true,
-			permissions: JSON.stringify(DEFAULT_USER_PERMISSIONS),
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			createdBy: ownerMember?.userId || org.id, // Fallback to org ID if no members

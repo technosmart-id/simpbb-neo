@@ -152,17 +152,13 @@ export async function GET(request: NextRequest, context: RouteContext) {
 					slug: orgRoles.slug,
 					description: orgRoles.description,
 					isDefaultRole: orgRoles.isDefaultRole,
-					permissions: orgRoles.permissions,
 				})
 				.from(orgRoles)
 				.where(eq(orgRoles.id, memberData.customRoleId))
 				.limit(1)
 
 			if (role) {
-				customRole = {
-					...role,
-					permissions: JSON.parse(role.permissions),
-				}
+				customRole = role
 			}
 		}
 

@@ -5,7 +5,7 @@ import { GLOBAL_ROLES, type GlobalRole } from "@/lib/services/authorization-cons
 
 // Role hierarchy for self-assignment
 const SELF_ASSIGNABLE_ROLES: GlobalRole[] = [GLOBAL_ROLES.GLOBAL_USER]
-const ADMIN_REQUIRED_ROLES: GlobalRole[] = [GLOBAL_ROLES.GLOBAL_MODERATOR, GLOBAL_ROLES.GLOBAL_ADMIN]
+const ADMIN_REQUIRED_ROLES: GlobalRole[] = [GLOBAL_ROLES.GLOBAL_ADMIN]
 
 /**
  * GET /api/authorization/global/roles

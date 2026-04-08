@@ -1,7 +1,8 @@
 "use client"
 
 import { LoginForm } from "@/components/auth/login-form"
-import { GalleryVerticalEndIcon } from "lucide-react"
+import { GalleryVerticalEndIcon, Loader2 } from "lucide-react"
+import { Suspense } from "react"
 
 export default function LoginPage() {
   return (
@@ -13,7 +14,9 @@ export default function LoginPage() {
           </div>
           Acme Inc.
         </a>
-        <LoginForm />
+        <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   )

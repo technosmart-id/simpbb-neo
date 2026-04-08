@@ -182,7 +182,9 @@ const getRoleIcon = (role: string) => {
 	}
 }
 
-export default function OrganizationsSettingsPage() {
+import { Suspense } from "react"
+
+function OrganizationsSettingsPageContent() {
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const [organizations, setOrganizations] = useState<Organization[]>([])
@@ -353,6 +355,21 @@ export default function OrganizationsSettingsPage() {
 			setUpdatingOrg(false)
 		}
 	}
+
+		const updateMemberRole = async (memberId: string, role: string) => {
+			try {
+				const orgClient = (authClient as AuthClientWithOrg).organization
+				const res = await orgClient.updateMemberRole({ memberIdOrEmail: memberId, role })
+				if (res.error) {
+					toast.error(res.error.message || "Failed to update role")
+				} else {
+					toast.success("Role updated")
+					await fetchMembers()
+				}
+			} catch {
+				toast.error("Failed to update role")
+			}
+		}
 
 	const removeMember = async (memberId: string) => {
 		try {
@@ -725,11 +742,11 @@ export default function OrganizationsSettingsPage() {
 																Impersonate
 															</DropdownMenuItem>
 															<DropdownMenuSeparator />
-															<DropdownMenuItem onClick={() => void updateMemberRole(member.id, "admin")}>
-																Grant Admin
+															<DropdownMenuItem onClick={() => void updateMemberRole(member.id, "owner")}>
+																Grant Owner
 															</DropdownMenuItem>
-															<DropdownMenuItem onClick={() => void updateMemberRole(member.id, "member")}>
-																Set as Member
+															<DropdownMenuItem onClick={() => void updateMemberRole(member.id, "user")}>
+																Set as User
 															</DropdownMenuItem>
 															<DropdownMenuSeparator />
 															<DropdownMenuItem
@@ -864,5 +881,13 @@ export default function OrganizationsSettingsPage() {
 				/>
 			)}
 		</div>
+	)
+}
+
+export default function OrganizationsSettingsPage() {
+	return (
+		<Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
+			<OrganizationsSettingsPageContent />
+		</Suspense>
 	)
 }

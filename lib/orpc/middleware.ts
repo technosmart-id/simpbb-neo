@@ -113,9 +113,9 @@ export function withAuth(options: AuthzOptions): MiddlewareFn {
     // 4. Add authorization metadata to context
     const userRoles = orgId
       ? await authService.getUserRoles(userId, orgId)
-      : ["global"] // Global users have the "global" role
+      : [{ id: "global", roleId: "global", roleType: "system" }] // Global users have the "global" role
     opts.context.organizationId = orgId
-    opts.context.userRoles = userRoles
+    opts.context.userRoles = userRoles.map(r => r.roleId)
 
     return next()
   }
@@ -160,14 +160,14 @@ export function withAdmin(requireOrg = false): MiddlewareFn {
       organizationId,
     )
 
-    const isAdmin = userRoles.some((r) => r === "owner" || r === "admin")
+    const isAdmin = userRoles.some((r) => r.roleId === "owner" || r.roleId === "admin")
 
     if (!isAdmin) {
       throw new AuthorizationError("Admin access required")
     }
 
     opts.context.organizationId = organizationId
-    opts.context.userRoles = userRoles
+    opts.context.userRoles = userRoles.map(r => r.roleId)
 
     return next()
   }

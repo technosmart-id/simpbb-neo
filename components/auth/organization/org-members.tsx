@@ -81,18 +81,26 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 	const fetchMembers = useCallback(async () => {
 		try {
 			setLoading(true);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const res = await (orpcClient as any).organizations.listMembers({ organizationId });
 			if (res) {
 				setMembers(res);
 			}
 		} catch (error) {
 			console.error("Failed to fetch members:", error);
+		} finally {
+			setLoading(false);
 		}
-		setLoading(false);
 	}, [organizationId]);
 
 	useEffect(() => {
-		fetchMembers();
+		let isMounted = true;
+		if (isMounted) {
+			fetchMembers();
+		}
+		return () => {
+			isMounted = false;
+		};
 	}, [fetchMembers]);
 
 	const inviteMember = async () => {
@@ -102,12 +110,14 @@ export function OrgMembers({ organizationId }: { organizationId: string }) {
 
 	const removeMember = async (memberId: string) => {
 		try {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			await (orpcClient as any).organizations.removeMember({
 				organizationId,
 				memberId,
 			});
 			toast.success("Member removed");
 			fetchMembers();
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			toast.error(error.message || "Failed to remove member");
 		}

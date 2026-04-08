@@ -11,12 +11,8 @@
  */
 
 import { newEnforcer, Enforcer } from "casbin";
-import { eq, and } from "drizzle-orm";
-import { db } from "@/lib/db";
-import { orgRoles } from "@/lib/db/schema";
 import { createDrizzleAdapter } from "@/lib/casbin/drizzle-adapter";
 import { join } from "path";
-import type { CrudPermissions } from "@/lib/db/schema/org-roles";
 
 // Path to the Casbin model config file
 const MODEL_PATH = join(process.cwd(), "lib/casbin/model.conf");
@@ -83,7 +79,10 @@ async function clearRolePolicies(roleId: string, orgId: string): Promise<void> {
 	}
 
 	// Remove all role assignments (g policies) for this custom role
-	const groupings = await enforcer.getFilteredNamedGroupingPolicy("g", casbinRoleId, "", orgId);
+	// fieldIndex 1 means we are filtering starting from v1 (which is the role column in g, subject, role, domain)
+	// Actually, in casbin g policy is usually: g, user, role, domain.
+	// So fieldIndex 1 corresponds to `role`
+	const groupings = await enforcer.getFilteredNamedGroupingPolicy("g", 1, casbinRoleId, orgId);
 	for (const grouping of groupings) {
 		await enforcer.removeNamedGroupingPolicy("g", ...grouping);
 	}
@@ -183,7 +182,8 @@ export class CasbinSyncService {
 	 */
 	async removeGlobalRole(userId: string): Promise<void> {
 		const enforcer = await getEnforcer();
-		const groupings = await enforcer.getFilteredNamedGroupingPolicy("g", userId, "", "");
+		// fieldIndex 0 means we filter by v0, which is the user/subject
+		const groupings = await enforcer.getFilteredNamedGroupingPolicy("g", 0, userId, "", "");
 
 		for (const grouping of groupings) {
 			await enforcer.removeNamedGroupingPolicy("g", ...grouping);
@@ -198,7 +198,7 @@ export class CasbinSyncService {
 		const casbinRoleId = `custom:${roleId}`;
 		const policies = await enforcer.getFilteredPolicy(0, casbinRoleId, "", "", orgId);
 
-		const permissions: PermissionMap = {};
+		const permissions: Record<string, Record<string, boolean>> = {};
 
 		for (const policy of policies) {
 			const resource = policy[1] as string;
@@ -211,7 +211,7 @@ export class CasbinSyncService {
 			permissions[resource][action] = true;
 		}
 
-		return permissions;
+		return permissions as PermissionMap;
 	}
 
 	/**
@@ -275,22 +275,8 @@ export class CasbinSyncService {
 	 * Call this during the migration to sync existing permissions
 	 */
 	async migrateOrgRolePermissions(): Promise<void> {
-		const roles = await db.select({
-			id: orgRoles.id,
-			organizationId: orgRoles.organizationId,
-			permissions: orgRoles.permissions,
-		}).from(orgRoles);
-
-		for (const role of roles) {
-			if (role.permissions) {
-				try {
-					const permissions = JSON.parse(role.permissions) as PermissionMap;
-					await this.createRolePermissions(role.id, permissions, role.organizationId);
-				} catch (e) {
-					console.error(`Failed to migrate permissions for role ${role.id}:`, e);
-				}
-			}
-		}
+		// Migration logic removed since org_roles.permissions column is removed
+		console.log("Migration no longer needed since permissions column is dropped.");
 	}
 }
 

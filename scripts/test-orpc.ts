@@ -1,5 +1,3 @@
-import { authClient } from "./lib/auth/client"
-
 async function debug() {
   try {
     console.log("Fetching API using local fetch...");

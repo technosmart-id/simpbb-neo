@@ -185,16 +185,23 @@ export async function assignRoleToMember(params: {
 	}
 
 	// Insert into junction table
-	const [assignment] = await db
+	const newAssignmentId = crypto.randomUUID();
+	await db
 		.insert(memberRoles)
 		.values({
-			id: crypto.randomUUID(),
+			id: newAssignmentId,
 			memberId,
 			roleId,
 			roleType,
 			createdBy: assignedBy,
-		})
-		.returning();
+		});
+
+	// Get the newly inserted assignment
+	const [assignment] = await db
+		.select()
+		.from(memberRoles)
+		.where(eq(memberRoles.id, newAssignmentId))
+		.limit(1);
 
 	// Sync to Casbin
 	const casbinSync = getCasbinSyncService();

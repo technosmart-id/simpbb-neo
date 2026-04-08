@@ -148,7 +148,7 @@ export default function MemberRolesPage({ params }: { params: Promise<{ id: stri
 						<CardTitle>Base Roles</CardTitle>
 					</div>
 					<CardDescription>
-						These structural roles define the member's foundational authority within the organization.
+							These structural roles define the member&apos;s foundational authority within the organization.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
