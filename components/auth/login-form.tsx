@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { authClient } from "@/lib/auth/client";
 import { useORPC } from "@/lib/orpc/react";
 import { useMutation } from "@tanstack/react-query";
@@ -76,7 +76,7 @@ function isValidCallbackURL(url: string | null): string {
 	return "/dashboard";
 }
 
-export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
+function LoginFormContent({ className, ...props }: React.ComponentProps<"div">) {
 	const router = useRouter();
 	const orpc = useORPC();
 	const searchParams = useSearchParams();
@@ -530,5 +530,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 				and <a href="#">Privacy Policy</a>.
 			</FieldDescription>
 		</div>
+	);
+}
+
+export function LoginForm(props: React.ComponentProps<"div">) {
+	return (
+		<Suspense fallback={<div className="h-96 flex items-center justify-center"><Loader2Icon className="animate-spin" /></div>}>
+			<LoginFormContent {...props} />
+		</Suspense>
 	);
 }
