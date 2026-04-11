@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { authClient } from "@/lib/auth/client"
@@ -178,7 +178,7 @@ const getRoleIcon = (role: string) => {
 	}
 }
 
-export default function OrganizationsSettingsPage() {
+export function OrganizationsSettingsPageContent() {
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const [organizations, setOrganizations] = useState<Organization[]>([])
@@ -919,5 +919,22 @@ export default function OrganizationsSettingsPage() {
 				/>
 			)}
 		</div>
+	)
+}
+
+export default function OrganizationsSettingsPage() {
+	return (
+		<Suspense fallback={
+			<div className="grid gap-6">
+				<Skeleton className="h-[200px] w-full" />
+				<div className="space-y-4">
+					<Skeleton className="h-12 w-full" />
+					<Skeleton className="h-12 w-full" />
+					<Skeleton className="h-12 w-full" />
+				</div>
+			</div>
+		}>
+			<OrganizationsSettingsPageContent />
+		</Suspense>
 	)
 }
