@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth/client";
 import { useORPC } from "@/lib/orpc/react";
+import { useMutation } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -95,16 +96,16 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 	};
 
 	// Reset DB: trigger via oRPC
-	const resetDb = orpc.system.resetDb.useMutation({
+	const resetDb = useMutation(orpc.system.resetDb.mutationOptions({
 		onSuccess: () => {
 			toast.success("Database reset and seeded successfully!");
 			setLoading(false);
 		},
-		onError: (err) => {
+		onError: (err: any) => {
 			toast.error(`Reset failed: ${err.message}`);
 			setLoading(false);
 		},
-	});
+	}));
 
 	const handleResetDb = async () => {
 		if (!confirm("Are you sure? This will drop all tables, migrate, and re-seed the database.")) return;
