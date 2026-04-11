@@ -25,7 +25,7 @@ import { seedReferensi } from "./referensi";
 
 const ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com";
 const ADMIN_NAME = process.env.DEFAULT_ADMIN_NAME || "Admin User";
-const ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "ChangeMe123!";
+const ADMIN_PASSWORD = "Password123#";
 
 // Better Auth password hash format: salt(hex):key(hex) using @noble/hashes/scrypt
 async function hashPassword(password: string): Promise<string> {
