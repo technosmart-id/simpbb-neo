@@ -70,7 +70,7 @@ export default async function Page() {
             className="h-12 px-10 text-base bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold shadow-lg shadow-yellow-400/20 border-0"
             asChild
           >
-            <Link href="/login">
+            <Link href="/sign-in">
               <LogIn className="mr-2 size-4" />
               Masuk ke Sistem
             </Link>

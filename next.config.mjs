@@ -5,6 +5,15 @@ const nextConfig = {
   // Node.js Worker code that Turbopack can't bundle for SSR. Externalizing
   // them means they are require()'d at runtime on the server instead of bundled.
   serverExternalPackages: ['jspdf', 'jspdf-autotable'],
+  async redirects() {
+    return [
+      {
+        source: '/login',
+        destination: '/sign-in',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 export default nextConfig
