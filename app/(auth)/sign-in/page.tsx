@@ -2,6 +2,7 @@
 
 import { LoginForm } from "@/components/auth/login-form"
 import { Building2 } from "lucide-react"
+import { Suspense } from "react"
 
 export default function LoginPage() {
   return (
@@ -18,7 +19,9 @@ export default function LoginPage() {
             <p className="text-lg font-bold">SIM-PBB</p>
           </div>
         </div>
-        <LoginForm />
+        <Suspense fallback={<div className="h-96 flex items-center justify-center">Loading...</div>}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   )
