@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth/client";
+import { useORPC } from "@/lib/orpc/react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,7 @@ function isValidCallbackURL(url: string | null): string {
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
 	const router = useRouter();
+	const orpc = useORPC();
 	const searchParams = useSearchParams();
 	const callbackURL = isValidCallbackURL(searchParams.get("callbackURL"));
 	const [loading, setLoading] = useState(false);
@@ -85,13 +87,29 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 	const [emailForPasswordless, setEmailForPasswordless] = useState("");
 	const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
-	// Dev admin credentials (for quick login in development)
-	const DEV_ADMIN_EMAIL = "admin@example.com";
-	const DEV_ADMIN_PASSWORD = "ChangeMe123!";
+	// Demo Akun: fill admin credentials
+	const fillDemoAdmin = () => {
+		setIdentifier("admin");
+		setPassword("Password123#");
+		setSignInMode("password");
+	};
 
-	const fillDevAdmin = () => {
-		setIdentifier(DEV_ADMIN_EMAIL);
-		setPassword(DEV_ADMIN_PASSWORD);
+	// Reset DB: trigger via oRPC
+	const resetDb = orpc.system.resetDb.useMutation({
+		onSuccess: () => {
+			toast.success("Database reset and seeded successfully!");
+			setLoading(false);
+		},
+		onError: (err) => {
+			toast.error(`Reset failed: ${err.message}`);
+			setLoading(false);
+		},
+	});
+
+	const handleResetDb = async () => {
+		if (!confirm("Are you sure? This will drop all tables, migrate, and re-seed the database.")) return;
+		setLoading(true);
+		resetDb.mutate({});
 	};
 
 	// Execute reCAPTCHA v3 and get token
@@ -425,6 +443,30 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 								</Field>
 							)}
 
+							{/* Demo & Reset Buttons */}
+							<div className="grid grid-cols-2 gap-2">
+								<Button
+									type="button"
+									variant="outline"
+									className="w-full"
+									onClick={fillDemoAdmin}
+									disabled={loading}
+								>
+									<Sparkles className="h-4 w-4 mr-2 text-yellow-500" />
+									Demo Akun
+								</Button>
+								<Button
+									type="button"
+									variant="outline"
+									className="w-full text-destructive hover:bg-destructive/10"
+									onClick={handleResetDb}
+									disabled={loading}
+								>
+									<Loader2Icon className={cn("h-4 w-4 mr-2", resetDb.isPending && "animate-spin")} />
+									Reset DB
+								</Button>
+							</div>
+
 							{/* Sign In Button */}
 							<Field>
 								<Button
@@ -432,27 +474,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 									className="w-full"
 									disabled={loading || !isIdentifierValid || (!isPasswordlessMode && !password)}
 								>
-									{loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+									{loading && !resetDb.isPending && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
 									{isPasswordlessMode ? "Send" : "Sign in"}
 								</Button>
 							</Field>
-
-							{/* Dev Admin Quick Fill - only shown in development */}
-							{process.env.NODE_ENV === "development" && (
-								<Field>
-									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										className="w-full text-muted-foreground hover:text-foreground"
-										onClick={fillDevAdmin}
-										disabled={loading}
-									>
-										<KeyRound className="h-4 w-4 mr-1.5" />
-										Fill Dev Admin Credentials
-									</Button>
-								</Field>
-							)}
 
 							{/* Passwordless Options - shown when email is detected */}
 							{!isPasswordlessMode && canUsePasswordless && identifier && (

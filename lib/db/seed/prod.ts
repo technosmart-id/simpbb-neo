@@ -55,6 +55,7 @@ export async function seedProd() {
 			id: userId,
 			name: ADMIN_NAME,
 			email: ADMIN_EMAIL,
+			username: "admin",
 			emailVerified: true,
 			role: "admin",
 			createdAt: new Date(),

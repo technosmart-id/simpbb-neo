@@ -36,6 +36,7 @@ import { tunggakanRouter } from "./routers/tunggakan"
 import { updateMasalRouter } from "./routers/update-masal"
 import { pemekaranRouter } from "./routers/pemekaran"
 import { booksRouter } from "./routers/books"
+import { systemRouter } from "./routers/system"
 
 import { os as osBase } from "@orpc/server"
 import { Context, os, requireAuth, requireSession, requireAdmin } from "./base"
@@ -466,6 +467,7 @@ export const router = os.router({
   tunggakan: tunggakanRouter,
   updateMasal: updateMasalRouter,
   pemekaran: pemekaranRouter,
+  system: systemRouter,
 
   notifications: os.router({
     list: os
