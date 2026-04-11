@@ -17,7 +17,7 @@ async function main() {
     console.log('Resetting database tables...');
     
     // Connect with the full URL (includes database name)
-    const connection = await mysql.createConnection(DATABASE_URL);
+    const connection = await mysql.createConnection(DATABASE_URL!);
     
     // Get all tables
     const [rows]: any = await connection.query('SHOW TABLES;');
