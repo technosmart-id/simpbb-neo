@@ -50,7 +50,7 @@ function serializeArray(name: string, rows: Record<string, unknown>[]): string {
 
 async function main() {
   console.log("🔌 Connecting to remote database...");
-  const conn = await mysql.createConnection(REMOTE_DB_URL);
+  const conn = await mysql.createConnection(REMOTE_DB_URL!);
   console.log("  ✓ Connected\n");
 
   // ── Step 1: Find two kelurahan from different kecamatan ──────────
