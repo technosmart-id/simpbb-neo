@@ -18,6 +18,7 @@ import { account, member, organization, user, orgRoles, memberRoles } from "@/li
 import { eq, and } from "drizzle-orm";
 import { getCasbinSyncService } from "@/lib/services/casbin-sync";
 import { ORG_ROLES } from "@/lib/services/authorization-constants";
+import { seedSampleSpop } from "./sample-spop";
 
 const ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com";
 const ADMIN_NAME = process.env.DEFAULT_ADMIN_NAME || "Admin User";
@@ -172,4 +173,7 @@ export async function seedDev() {
 	await casbinSync.assignRoleToMember(memberId, ORG_ROLES.OWNER, "system", orgId);
 
 	console.log("  ✓ Done\n");
+
+	// Sample SPOP data for development
+	await seedSampleSpop();
 }
