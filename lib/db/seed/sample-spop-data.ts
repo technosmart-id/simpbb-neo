@@ -9,26 +9,26 @@
 
 export const sampleRefPropinsi = [
   { kdPropinsi: "51", nmPropinsi: "BALI" },
-] as const;
+];
 
 export const sampleRefDati2 = [
   { kdPropinsi: "51", kdDati2: "71", nmDati2: "DENPASAR" },
-] as const;
+];
 
 export const sampleRefKecamatan = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "010", nmKecamatanOnly: "DENPASAR SELATAN" },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", nmKecamatanOnly: "DENPASAR BARAT" },
-] as const;
+];
 
 export const sampleRefKelurahan = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "010", kdKelurahan: "001", kdSektor: "20", nmKelurahanOnly: "PEMOGAN", noKelurahan: 3099, kdPosKelurahan: null },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdSektor: "20", nmKelurahanOnly: "PADANG SAMBIAN", noKelurahan: 918, kdPosKelurahan: null },
-] as const;
+];
 
 export const sampleFasilitas = [
   { kdFasilitas: "01", nmFasilitas: "AC SPLIT", satuanFasilitas: "BH", statusFasilitas: "5", ketergantungan: "0" },
   { kdFasilitas: "44", nmFasilitas: "LISTRIK", satuanFasilitas: "WATT (VA)", statusFasilitas: "5", ketergantungan: "0" },
-] as const;
+];
 
 export const sampleDatSubjekPajak = [
   { subjekPajakId: "12.1431.090549.0601           ", nmWp: "ABDUL HAMID", jalanWp: "JL BROMO", blokKavNoWp: "1/4", rwWp: null, rtWp: null, kelurahanWp: "KEPANJEN", kotaWp: "MALANG", kdPosWp: null, telpWp: null, npwp: "-", statusPekerjaanWp: "5", emailWp: null },
@@ -131,7 +131,7 @@ export const sampleDatSubjekPajak = [
   { subjekPajakId: "5171035404640003              ", nmWp: "EMI LESTARI SANTAJAYA PO", jalanWp: "JL TK UNDA", blokKavNoWp: "19", rwWp: "00", rtWp: "000", kelurahanWp: "PANJER", kotaWp: "KOTA DENPASAR", kdPosWp: null, telpWp: null, npwp: "-", statusPekerjaanWp: "5", emailWp: null },
   { subjekPajakId: "5171040707610002", nmWp: "GEDE WIJANA", jalanWp: "JL PATIH NAMBI IV F", blokKavNoWp: "2", rwWp: null, rtWp: null, kelurahanWp: "UBUNG KAJA", kotaWp: "KOTA DENPASAR", kdPosWp: null, telpWp: "08123635597", npwp: null, statusPekerjaanWp: "5", emailWp: "gedewijana@unud.ac.id" },
   { subjekPajakId: "9517103000803800140           ", nmWp: "A A MADE PEGUG", jalanWp: "LC PADANGSAMBIAN", blokKavNoWp: null, rwWp: "00", rtWp: "000", kelurahanWp: "PADANG SAMBIAN", kotaWp: "KOTA DENPASAR", kdPosWp: null, telpWp: null, npwp: "-", statusPekerjaanWp: "5", emailWp: null },
-] as const;
+];
 
 export const sampleSpop = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "010", kdKelurahan: "001", kdBlok: "006", noUrut: "0236", kdJnsOp: "0", subjekPajakId: "22.0702.621274.0003           ", noFormulirSpop: "20084606035", jnsTransaksiOp: "2", kdPropinsiBersama: null, kdDati2Bersama: null, kdKecamatanBersama: null, kdKelurahanBersama: null, kdBlokBersama: null, noUrutBersama: null, kdJnsOpBersama: null, kdPropinsiAsal: null, kdDati2Asal: null, kdKecamatanAsal: null, kdKelurahanAsal: null, kdBlokAsal: null, noUrutAsal: null, kdJnsOpAsal: null, noSpptLama: null, jalanOp: "JL P YONI GG PURA TAMAN", blokKavNoOp: "-", kelurahanOp: null, rwOp: "00", rtOp: "000", kdStatusWp: "1", luasBumi: 150, kdZnt: "AJ", jnsBumi: "1", nilaiSistemBumi: 348000, tglPendataanOp: new Date("2008-06-25"), nmPendataanOp: null, nipPendata: "060000000", tglPemeriksaanOp: new Date("2008-06-25"), nmPemeriksaanOp: null, nipPemeriksaOp: "060000000" },
@@ -234,7 +234,7 @@ export const sampleSpop = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "016", noUrut: "0012", kdJnsOp: "0", subjekPajakId: "517103000801600120            ", noFormulirSpop: "19943816013", jnsTransaksiOp: "1", kdPropinsiBersama: null, kdDati2Bersama: null, kdKecamatanBersama: null, kdKelurahanBersama: null, kdBlokBersama: null, noUrutBersama: null, kdJnsOpBersama: null, kdPropinsiAsal: null, kdDati2Asal: null, kdKecamatanAsal: null, kdKelurahanAsal: null, kdBlokAsal: null, noUrutAsal: null, kdJnsOpAsal: null, noSpptLama: null, jalanOp: "JL GN SANGIANG", blokKavNoOp: null, kelurahanOp: null, rwOp: "00", rtOp: "000", kdStatusWp: "1", luasBumi: 300, kdZnt: "BM", jnsBumi: "3", nilaiSistemBumi: 696000, tglPendataanOp: new Date("1994-08-15"), nmPendataanOp: null, nipPendata: "060000000", tglPemeriksaanOp: new Date("2000-12-06"), nmPemeriksaanOp: null, nipPemeriksaOp: "060000000" },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "016", noUrut: "0039", kdJnsOp: "0", subjekPajakId: "517103000801600390            ", noFormulirSpop: "20098059181", jnsTransaksiOp: "2", kdPropinsiBersama: null, kdDati2Bersama: null, kdKecamatanBersama: null, kdKelurahanBersama: null, kdBlokBersama: null, noUrutBersama: null, kdJnsOpBersama: null, kdPropinsiAsal: null, kdDati2Asal: null, kdKecamatanAsal: null, kdKelurahanAsal: null, kdBlokAsal: null, noUrutAsal: null, kdJnsOpAsal: null, noSpptLama: null, jalanOp: "JL TAMAN SEKAR", blokKavNoOp: "V B", kelurahanOp: null, rwOp: "00", rtOp: "000", kdStatusWp: "1", luasBumi: 135, kdZnt: "BW", jnsBumi: "2", nilaiSistemBumi: 696600, tglPendataanOp: new Date("2009-12-30"), nmPendataanOp: null, nipPendata: "060000000", tglPemeriksaanOp: new Date("2009-12-30"), nmPemeriksaanOp: null, nipPemeriksaOp: "060000000" },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "037", noUrut: "0051", kdJnsOp: "0", subjekPajakId: "5171030109440001", noFormulirSpop: "19943837071", jnsTransaksiOp: "2", kdPropinsiBersama: null, kdDati2Bersama: null, kdKecamatanBersama: null, kdKelurahanBersama: null, kdBlokBersama: null, noUrutBersama: null, kdJnsOpBersama: null, kdPropinsiAsal: null, kdDati2Asal: null, kdKecamatanAsal: null, kdKelurahanAsal: null, kdBlokAsal: null, noUrutAsal: null, kdJnsOpAsal: null, noSpptLama: null, jalanOp: "BR BUANA AGUNG", blokKavNoOp: null, kelurahanOp: null, rwOp: "00", rtOp: "000", kdStatusWp: "1", luasBumi: 200, kdZnt: "CY", jnsBumi: "2", nilaiSistemBumi: 702000, tglPendataanOp: new Date("1994-10-20"), nmPendataanOp: null, nipPendata: "060000000", tglPemeriksaanOp: new Date("2015-04-29"), nmPemeriksaanOp: "Nyoman Sastra Wibawa, SE", nipPemeriksaOp: "19690429 199803 1 00" },
-] as const;
+];
 
 export const sampleDatOpBangunan = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "010", kdKelurahan: "001", kdBlok: "002", noUrut: "0227", kdJnsOp: "0", noBng: 1, kdJpb: "01", noFormulirLspop: "20192001142", thnDibangunBng: "2010", thnRenovasiBng: null, luasBng: 45, jmlLantaiBng: 1, kondisiBng: "2", jnsKonstruksiBng: "2", jnsAtapBng: "3", kdDinding: "2", kdLantai: "2", kdLangitLangit: "2", nilaiSistemBng: 33661, jnsTransaksiBng: "1", tglPendataanBng: new Date("2012-01-02T00:00:00"), nipPendataBng: "060000000", tglPemeriksaanBng: new Date("2019-02-13T10:08:44"), nipPemeriksaBng: "19690429 199803 1 00", tglKunjunganKembali: new Date("0001-01-01"), nilaiIndividu: "0", aktif: 1 },
@@ -289,7 +289,7 @@ export const sampleDatOpBangunan = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "037", noUrut: "0045", kdJnsOp: "0", noBng: 1, kdJpb: "01", noFormulirLspop: "19943837063", thnDibangunBng: "1982", thnRenovasiBng: null, luasBng: 20, jmlLantaiBng: 1, kondisiBng: "3", jnsKonstruksiBng: "2", jnsAtapBng: "3", kdDinding: "3", kdLantai: "5", kdLangitLangit: "2", nilaiSistemBng: 7798, jnsTransaksiBng: "1", tglPendataanBng: new Date("1994-10-20T00:00:00"), nipPendataBng: "060000000", tglPemeriksaanBng: new Date("1994-10-20T00:00:00"), nipPemeriksaBng: "060000000", tglKunjunganKembali: null, nilaiIndividu: "0", aktif: 1 },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "037", noUrut: "0402", kdJnsOp: "0", noBng: 1, kdJpb: "01", noFormulirLspop: "20152019175", thnDibangunBng: "2015", thnRenovasiBng: null, luasBng: 60, jmlLantaiBng: 2, kondisiBng: "1", jnsKonstruksiBng: "2", jnsAtapBng: "1", kdDinding: "3", kdLantai: "2", kdLangitLangit: "2", nilaiSistemBng: 55972, jnsTransaksiBng: "2", tglPendataanBng: new Date("2015-10-06T00:00:00"), nipPendataBng: "197805182009031004", tglPemeriksaanBng: new Date("2015-10-06T00:00:00"), nipPemeriksaBng: "19690429 199803 1 003", tglKunjunganKembali: new Date("2015-10-06"), nilaiIndividu: "0", aktif: 1 },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "039", noUrut: "0378", kdJnsOp: "0", noBng: 1, kdJpb: "01", noFormulirLspop: "20245022023", thnDibangunBng: "2015", thnRenovasiBng: null, luasBng: 30, jmlLantaiBng: 1, kondisiBng: "2", jnsKonstruksiBng: "2", jnsAtapBng: "3", kdDinding: "3", kdLantai: "2", kdLangitLangit: "2", nilaiSistemBng: 20582, jnsTransaksiBng: "1", tglPendataanBng: new Date("2024-08-12T10:45:24"), nipPendataBng: "011111111", tglPemeriksaanBng: new Date("2024-08-12T10:46:07"), nipPemeriksaBng: "19721129 200003 2 00", tglKunjunganKembali: new Date("0001-01-01"), nilaiIndividu: "0", aktif: 1 },
-] as const;
+];
 
 export const sampleDatFasilitasBangunan = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "010", kdKelurahan: "001", kdBlok: "002", noUrut: "0227", kdJnsOp: "0", noBng: 1, kdFasilitas: "44", jmlSatuan: 900 },
@@ -301,7 +301,7 @@ export const sampleDatFasilitasBangunan = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "026", noUrut: "0415", kdJnsOp: "0", noBng: 1, kdFasilitas: "44", jmlSatuan: 2200 },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "026", noUrut: "0426", kdJnsOp: "0", noBng: 1, kdFasilitas: "44", jmlSatuan: 900 },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "029", noUrut: "0090", kdJnsOp: "0", noBng: 1, kdFasilitas: "44", jmlSatuan: 2200 },
-] as const;
+];
 
 export const sampleDatLegalitasBumi = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "010", kdKelurahan: "001", kdBlok: "004", noUrut: "0114", kdJnsOp: "0", noLegalitasTanah: "08323" },
@@ -321,7 +321,7 @@ export const sampleDatLegalitasBumi = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "024", noUrut: "0010", kdJnsOp: "0", noLegalitasTanah: "22090000003210" },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "026", noUrut: "0447", kdJnsOp: "0", noLegalitasTanah: "13942" },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "039", noUrut: "0378", kdJnsOp: "0", noLegalitasTanah: "22090000043860" },
-] as const;
+];
 
 export const sampleSppt = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "010", kdKelurahan: "001", kdBlok: "002", noUrut: "0227", kdJnsOp: "0", thnPajakSppt: 2010, siklusSppt: 1, nmWp: "I MADE KUPUG", jalanWp: "JL GUNUNG KAWI I", kdKlsTanah: "A19", kdKlsBng: "XXX", tglJatuhTempo: new Date("2010-03-12"), luasBumi: "100", luasBng: "0", njopBumi: "61400000", njopBng: "0", njopSppt: "61400000", njoptkpSppt: "0", njkpSppt: "20", pbbTerhutangSppt: "61400", faktorPengurangSppt: "0", pbbYgHarusDibayarSppt: "61400", statusPembayaranSppt: "1", statusTagihanSppt: "0", statusCetakSppt: "1", tglTerbit: new Date("2010-02-12 00:00:00"), tglCetak: new Date("2010-02-12 13:55:37") },
@@ -2596,7 +2596,7 @@ export const sampleSppt = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "041", noUrut: "0234", kdJnsOp: "0", thnPajakSppt: 2017, siklusSppt: 5, nmWp: "NI WAYAN SURYANI", jalanWp: "NOJA SARASWATI/PERMATA HIJAU", kdKlsTanah: "065", kdKlsBng: null, tglJatuhTempo: new Date("2017-08-31"), luasBumi: "106", luasBng: "0", njopBumi: "109392000", njopBng: "0", njopSppt: "109392000", njoptkpSppt: "0", njkpSppt: "20", pbbTerhutangSppt: "109392", faktorPengurangSppt: "0", pbbYgHarusDibayarSppt: "109392", statusPembayaranSppt: "1", statusTagihanSppt: "0", statusCetakSppt: "0", tglTerbit: new Date("2017-01-03 00:00:00"), tglCetak: new Date("2017-02-01 07:54:04") },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "041", noUrut: "0234", kdJnsOp: "0", thnPajakSppt: 2018, siklusSppt: 5, nmWp: "NI WAYAN SURYANI", jalanWp: "NOJA SARASWATI/PERMATA HIJAU", kdKlsTanah: "065", kdKlsBng: null, tglJatuhTempo: new Date("2018-08-31"), luasBumi: "106", luasBng: "0", njopBumi: "109392000", njopBng: "0", njopSppt: "109392000", njoptkpSppt: "0", njkpSppt: "20", pbbTerhutangSppt: "109392", faktorPengurangSppt: "0", pbbYgHarusDibayarSppt: "109392", statusPembayaranSppt: "1", statusTagihanSppt: "0", statusCetakSppt: "0", tglTerbit: new Date("2018-01-03 00:00:00"), tglCetak: new Date("2018-02-12 10:51:13") },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "041", noUrut: "0234", kdJnsOp: "0", thnPajakSppt: 2019, siklusSppt: 14, nmWp: "NI WAYAN SURYANI", jalanWp: "NOJA SARASWATI/PERMATA HIJAU", kdKlsTanah: "065", kdKlsBng: null, tglJatuhTempo: new Date("2019-08-31"), luasBumi: "106", luasBng: "0", njopBumi: "109392000", njopBng: "0", njopSppt: "109392000", njoptkpSppt: "0", njkpSppt: "20", pbbTerhutangSppt: "109392", faktorPengurangSppt: "0", pbbYgHarusDibayarSppt: "109392", statusPembayaranSppt: "1", statusTagihanSppt: "0", statusCetakSppt: "0", tglTerbit: new Date("2019-01-15 00:00:00"), tglCetak: new Date("2019-01-28 06:32:00") },
-] as const;
+];
 
 export const samplePembayaranSppt = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "010", kdKelurahan: "001", kdBlok: "002", noUrut: "0227", kdJnsOp: "0", thnPajakSppt: 2010, pembayaranKe: 1, dendaSppt: "0", jmlSpptYgDibayar: "61400", tglPembayaranSppt: new Date("2010-02-18") },
@@ -4040,4 +4040,4 @@ export const samplePembayaranSppt = [
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "041", noUrut: "0234", kdJnsOp: "0", thnPajakSppt: 2017, pembayaranKe: 1, dendaSppt: "0", jmlSpptYgDibayar: "109392", tglPembayaranSppt: new Date("2017-01-30") },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "041", noUrut: "0234", kdJnsOp: "0", thnPajakSppt: 2018, pembayaranKe: 1, dendaSppt: "24066", jmlSpptYgDibayar: "133458", tglPembayaranSppt: new Date("2019-07-10") },
   { kdPropinsi: "51", kdDati2: "71", kdKecamatan: "030", kdKelurahan: "008", kdBlok: "041", noUrut: "0234", kdJnsOp: "0", thnPajakSppt: 2019, pembayaranKe: 1, dendaSppt: "0", jmlSpptYgDibayar: "109392", tglPembayaranSppt: new Date("2019-07-10") },
-] as const;
+];

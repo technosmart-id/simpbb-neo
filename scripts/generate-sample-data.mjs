@@ -187,7 +187,7 @@ function serializeArray(name, objects, dbColMapping) {
     return "  { " + pairs.join(", ") + " }";
   });
 
-  return `export const ${name} = [\n${lines.join(",\n")},\n] as const;`;
+  return `export const ${name} = [\n${lines.join(",\n")},\n];`;
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────
