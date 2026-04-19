@@ -60,23 +60,26 @@ export function WilayahCascade({
   // Data queries
   const propinsiQuery = useQuery(orpc.wilayah.listPropinsi.queryOptions())
 
-  const dati2Query = useQuery(
-    orpc.wilayah.listDati2.queryOptions({
+  const dati2Query = useQuery({
+    ...orpc.wilayah.listDati2.queryOptions({
       input: { kdPropinsi: propinsi },
     }),
-  )
+    enabled: !!propinsi,
+  })
 
-  const kecamatanQuery = useQuery(
-    orpc.wilayah.listKecamatan.queryOptions({
+  const kecamatanQuery = useQuery({
+    ...orpc.wilayah.listKecamatan.queryOptions({
       input: { kdPropinsi: propinsi, kdDati2: dati2 },
     }),
-  )
+    enabled: !!propinsi && !!dati2,
+  })
 
-  const kelurahanQuery = useQuery(
-    orpc.wilayah.listKelurahan.queryOptions({
+  const kelurahanQuery = useQuery({
+    ...orpc.wilayah.listKelurahan.queryOptions({
       input: { kdPropinsi: propinsi, kdDati2: dati2, kdKecamatan: kecamatan },
     }),
-  )
+    enabled: !!propinsi && !!dati2 && !!kecamatan,
+  })
 
   const levels = ["propinsi", "dati2", "kecamatan", "kelurahan"] as const
   const maxIdx = levels.indexOf(maxLevel)
