@@ -75,7 +75,10 @@ export default function SpopPage() {
   const orpc = useORPC()
   const [page, setPage] = React.useState(1)
   const [search, setSearch] = React.useState('')
-  const [wilayah, setWilayah] = React.useState<Partial<WilayahValue>>({})
+  const [wilayah, setWilayah] = React.useState<Partial<WilayahValue>>({
+    kdPropinsi: '51',
+    kdDati2: '71',
+  })
 
   const listQuery = useQuery(
     orpc.objekPajak.list.queryOptions({
@@ -87,6 +90,8 @@ export default function SpopPage() {
         kdDati2: wilayah.kdDati2 || undefined,
         kdKecamatan: wilayah.kdKecamatan || undefined,
         kdKelurahan: wilayah.kdKelurahan || undefined,
+        kdBlok: wilayah.kdBlok || undefined,
+        kdZnt: wilayah.kdZnt || undefined,
       },
     }),
   )
@@ -109,25 +114,28 @@ export default function SpopPage() {
       </div>
 
       {/* Filters */}
-      <div className="rounded-md border bg-card p-4 space-y-3">
-        <WilayahCascade
-          value={wilayah}
-          onChange={(v) => {
-            setWilayah(v)
-            setPage(1)
-          }}
-        />
-        <div className="relative max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Cari alamat, no urut..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value)
+      <div className="rounded-md border bg-card p-4 space-y-4">
+        <div className="flex flex-wrap items-end gap-4">
+          <WilayahCascade
+            value={wilayah}
+            onChange={(v) => {
+              setWilayah(v)
               setPage(1)
             }}
-            className="pl-8"
+            maxLevel="znt"
           />
+          <div className="relative w-full sm:max-w-xs">
+            <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Cari alamat, no urut..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              className="pl-8"
+            />
+          </div>
         </div>
       </div>
 

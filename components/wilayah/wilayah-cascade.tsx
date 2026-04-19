@@ -17,13 +17,15 @@ export interface WilayahValue {
   kdDati2: string
   kdKecamatan: string
   kdKelurahan: string
+  kdBlok?: string
+  kdZnt?: string
 }
 
 interface WilayahCascadeProps {
   value?: Partial<WilayahValue>
   onChange?: (value: WilayahValue) => void
   /** Show only up to a specific level */
-  maxLevel?: "propinsi" | "dati2" | "kecamatan" | "kelurahan"
+  maxLevel?: "propinsi" | "dati2" | "kecamatan" | "kelurahan" | "blok" | "znt"
   disabled?: boolean
   className?: string
   /** Layout direction */
@@ -31,7 +33,7 @@ interface WilayahCascadeProps {
 }
 
 /**
- * Cascading dropdown: Provinsi -> Kab/Kota -> Kecamatan -> Kelurahan
+ * Cascading dropdown: Provinsi -> Kab/Kota -> Kecamatan -> Kelurahan -> Blok -> ZNT
  * Each level auto-fetches options based on parent selection
  */
 export function WilayahCascade({
@@ -48,6 +50,8 @@ export function WilayahCascade({
   const [dati2, setDati2] = React.useState(value?.kdDati2 ?? "")
   const [kecamatan, setKecamatan] = React.useState(value?.kdKecamatan ?? "")
   const [kelurahan, setKelurahan] = React.useState(value?.kdKelurahan ?? "")
+  const [blok, setBlok] = React.useState(value?.kdBlok ?? "")
+  const [znt, setZnt] = React.useState(value?.kdZnt ?? "")
 
   // Sync from external value
   React.useEffect(() => {
@@ -55,7 +59,9 @@ export function WilayahCascade({
     if (value?.kdDati2 !== undefined) setDati2(value.kdDati2)
     if (value?.kdKecamatan !== undefined) setKecamatan(value.kdKecamatan)
     if (value?.kdKelurahan !== undefined) setKelurahan(value.kdKelurahan)
-  }, [value?.kdPropinsi, value?.kdDati2, value?.kdKecamatan, value?.kdKelurahan])
+    if (value?.kdBlok !== undefined) setBlok(value.kdBlok)
+    if (value?.kdZnt !== undefined) setZnt(value.kdZnt)
+  }, [value?.kdPropinsi, value?.kdDati2, value?.kdKecamatan, value?.kdKelurahan, value?.kdBlok, value?.kdZnt])
 
   // Data queries
   const propinsiQuery = useQuery(orpc.wilayah.listPropinsi.queryOptions())
@@ -81,12 +87,26 @@ export function WilayahCascade({
     enabled: !!propinsi && !!dati2 && !!kecamatan,
   })
 
-  const levels = ["propinsi", "dati2", "kecamatan", "kelurahan"] as const
+  const blokQuery = useQuery({
+    ...orpc.wilayah.listBlok.queryOptions({
+      input: { kdPropinsi: propinsi, kdDati2: dati2, kdKecamatan: kecamatan, kdKelurahan: kelurahan },
+    }),
+    enabled: !!propinsi && !!dati2 && !!kecamatan && !!kelurahan && (maxLevel === "blok" || maxLevel === "znt"),
+  })
+
+  const zntQuery = useQuery({
+    ...orpc.wilayah.listZnt.queryOptions({
+      input: { kdPropinsi: propinsi, kdDati2: dati2, kdKecamatan: kecamatan, kdKelurahan: kelurahan },
+    }),
+    enabled: !!propinsi && !!dati2 && !!kecamatan && !!kelurahan && maxLevel === "znt",
+  })
+
+  const levels = ["propinsi", "dati2", "kecamatan", "kelurahan", "blok", "znt"] as const
   const maxIdx = levels.indexOf(maxLevel)
 
-  const notifyChange = (p: string, d: string, k: string, l: string) => {
+  const notifyChange = (p: string, d: string, k: string, l: string, b?: string, z?: string) => {
     if (p && d && k && l) {
-      onChange?.({ kdPropinsi: p, kdDati2: d, kdKecamatan: k, kdKelurahan: l })
+      onChange?.({ kdPropinsi: p, kdDati2: d, kdKecamatan: k, kdKelurahan: l, kdBlok: b, kdZnt: z })
     }
   }
 
@@ -95,22 +115,41 @@ export function WilayahCascade({
     setDati2("")
     setKecamatan("")
     setKelurahan("")
+    setBlok("")
+    setZnt("")
   }
 
   const handleDati2Change = (v: string) => {
     setDati2(v)
     setKecamatan("")
     setKelurahan("")
+    setBlok("")
+    setZnt("")
   }
 
   const handleKecamatanChange = (v: string) => {
     setKecamatan(v)
     setKelurahan("")
+    setBlok("")
+    setZnt("")
   }
 
   const handleKelurahanChange = (v: string) => {
     setKelurahan(v)
-    notifyChange(propinsi, dati2, kecamatan, v)
+    setBlok("")
+    setZnt("")
+    notifyChange(propinsi, dati2, kecamatan, v, "", "")
+  }
+
+  const handleBlokChange = (v: string) => {
+    setBlok(v)
+    setZnt("")
+    notifyChange(propinsi, dati2, kecamatan, kelurahan, v, "")
+  }
+
+  const handleZntChange = (v: string) => {
+    setZnt(v)
+    notifyChange(propinsi, dati2, kecamatan, kelurahan, blok, v)
   }
 
   return (
@@ -203,6 +242,58 @@ export function WilayahCascade({
                   {k.kdKelurahan} - {k.nmKelurahanOnly}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Blok */}
+      {maxIdx >= 4 && (
+        <div className="space-y-1 min-w-[120px]">
+          <label className="text-xs text-muted-foreground">Blok</label>
+          <Select
+            value={blok}
+            onValueChange={handleBlokChange}
+            disabled={disabled || !kelurahan}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Pilih Blok" />
+            </SelectTrigger>
+            <SelectContent>
+              {blokQuery.data?.map((b) => (
+                <SelectItem key={b.kdBlok} value={b.kdBlok}>
+                  {b.kdBlok}
+                </SelectItem>
+              ))}
+              {blokQuery.data?.length === 0 && !blokQuery.isLoading && (
+                <SelectItem value="_empty" disabled>Tidak ada blok</SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* ZNT */}
+      {maxIdx >= 5 && (
+        <div className="space-y-1 min-w-[100px]">
+          <label className="text-xs text-muted-foreground">ZNT</label>
+          <Select
+            value={znt}
+            onValueChange={handleZntChange}
+            disabled={disabled || !kelurahan}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Pilih ZNT" />
+            </SelectTrigger>
+            <SelectContent>
+              {zntQuery.data?.map((z) => (
+                <SelectItem key={z.kdZnt} value={z.kdZnt!}>
+                  {z.kdZnt}
+                </SelectItem>
+              ))}
+              {zntQuery.data?.length === 0 && !zntQuery.isLoading && (
+                <SelectItem value="_empty" disabled>Tidak ada ZNT</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>

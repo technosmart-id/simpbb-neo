@@ -24,6 +24,8 @@ export const objekPajakRouter = os.router({
       kdDati2: z.string().optional(),
       kdKecamatan: z.string().optional(),
       kdKelurahan: z.string().optional(),
+      kdBlok: z.string().optional(),
+      kdZnt: z.string().optional(),
       search: z.string().optional(),
     }))
     .handler(async ({ input }) => {
@@ -32,6 +34,8 @@ export const objekPajakRouter = os.router({
       if (input.kdDati2) conditions.push(eq(spop.kdDati2, input.kdDati2))
       if (input.kdKecamatan) conditions.push(eq(spop.kdKecamatan, input.kdKecamatan))
       if (input.kdKelurahan) conditions.push(eq(spop.kdKelurahan, input.kdKelurahan))
+      if (input.kdBlok) conditions.push(eq(spop.kdBlok, input.kdBlok))
+      if (input.kdZnt) conditions.push(eq(spop.kdZnt, input.kdZnt))
       if (input.search) {
         conditions.push(
           sql`(${spop.jalanOp} LIKE ${`%${input.search}%`} OR ${spop.noUrut} LIKE ${`%${input.search}%`})`,
@@ -196,7 +200,7 @@ export const objekPajakRouter = os.router({
     }),
 
   // ── Next available NO_URUT for a blok ──
-  nextNoUrut: os
+  getNextNoUrut: os
     .input(z.object({
       kdPropinsi: z.string().length(2),
       kdDati2: z.string().length(2),
