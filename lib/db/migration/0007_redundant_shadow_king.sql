@@ -1,0 +1,26 @@
+ALTER TABLE `ref_dati2` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `ref_kecamatan` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `ref_kelurahan` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `spop` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `dat_fasilitas_bangunan` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `dat_op_bangunan` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `dat_legalitas_bumi` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `dat_op_anggota` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `dat_op_induk` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `sppt` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `sppt_khusus` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `status_pbb` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `pembayaran_sppt` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `ref_dati2` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`);--> statement-breakpoint
+ALTER TABLE `ref_kecamatan` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`);--> statement-breakpoint
+ALTER TABLE `ref_kelurahan` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_SEKTOR`);--> statement-breakpoint
+ALTER TABLE `spop` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`);--> statement-breakpoint
+ALTER TABLE `dat_fasilitas_bangunan` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`,`KD_FASILITAS`);--> statement-breakpoint
+ALTER TABLE `dat_op_bangunan` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`);--> statement-breakpoint
+ALTER TABLE `dat_legalitas_bumi` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`);--> statement-breakpoint
+ALTER TABLE `dat_op_anggota` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`);--> statement-breakpoint
+ALTER TABLE `dat_op_induk` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`);--> statement-breakpoint
+ALTER TABLE `sppt` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`THN_PAJAK_SPPT`);--> statement-breakpoint
+ALTER TABLE `sppt_khusus` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`);--> statement-breakpoint
+ALTER TABLE `status_pbb` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`TAHUN_PBB`);--> statement-breakpoint
+ALTER TABLE `pembayaran_sppt` ADD PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`THN_PAJAK_SPPT`,`PEMBAYARAN_KE`);

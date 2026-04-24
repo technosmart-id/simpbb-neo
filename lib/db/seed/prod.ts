@@ -14,7 +14,7 @@ const hex = {
 };
 // Simple scrypt implementation or just use a placeholder for now since we're seeding
 // Better: use a mock for the seed if we can't get scrypt to load
-import { scryptAsync } from "@noble/hashes/scrypt.js"; 
+import { hashPassword } from "better-auth/crypto";
 import { db } from "@/lib/db";
 import { account, member, organization, user, orgRoles, memberRoles } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -22,22 +22,12 @@ import { getCasbinSyncService } from "@/lib/services/casbin-sync";
 import { ORG_ROLES } from "@/lib/services/authorization-constants";
 import { DEFAULT_USER_PERMISSIONS } from "@/lib/services/authorization-constants";
 import { seedReferensi } from "./referensi";
+import { seedMasterData } from "./master-data";
 
 const ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com";
 const ADMIN_NAME = process.env.DEFAULT_ADMIN_NAME || "Admin User";
 const ADMIN_PASSWORD = "Password123#";
 
-// Better Auth password hash format: salt(hex):key(hex) using @noble/hashes/scrypt
-async function hashPassword(password: string): Promise<string> {
-	const salt = hex.encode(crypto.getRandomValues(new Uint8Array(16)));
-	const key = await scryptAsync(password.normalize("NFKC"), salt, {
-		N: 16384,
-		r: 16,
-		p: 1,
-		dkLen: 64,
-	});
-	return `${salt}:${hex.encode(key)}`;
-}
 
 export async function seedProd() {
 	console.log("🌱 Production seed (Casbin-first architecture)\n");
@@ -64,7 +54,7 @@ export async function seedProd() {
 
 		await db.insert(account).values({
 			id: crypto.randomUUID(),
-			accountId: userId,
+			accountId: ADMIN_EMAIL,
 			providerId: "credential",
 			userId: userId,
 			password: passwordHash,
@@ -79,7 +69,7 @@ export async function seedProd() {
 		const passwordHash = await hashPassword(ADMIN_PASSWORD);
 		await db.update(account)
 			.set({ password: passwordHash, updatedAt: new Date() })
-			.where(eq(account.accountId, userId));
+			.where(eq(account.userId, userId));
 		console.log(`  ✓ Updated admin password hash`);
 	}
 
@@ -199,6 +189,7 @@ export async function seedProd() {
 	// Seed domain data
 	console.log("📦 Seeding domain data...");
 	await seedReferensi();
+	await seedMasterData();
 
 	console.log("\n✅ Production seed complete");
 	console.log(`   Email: ${ADMIN_EMAIL}`);

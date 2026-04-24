@@ -1,7 +1,6 @@
 /**
- * Sample SPOP data seeder
- * Seeds 100 sample SPOP records from 2 kelurahan in different kecamatan
- * along with all related tables (wilayah refs, subjek pajak, bangunan, SPPT, pembayaran).
+ * Dynamic Sample SPOP data seeder using Falso factories
+ * Seeds 100 sample SPOP records with all related tables.
  *
  * Run: npx tsx lib/db/seed/sample-spop.ts
  */
@@ -17,218 +16,116 @@ import {
   spop,
   datOpBangunan,
   datFasilitasBangunan,
-  datLegalitasBumi,
   sppt,
   pembayaranSppt,
   fasilitas,
 } from "@/lib/db/schema";
-import {
-  sampleRefPropinsi,
-  sampleRefDati2,
-  sampleRefKecamatan,
-  sampleRefKelurahan,
-  sampleFasilitas,
-  sampleDatSubjekPajak,
-  sampleSpop,
-  sampleDatOpBangunan,
-  sampleDatFasilitasBangunan,
-  sampleDatLegalitasBumi,
-  sampleSppt,
-  samplePembayaranSppt,
-} from "./sample-spop-data";
+
+import { getBaseWilayahData, getRandomRegion } from "./factories/wilayah";
+import { createSubjekPajak } from "./factories/subjek-pajak";
+import { createSpop } from "./factories/spop";
+import { createDatOpBangunan, createFasilitasBangunan } from "./factories/bangunan";
+import { createSppt } from "./factories/sppt";
+import { createPembayaranSppt } from "./factories/pembayaran";
 
 export async function seedSampleSpop() {
-  console.log("📋 Seeding sample SPOP data...\n");
+  console.log("📋 Seeding dynamic sample SPOP data using Falso...\n");
 
-  // 1. Wilayah reference data (top-down)
-  console.log("  🗺️  ref_propinsi...");
-  await db
-    .insert(refPropinsi)
-    .values(sampleRefPropinsi as any)
-    .onDuplicateKeyUpdate({ set: { nmPropinsi: sql`VALUES(NM_PROPINSI)` } });
+  // 1. Wilayah reference data
+  console.log("  🗺️  Seeding wilayah reference data...");
+  const { propinsis, dati2s, kecamatans, kelurahans } = getBaseWilayahData();
+  
+  await db.insert(refPropinsi).values(propinsis).onDuplicateKeyUpdate({ set: { nmPropinsi: sql`VALUES(NM_PROPINSI)` } });
+  await db.insert(refDati2).values(dati2s).onDuplicateKeyUpdate({ set: { nmDati2: sql`VALUES(NM_DATI2)` } });
+  await db.insert(refKecamatan).values(kecamatans).onDuplicateKeyUpdate({ set: { nmKecamatanOnly: sql`VALUES(NM_KECAMATAN_ONLY)` } });
+  await db.insert(refKelurahan).values(kelurahans).onDuplicateKeyUpdate({ set: { nmKelurahanOnly: sql`VALUES(NM_KELURAHAN_ONLY)` } });
 
-  console.log("  🗺️  ref_dati2...");
-  await db
-    .insert(refDati2)
-    .values(sampleRefDati2 as any)
-    .onDuplicateKeyUpdate({ set: { nmDati2: sql`VALUES(NM_DATI2)` } });
+  // 2. Master Fasilitas
+  console.log("  🔧 Seeding master fasilitas...");
+  const sampleFasilitas = [
+    { kdFasilitas: "01", nmFasilitas: "AC SENTRAL", satuanFasilitas: "M2", nilaiFasilitas: 500000 },
+    { kdFasilitas: "02", nmFasilitas: "LIFT PENUMPANG", satuanFasilitas: "UNIT", nilaiFasilitas: 150000000 },
+    { kdFasilitas: "03", nmFasilitas: "ESKALATOR", satuanFasilitas: "UNIT", nilaiFasilitas: 120000000 },
+    { kdFasilitas: "04", nmFasilitas: "PAGAR", satuanFasilitas: "M", nilaiFasilitas: 200000 },
+    { kdFasilitas: "05", nmFasilitas: "LAPANGAN TENIS", satuanFasilitas: "M2", nilaiFasilitas: 300000 },
+  ];
+  await db.insert(fasilitas).values(sampleFasilitas).onDuplicateKeyUpdate({ set: { nmFasilitas: sql`VALUES(NM_FASILITAS)` } });
 
-  console.log("  🗺️  ref_kecamatan...");
-  await db
-    .insert(refKecamatan)
-    .values(sampleRefKecamatan as any)
-    .onDuplicateKeyUpdate({ set: { nmKecamatanOnly: sql`VALUES(NM_KECAMATAN_ONLY)` } });
+  // 3. Generate Core Data
+  console.log("  🚀 Generating 100 SPOP records and relations...");
+  
+  const subjekPajaks: any[] = [];
+  const spops: any[] = [];
+  const bangunans: any[] = [];
+  const fasBangunans: any[] = [];
+  const sppts: any[] = [];
+  const pembayarans: any[] = [];
 
-  console.log("  🗺️  ref_kelurahan...");
-  await db
-    .insert(refKelurahan)
-    .values(sampleRefKelurahan as any)
-    .onDuplicateKeyUpdate({ set: { nmKelurahanOnly: sql`VALUES(NM_KELURAHAN_ONLY)` } });
+  for (let i = 0; i < 100; i++) {
+    const subjek = createSubjekPajak();
+    subjekPajaks.push(subjek);
 
-  // 2. Master data
-  if (sampleFasilitas.length > 0) {
-    console.log("  🔧 fasilitas...");
-    await db
-      .insert(fasilitas)
-      .values(sampleFasilitas as any)
-      .onDuplicateKeyUpdate({
-        set: {
-          nmFasilitas: sql`VALUES(NM_FASILITAS)`,
-          satuanFasilitas: sql`VALUES(SATUAN_FASILITAS)`,
-          nilaiFasilitas: sql`VALUES(NILAI_FASILITAS)`,
-          statusFasilitas: sql`VALUES(STATUS_FASILITAS)`,
-          ketergantungan: sql`VALUES(KETERGANTUNGAN)`,
-        },
-      });
-  }
+    const region = getRandomRegion();
+    const s = createSpop(subjek.subjekPajakId!, region, i + 1);
+    spops.push(s);
 
-  // 3. Core entities
-  console.log("  👤 dat_subjek_pajak...");
-  await db
-    .insert(datSubjekPajak)
-    .values(sampleDatSubjekPajak as any)
-    .onDuplicateKeyUpdate({
-      set: {
-        nmWp: sql`VALUES(NM_WP)`,
-        jalanWp: sql`VALUES(JALAN_WP)`,
-        blokKavNoWp: sql`VALUES(BLOK_KAV_NO_WP)`,
-        rwWp: sql`VALUES(RW_WP)`,
-        rtWp: sql`VALUES(RT_WP)`,
-        kelurahanWp: sql`VALUES(KELURAHAN_WP)`,
-        kotaWp: sql`VALUES(KOTA_WP)`,
-        kdPosWp: sql`VALUES(KD_POS_WP)`,
-        telpWp: sql`VALUES(TELP_WP)`,
-        npwp: sql`VALUES(NPWP)`,
-        statusPekerjaanWp: sql`VALUES(STATUS_PEKERJAAN_WP)`,
-        emailWp: sql`VALUES(EMAIL_WP)`,
-      },
-    });
+    // 50% chance of having a building
+    if (Math.random() > 0.5) {
+      const bng = createDatOpBangunan(s, 1);
+      bangunans.push(bng);
 
-  console.log("  📋 spop (100 records)...");
-  await db
-    .insert(spop)
-    .values(sampleSpop as any)
-    .onDuplicateKeyUpdate({
-      set: {
-        subjekPajakId: sql`VALUES(SUBJEK_PAJAK_ID)`,
-        noFormulirSpop: sql`VALUES(NO_FORMULIR_SPOP)`,
-        jnsTransaksiOp: sql`VALUES(JNS_TRANSAKSI_OP)`,
-        jalanOp: sql`VALUES(JALAN_OP)`,
-        blokKavNoOp: sql`VALUES(BLOK_KAV_NO_OP)`,
-        rtOp: sql`VALUES(RT_OP)`,
-        rwOp: sql`VALUES(RW_OP)`,
-        kelurahanOp: sql`VALUES(KELURAHAN_OP)`,
-        kdStatusWp: sql`VALUES(KD_STATUS_WP)`,
-        luasBumi: sql`VALUES(LUAS_BUMI)`,
-        kdZnt: sql`VALUES(KD_ZNT)`,
-        jnsBumi: sql`VALUES(JNS_BUMI)`,
-        nilaiSistemBumi: sql`VALUES(NILAI_SISTEM_BUMI)`,
-        tglPendataanOp: sql`VALUES(TGL_PENDATAAN_OP)`,
-        nmPendataanOp: sql`VALUES(NM_PENDATAAN_OP)`,
-        nipPendata: sql`VALUES(NIP_PENDATA)`,
-        tglPemeriksaanOp: sql`VALUES(TGL_PEMERIKSAAN_OP)`,
-        nmPemeriksaanOp: sql`VALUES(NM_PEMERIKSAAN_OP)`,
-        nipPemeriksaOp: sql`VALUES(NIP_PEMERIKSA_OP)`,
-      },
-    });
+      // 30% chance of having a facility
+      if (Math.random() > 0.7) {
+        fasBangunans.push(createFasilitasBangunan(s, 1, "04")); // Pagar
+      }
+    }
 
-  // 4. Child entities
-  if (sampleDatOpBangunan.length > 0) {
-    console.log(`  🏗️  dat_op_bangunan (${sampleDatOpBangunan.length})...`);
-    await db
-      .insert(datOpBangunan)
-      .values(sampleDatOpBangunan as any)
-      .onDuplicateKeyUpdate({
-        set: {
-          kdJpb: sql`VALUES(KD_JPB)`,
-          luasBng: sql`VALUES(LUAS_BNG)`,
-          jmlLantaiBng: sql`VALUES(JML_LANTAI_BNG)`,
-          kondisiBng: sql`VALUES(KONDISI_BNG)`,
-          jnsKonstruksiBng: sql`VALUES(JNS_KONSTRUKSI_BNG)`,
-          jnsAtapBng: sql`VALUES(JNS_ATAP_BNG)`,
-          kdDinding: sql`VALUES(KD_DINDING)`,
-          kdLantai: sql`VALUES(KD_LANTAI)`,
-          kdLangitLangit: sql`VALUES(KD_LANGIT_LANGIT)`,
-          nilaiSistemBng: sql`VALUES(NILAI_SISTEM_BNG)`,
-          nilaiIndividu: sql`VALUES(NILAI_INDIVIDU)`,
-          aktif: sql`VALUES(AKTIF)`,
-        },
-      });
-  }
+    // Generate 3 years of SPPT
+    const years = ["2023", "2024", "2025"];
+    for (const year of years) {
+      const sp = createSppt(s, year, s.luasBumi!, bangunans.find(b => b.noUrut === s.noUrut)?.luasBng || 0);
+      sppts.push(sp);
 
-  if (sampleDatFasilitasBangunan.length > 0) {
-    console.log(`  🏠 dat_fasilitas_bangunan (${sampleDatFasilitasBangunan.length})...`);
-    await db
-      .insert(datFasilitasBangunan)
-      .values(sampleDatFasilitasBangunan as any)
-      .onDuplicateKeyUpdate({
-        set: { jmlSatuan: sql`VALUES(JML_SATUAN)` },
-      });
-  }
-
-  if (sampleDatLegalitasBumi.length > 0) {
-    console.log(`  📄 dat_legalitas_bumi (${sampleDatLegalitasBumi.length})...`);
-    await db
-      .insert(datLegalitasBumi)
-      .values(sampleDatLegalitasBumi as any)
-      .onDuplicateKeyUpdate({
-        set: { noLegalitasTanah: sql`VALUES(NO_LEGALITAS_TANAH)` },
-      });
-  }
-
-  // 5. SPPT (batch into chunks of 200 to avoid packet size issues)
-  if (sampleSppt.length > 0) {
-    console.log(`  📊 sppt (${sampleSppt.length})...`);
-    const SPPT_CHUNK = 200;
-    for (let i = 0; i < sampleSppt.length; i += SPPT_CHUNK) {
-      const chunk = sampleSppt.slice(i, i + SPPT_CHUNK);
-      await db
-        .insert(sppt)
-        .values(chunk as any)
-        .onDuplicateKeyUpdate({
-          set: {
-            siklusSppt: sql`VALUES(SIKLUS_SPPT)`,
-            luasBumi: sql`VALUES(LUAS_BUMI)`,
-            luasBng: sql`VALUES(LUAS_BNG)`,
-            njopBumi: sql`VALUES(NJOP_BUMI)`,
-            njopBng: sql`VALUES(NJOP_BNG)`,
-            njopSppt: sql`VALUES(NJOP_SPPT)`,
-            njoptkpSppt: sql`VALUES(NJOPTKP_SPPT)`,
-            njkpSppt: sql`VALUES(NJKP_SPPT)`,
-            pbbTerhutangSppt: sql`VALUES(PBB_TERHUTANG_SPPT)`,
-            faktorPengurangSppt: sql`VALUES(FAKTOR_PENGURANG_SPPT)`,
-            pbbYgHarusDibayarSppt: sql`VALUES(PBB_YG_HARUS_DIBAYAR_SPPT)`,
-            statusPembayaranSppt: sql`VALUES(STATUS_PEMBAYARAN_SPPT)`,
-            statusTagihanSppt: sql`VALUES(STATUS_TAGIHAN_SPPT)`,
-            statusCetakSppt: sql`VALUES(STATUS_CETAK_SPPT)`,
-            nmWp: sql`VALUES(NM_WP)`,
-            jalanWp: sql`VALUES(JALAN_WP)`,
-          },
-        });
+      // If status is paid (1 or 2), create payment
+      if (sp.statusPembayaranSppt === "1" || sp.statusPembayaranSppt === "2") {
+        pembayarans.push(createPembayaranSppt(sp));
+      }
     }
   }
 
-  // 6. Pembayaran SPPT (batch into chunks)
-  if (samplePembayaranSppt.length > 0) {
-    console.log(`  💰 pembayaran_sppt (${samplePembayaranSppt.length})...`);
-    const PAY_CHUNK = 200;
-    for (let i = 0; i < samplePembayaranSppt.length; i += PAY_CHUNK) {
-      const chunk = samplePembayaranSppt.slice(i, i + PAY_CHUNK);
-      await db
-        .insert(pembayaranSppt)
-        .values(chunk as any)
-        .onDuplicateKeyUpdate({
-          set: {
-            tglPembayaranSppt: sql`VALUES(TGL_PEMBAYARAN_SPPT)`,
-            jmlSpptYgDibayar: sql`VALUES(JML_SPPT_YG_DIBAYAR)`,
-            dendaSppt: sql`VALUES(DENDA_SPPT)`,
-          },
-        });
+  // 4. Batch Insert
+  console.log(`  👤 Inserting ${subjekPajaks.length} Subjek Pajak...`);
+  await db.insert(datSubjekPajak).values(subjekPajaks).onDuplicateKeyUpdate({ set: { nmWp: sql`VALUES(NM_WP)` } });
+
+  console.log(`  📋 Inserting ${spops.length} SPOP...`);
+  await db.insert(spop).values(spops).onDuplicateKeyUpdate({ set: { jalanOp: sql`VALUES(JALAN_OP)` } });
+
+  if (bangunans.length > 0) {
+    console.log(`  🏗️  Inserting ${bangunans.length} Bangunan...`);
+    await db.insert(datOpBangunan).values(bangunans).onDuplicateKeyUpdate({ set: { luasBng: sql`VALUES(LUAS_BNG)` } });
+  }
+
+  if (fasBangunans.length > 0) {
+    console.log(`  🏠 Inserting ${fasBangunans.length} Fasilitas Bangunan...`);
+    await db.insert(datFasilitasBangunan).values(fasBangunans).onDuplicateKeyUpdate({ set: { jmlSatuan: sql`VALUES(JML_SATUAN)` } });
+  }
+
+  if (sppts.length > 0) {
+    console.log(`  📊 Inserting ${sppts.length} SPPT...`);
+    // Chunking to avoid large packet size
+    for (let i = 0; i < sppts.length; i += 200) {
+      await db.insert(sppt).values(sppts.slice(i, i + 200)).onDuplicateKeyUpdate({ set: { pbbYgHarusDibayarSppt: sql`VALUES(PBB_YG_HARUS_DIBAYAR_SPPT)` } });
     }
   }
 
-  console.log("\n  ✅ Sample SPOP data seeded successfully!");
-  console.log(`     100 SPOP | ${sampleDatSubjekPajak.length} Subjek | ${sampleDatOpBangunan.length} Bangunan | ${sampleSppt.length} SPPT | ${samplePembayaranSppt.length} Pembayaran\n`);
+  if (pembayarans.length > 0) {
+    console.log(`  💰 Inserting ${pembayarans.length} Pembayaran...`);
+    for (let i = 0; i < pembayarans.length; i += 200) {
+      await db.insert(pembayaranSppt).values(pembayarans.slice(i, i + 200)).onDuplicateKeyUpdate({ set: { tglPembayaranSppt: sql`VALUES(TGL_PEMBAYARAN_SPPT)` } });
+    }
+  }
+
+  console.log("\n  ✅ Dynamic Sample SPOP data seeded successfully!");
 }
 
 // Allow direct execution

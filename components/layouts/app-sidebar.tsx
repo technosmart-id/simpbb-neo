@@ -28,6 +28,7 @@ import {
   RefreshCw,
   GitBranch,
   ScrollText,
+  Database,
 } from "lucide-react"
 
 import {
@@ -67,6 +68,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Dashboard",
       url: "/dashboard",
       icon: <LayoutDashboardIcon />,
+    },
+    {
+      title: "Objek Pajak",
+      url: "/objek-pajak",
+      icon: <Database />,
     },
     {
       title: "SPOP",

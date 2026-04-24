@@ -12,8 +12,8 @@ export default function AuthLayout({
     <div className="relative min-h-screen w-full">
       {/* Background image */}
       <Image
-        src="/images/bali-bg.jpg"
-        alt="Bali"
+        src="/images/denpasar-bg.png"
+        alt="Denpasar"
         fill
         className="object-cover"
         priority
