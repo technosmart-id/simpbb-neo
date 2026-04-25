@@ -43,11 +43,11 @@ export async function seedSampleSpop() {
   // 2. Master Fasilitas
   console.log("  🔧 Seeding master fasilitas...");
   const sampleFasilitas = [
-    { kdFasilitas: "01", nmFasilitas: "AC SENTRAL", satuanFasilitas: "M2", nilaiFasilitas: 500000 },
-    { kdFasilitas: "02", nmFasilitas: "LIFT PENUMPANG", satuanFasilitas: "UNIT", nilaiFasilitas: 150000000 },
-    { kdFasilitas: "03", nmFasilitas: "ESKALATOR", satuanFasilitas: "UNIT", nilaiFasilitas: 120000000 },
-    { kdFasilitas: "04", nmFasilitas: "PAGAR", satuanFasilitas: "M", nilaiFasilitas: 200000 },
-    { kdFasilitas: "05", nmFasilitas: "LAPANGAN TENIS", satuanFasilitas: "M2", nilaiFasilitas: 300000 },
+    { kdFasilitas: "01", nmFasilitas: "AC SENTRAL", satuanFasilitas: "M2", nilaiFasilitas: "500000" },
+    { kdFasilitas: "02", nmFasilitas: "LIFT PENUMPANG", satuanFasilitas: "UNIT", nilaiFasilitas: "150000000" },
+    { kdFasilitas: "03", nmFasilitas: "ESKALATOR", satuanFasilitas: "UNIT", nilaiFasilitas: "120000000" },
+    { kdFasilitas: "04", nmFasilitas: "PAGAR", satuanFasilitas: "M", nilaiFasilitas: "200000" },
+    { kdFasilitas: "05", nmFasilitas: "LAPANGAN TENIS", satuanFasilitas: "M2", nilaiFasilitas: "300000" },
   ];
   await db.insert(fasilitas).values(sampleFasilitas).onDuplicateKeyUpdate({ set: { nmFasilitas: sql`VALUES(NM_FASILITAS)` } });
 
@@ -81,13 +81,13 @@ export async function seedSampleSpop() {
     }
 
     // Generate 3 years of SPPT
-    const years = ["2023", "2024", "2025"];
+    const years = [2023, 2024, 2025];
     for (const year of years) {
       const sp = createSppt(s, year, s.luasBumi!, bangunans.find(b => b.noUrut === s.noUrut)?.luasBng || 0);
       sppts.push(sp);
 
       // If status is paid (1 or 2), create payment
-      if (sp.statusPembayaranSppt === "1" || sp.statusPembayaranSppt === "2") {
+      if (sp.statusPembayaranSppt === 1 || sp.statusPembayaranSppt === 2) {
         pembayarans.push(createPembayaranSppt(sp));
       }
     }

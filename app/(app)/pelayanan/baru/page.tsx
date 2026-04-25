@@ -198,7 +198,7 @@ export default function PelayananBaruPage() {
           <CardContent className="space-y-3">
             <div className="space-y-1">
               <Label>NOP (18 digit)</Label>
-              <NopInput value={nopParts} onChange={setNopParts} />
+              <NopInput value={nopParts} onChange={(_, parts) => setNopParts(parts ?? undefined)} />
             </div>
             <div className="space-y-1">
               <Label>Letak / Alamat OP</Label>

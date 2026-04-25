@@ -66,8 +66,8 @@ export const spptRouter = os.router({
       if (input.kdDati2) conditions.push(eq(sppt.kdDati2, input.kdDati2))
       if (input.kdKecamatan) conditions.push(eq(sppt.kdKecamatan, input.kdKecamatan))
       if (input.kdKelurahan) conditions.push(eq(sppt.kdKelurahan, input.kdKelurahan))
-      if (input.statusPembayaran) conditions.push(eq(sppt.statusPembayaranSppt, input.statusPembayaran))
-      if (input.statusCetak) conditions.push(eq(sppt.statusCetakSppt, input.statusCetak))
+      if (input.statusPembayaran) conditions.push(eq(sppt.statusPembayaranSppt, Number(input.statusPembayaran)))
+      if (input.statusCetak) conditions.push(eq(sppt.statusCetakSppt, Number(input.statusCetak)))
       if (input.search) {
         conditions.push(sql`(${sppt.nmWp} LIKE ${`%${input.search}%`} OR ${sppt.noUrut} LIKE ${`%${input.search}%`})`)
       }
@@ -116,28 +116,26 @@ export const spptRouter = os.router({
         noUrut: input.noUrut,
         kdJnsOp: input.kdJnsOp,
         thnPajakSppt: input.thnPajakSppt,
-        luasBumi: input.luasBumi,
-        luasBng: input.luasBng,
-        njopBumi: input.njopBumi,
-        njopBng: input.njopBng,
-        njopSppt: input.njopSppt,
-        njoptkpSppt: input.njoptkpSppt,
-        njkpSppt: input.njkpSppt,
-        pbbTerhutangSppt: input.pbbTerhutangSppt,
-        faktorPengurangSppt: input.faktorPengurangSppt,
-        pbbYgHarusDibayarSppt: input.pbbYgHarusDibayarSppt,
+        luasBumi: Number(input.luasBumi),
+        luasBng: Number(input.luasBng),
+        njopBumi: Number(input.njopBumi),
+        njopBng: Number(input.njopBng),
+        njopSppt: Number(input.njopSppt),
+        njoptkpSppt: Number(input.njoptkpSppt),
+        njkpSppt: Number(input.njkpSppt),
+        pbbTerhutangSppt: Number(input.pbbTerhutangSppt),
+        faktorPengurangSppt: Number(input.faktorPengurangSppt),
+        pbbYgHarusDibayarSppt: Number(input.pbbYgHarusDibayarSppt),
         kdKlsTanah: input.kdKlsTanah ?? null,
         kdKlsBng: input.kdKlsBng ?? null,
         tglJatuhTempo: input.tglJatuhTempo ? new Date(input.tglJatuhTempo) : null,
-        tglTerbit: input.tglTerbit ? new Date(input.tglTerbit) : null,
+        tglTerbitSppt: input.tglTerbit ? new Date(input.tglTerbit) : null,
         nmWp: input.nmWp ?? null,
         jalanWp: input.jalanWp ?? null,
-        kdJnsSppt: input.kdJnsSppt ?? null,
         siklusSppt: 1,
-        statusPembayaranSppt: "0",
-        statusTagihanSppt: "0",
-        statusCetakSppt: "0",
-        statusPembatalan: "0",
+        statusPembayaranSppt: 0,
+        statusTagihanSppt: 0,
+        statusCetakSppt: 0,
       })
       return { success: true }
     }),
@@ -178,37 +176,37 @@ export const spptRouter = os.router({
         noUrut: current.noUrut,
         kdJnsOp: current.kdJnsOp,
         thnPajakSppt: current.thnPajakSppt,
-        siklusSppt: current.siklusSppt,
-        njopBumi: current.njopBumi,
-        njopBng: current.njopBng,
-        njopSppt: current.njopSppt,
-        njoptkpSppt: current.njoptkpSppt,
-        njkpSppt: current.njkpSppt,
-        pbbTerhutangSppt: current.pbbTerhutangSppt,
-        faktorPengurangSppt: current.faktorPengurangSppt,
-        pbbYgHarusDibayarSppt: current.pbbYgHarusDibayarSppt,
+        siklusSppt: current.siklusSppt ?? 0,
+        njopBumi: String(current.njopBumi),
+        njopBng: String(current.njopBng),
+        njopSppt: String(current.njopSppt),
+        njoptkpSppt: String(current.njoptkpSppt),
+        njkpSppt: String(current.njkpSppt),
+        pbbTerhutangSppt: String(current.pbbTerhutangSppt),
+        faktorPengurangSppt: String(current.faktorPengurangSppt),
+        pbbYgHarusDibayarSppt: String(current.pbbYgHarusDibayarSppt),
         nipPetugas: input.nipPetugas ?? null,
         keterangan: input.keterangan ?? null,
       })
 
       // Update SPPT with new values and increment siklus
       await db.update(sppt).set({
-        njopBumi: input.njopBumi,
-        njopBng: input.njopBng,
-        njopSppt: input.njopSppt,
-        njoptkpSppt: input.njoptkpSppt,
-        njkpSppt: input.njkpSppt,
-        pbbTerhutangSppt: input.pbbTerhutangSppt,
-        faktorPengurangSppt: input.faktorPengurangSppt,
-        pbbYgHarusDibayarSppt: input.pbbYgHarusDibayarSppt,
+        njopBumi: Number(input.njopBumi),
+        njopBng: Number(input.njopBng),
+        njopSppt: Number(input.njopSppt),
+        njoptkpSppt: Number(input.njoptkpSppt),
+        njkpSppt: Number(input.njkpSppt),
+        pbbTerhutangSppt: Number(input.pbbTerhutangSppt),
+        faktorPengurangSppt: Number(input.faktorPengurangSppt),
+        pbbYgHarusDibayarSppt: Number(input.pbbYgHarusDibayarSppt),
         ...(input.kdKlsTanah && { kdKlsTanah: input.kdKlsTanah }),
         ...(input.kdKlsBng && { kdKlsBng: input.kdKlsBng }),
-        ...(input.luasBumi && { luasBumi: input.luasBumi }),
-        ...(input.luasBng && { luasBng: input.luasBng }),
-        siklusSppt: current.siklusSppt + 1,
+        ...(input.luasBumi && { luasBumi: Number(input.luasBumi) }),
+        ...(input.luasBng && { luasBng: Number(input.luasBng) }),
+        siklusSppt: (current.siklusSppt ?? 0) + 1,
       }).where(and(nopWhere(sppt, input), eq(sppt.thnPajakSppt, input.thnPajakSppt)))
 
-      return { success: true, newSiklus: current.siklusSppt + 1 }
+      return { success: true, newSiklus: (current.siklusSppt ?? 0) + 1 }
     }),
 
   // Update print status
@@ -216,7 +214,7 @@ export const spptRouter = os.router({
     .input(nopInput.extend({ thnPajakSppt: z.number() }))
     .handler(async ({ input }) => {
       await db.update(sppt)
-        .set({ statusCetakSppt: "1", tglCetak: new Date() })
+        .set({ statusCetakSppt: 1, tglCetakSppt: new Date() })
         .where(and(nopWhere(sppt, input), eq(sppt.thnPajakSppt, input.thnPajakSppt)))
       return { success: true }
     }),

@@ -1,8 +1,6 @@
 import { os } from "../context"
 import { z } from "zod"
 import mysql from 'mysql2/promise';
-import { readFileSync, readdirSync } from "fs";
-import { join } from "path";
 import { seedProd } from "../../db/seed/prod";
 import { seedDev } from "../../db/seed/dev";
 
@@ -22,42 +20,36 @@ export const systemRouter = os.router({
         console.log("[SYSTEM] Resetting database tables...");
         connection = await mysql.createConnection(DATABASE_URL);
         
-        // 1. DROP ALL TABLES
-        const [rows]: any = await connection.query('SHOW TABLES;');
-        const tables = rows.map((row: any) => Object.values(row)[0]);
+        // 1. DROP ALL TABLES & VIEWS
+        await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
+        const [rows]: any = await connection.query('SHOW FULL TABLES;');
+        const items = rows.map((row: any) => ({
+          name: Object.values(row)[0] as string,
+          type: Object.values(row)[1] as string
+        }));
         
-        if (tables.length > 0) {
-          console.log(`[SYSTEM] Dropping ${tables.length} tables...`);
-          await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
-          for (const table of tables) {
-            await connection.query(`DROP TABLE IF EXISTS \`${table}\`;`);
-          }
-          await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
-        }
-
-        // 2. APPLY MIGRATIONS
-        const migrationDir = join(process.cwd(), "lib/db/migration");
-        const migrationFiles = readdirSync(migrationDir)
-          .filter(f => f.endsWith(".sql"))
-          .sort();
-
-        console.log(`[SYSTEM] Found ${migrationFiles.length} migration files.`);
-
-        for (const file of migrationFiles) {
-          console.log(`[SYSTEM] Applying migration: ${file}`);
-          const migrationSQL = readFileSync(join(migrationDir, file), "utf-8");
-          const statements = migrationSQL
-            .split("--> statement-breakpoint")
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0);
-
-          for (const statement of statements) {
-            await connection.query(statement);
+        if (items.length > 0) {
+          console.log(`[SYSTEM] Dropping ${items.length} items...`);
+          for (const item of items) {
+            if (item.type === 'VIEW') {
+              await connection.query(`DROP VIEW IF EXISTS \`${item.name}\`;`);
+            } else {
+              await connection.query(`DROP TABLE IF EXISTS \`${item.name}\`;`);
+            }
           }
         }
-
+        await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
         await connection.end();
-        console.log("[SYSTEM] Tables recreated via migrations.");
+
+        // 2. APPLY SCHEMA VIA DRIZZLE PUSH
+        console.log("[SYSTEM] Recreating tables via drizzle-kit push...");
+        const { execSync } = await import('child_process');
+        execSync('npx drizzle-kit push --force', {
+          env: { ...process.env, NODE_ENV: 'development' },
+          stdio: 'inherit'
+        });
+
+        console.log("[SYSTEM] Tables recreated.");
 
         // 3. SEED DATA
         console.log("[SYSTEM] Seeding production data...");

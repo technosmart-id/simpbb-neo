@@ -12,12 +12,12 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
 }
 
 interface PembayaranBadgeProps {
-  status: string
+  status: string | number
   className?: string
 }
 
 export function PembayaranBadge({ status, className }: PembayaranBadgeProps) {
-  const config = STATUS_CONFIG[status] ?? {
+  const config = STATUS_CONFIG[String(status)] ?? {
     label: `Status ${status}`,
     className: "",
   }

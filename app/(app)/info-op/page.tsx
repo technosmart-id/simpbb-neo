@@ -59,7 +59,7 @@ export default function InfoOpPage() {
         <div className="flex items-end gap-2">
           <div className="flex-1 max-w-md">
             <label className="text-sm font-medium mb-1 block">Masukkan NOP</label>
-            <NopInput value={nop ?? undefined} onChange={setNop} />
+            <NopInput value={nop ? formatNop(nop) : ''} onChange={(_, parts) => setNop(parts)} />
           </div>
           <Button onClick={handleSearch} disabled={!nop}>
             <Search className="w-4 h-4 mr-2" />
@@ -163,7 +163,7 @@ export default function InfoOpPage() {
                     <div key={s.thnPajakSppt} className="flex items-center justify-between text-sm border-b pb-2 last:border-0">
                       <span className="font-medium">{s.thnPajakSppt}</span>
                       <span className="font-mono">{formatRupiah(s.pbbYgHarusDibayarSppt)}</span>
-                      <PembayaranBadge status={s.statusPembayaranSppt} />
+                      <PembayaranBadge status={s.statusPembayaranSppt ?? 0} />
                     </div>
                   ))}
                 </div>

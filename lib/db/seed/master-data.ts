@@ -1,9 +1,31 @@
 import { db } from "../index";
-import { kelasBumi, kelasBangunan, tarif, fasilitas } from "../schema";
+import { kelasBumi, kelasBangunan, tarif, fasilitas, konfigurasi } from "../schema";
 import { sql } from "drizzle-orm";
+import mysql from 'mysql2/promise';
 
 export async function seedMasterData() {
   console.log("📊 Seeding official SISMIOP master data...");
+
+  // 0. Konfigurasi from Production
+  console.log("  ⚙️  Seeding konfigurasi from production backup...");
+  const PROD_DB = 'mysql://simpbb:af1u5nyk62vgugfm@203.130.255.4:33063/simpbb';
+  const prodConn = await mysql.createConnection(PROD_DB);
+  try {
+    const [rows]: any = await prodConn.execute('SELECT NAMA, NILAI FROM konfigurasi');
+    const configData = rows.map((row: any) => ({
+      nama: row.NAMA,
+      nilai: row.NILAI instanceof Buffer ? row.NILAI.toString() : row.NILAI,
+    }));
+    
+    // Chunking insert for konfigurasi
+    for (let i = 0; i < configData.length; i += 50) {
+      await db.insert(konfigurasi).values(configData.slice(i, i + 50)).onDuplicateKeyUpdate({
+        set: { nilai: sql`VALUES(NILAI)` },
+      });
+    }
+  } finally {
+    await prodConn.end();
+  }
 
   // 1. Kelas Bumi (100 classes)
   console.log("  🌱 Seeding kelas_bumi...");
@@ -72,10 +94,10 @@ export async function seedMasterData() {
   // 3. Tarif
   console.log("  💸 Seeding tarif...");
   const dataTarif = [
-    { thnAwal: "1970", thnAkhir: "2023", njopMin: "0", njopMax: "1000000000", nilaiTarif: "0.1000" },
-    { thnAwal: "1970", thnAkhir: "2023", njopMin: "1000000001", njopMax: "999999999999", nilaiTarif: "0.2000" },
-    { thnAwal: "2024", thnAkhir: "2155", njopMin: "0", njopMax: "1000000000", nilaiTarif: "0.1000" },
-    { thnAwal: "2024", thnAkhir: "2155", njopMin: "1000000001", njopMax: "999999999999", nilaiTarif: "0.2000" },
+    { thnAwal: 1970, thnAkhir: 2023, njopMin: "0", njopMax: "1000000000", nilaiTarif: "0.1000" },
+    { thnAwal: 1970, thnAkhir: 2023, njopMin: "1000000001", njopMax: "999999999999", nilaiTarif: "0.2000" },
+    { thnAwal: 2024, thnAkhir: 2155, njopMin: "0", njopMax: "1000000000", nilaiTarif: "0.1000" },
+    { thnAwal: 2024, thnAkhir: 2155, njopMin: "1000000001", njopMax: "999999999999", nilaiTarif: "0.2000" },
   ];
   await db.insert(tarif).values(dataTarif).onDuplicateKeyUpdate({
     set: {

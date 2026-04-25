@@ -21,7 +21,7 @@ type Row = {
   kdPropinsi: string; kdDati2: string; kdKecamatan: string; kdKelurahan: string
   kdBlok: string; noUrut: string; kdJnsOp: string
   thnPajakSppt: number; nmWp: string | null
-  njopSppt: string; pbbYgHarusDibayarSppt: string; statusPembayaranSppt: string
+  njopSppt: string | number; pbbYgHarusDibayarSppt: string | number; statusPembayaranSppt: string | number
 }
 
 const columns: ColumnDef<Row>[] = [

@@ -33,15 +33,15 @@ type SpptRow = {
   kdJnsOp: string
   thnPajakSppt: number
   nmWp: string | null
-  luasBumi: string | null
-  luasBng: string | null
-  njopSppt: string | null
-  njoptkpSppt: string | null
-  njkpSppt: string | null
-  pbbTerhutangSppt: string | null
-  faktorPengurangSppt: string | null
-  pbbYgHarusDibayarSppt: string
-  statusPembayaranSppt: string
+  luasBumi: string | number | null
+  luasBng: string | number | null
+  njopSppt: string | number | null
+  njoptkpSppt: string | number | null
+  njkpSppt: string | number | null
+  pbbTerhutangSppt: string | number | null
+  faktorPengurangSppt: string | number | null
+  pbbYgHarusDibayarSppt: string | number
+  statusPembayaranSppt: string | number
 }
 
 const EXCEL_COLUMNS = [

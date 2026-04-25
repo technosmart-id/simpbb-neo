@@ -4,7 +4,7 @@ import * as React from 'react'
 import { NopInput } from '@/components/nop/nop-input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { type NopParts } from '@/lib/utils/nop'
+import { type NopParts, formatNop } from '@/lib/utils/nop'
 import { useQuery } from '@tanstack/react-query'
 import { useORPC } from '@/lib/orpc/react'
 import { formatRupiah } from '@/components/data-table/column-helpers'
@@ -32,7 +32,7 @@ export default function LspopPage() {
         <div className="flex items-end gap-2">
           <div className="flex-1 max-w-md">
             <label className="text-sm font-medium mb-1 block">Masukkan NOP</label>
-            <NopInput value={nop ?? undefined} onChange={setNop} />
+            <NopInput value={nop ? formatNop(nop) : ''} onChange={(_, parts) => setNop(parts)} />
           </div>
           <Button onClick={() => nop && setSearchNop(nop)} disabled={!nop}>
             <Search className="w-4 h-4 mr-2" />

@@ -13,6 +13,7 @@ import {
   primaryKey,
   foreignKey,
   index,
+  bigint,
 } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 import { nopColumns, nopPrimaryKey, nopForeignKey, longtext } from "./_columns";
@@ -24,47 +25,68 @@ import { jenisSppt } from "./klasifikasi";
 export const sppt = mysqlTable(
   "sppt",
   {
-    ...nopColumns(),
-    thnPajakSppt: year("THN_PAJAK_SPPT").notNull(),
+    kdPropinsi: char("KD_PROPINSI", { length: 2 }).notNull(),
+    kdDati2: char("KD_DATI2", { length: 2 }).notNull(),
+    kdKecamatan: char("KD_KECAMATAN", { length: 3 }).notNull(),
+    kdKelurahan: char("KD_KELURAHAN", { length: 3 }).notNull(),
+    kdBlok: char("KD_BLOK", { length: 3 }).notNull(),
+    noUrut: char("NO_URUT", { length: 4 }).notNull(),
+    kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
+    thnPajakSppt: varchar("THN_PAJAK_SPPT", { length: 4 }).notNull().$type<number>(),
 
     // Metadata
-    siklusSppt: tinyint("SIKLUS_SPPT").notNull().default(1),
-    kdJnsSppt: int("KD_JNS_SPPT"),
-
-    // Kelas
-    kdKlsTanah: varchar("KD_KLS_TANAH", { length: 5 }),
-    kdKlsBng: varchar("KD_KLS_BNG", { length: 5 }),
-
-    // Tanggal
-    tglJatuhTempo: date("TGL_JATUH_TEMPO"),
-    tglTerbit: date("TGL_TERBIT"),
-    tglCetak: date("TGL_CETAK"),
-
-    // Data Fisik (snapshot)
-    luasBumi: decimal("LUAS_BUMI", { precision: 12, scale: 2 }).notNull().default("0"),
-    luasBng: decimal("LUAS_BNG", { precision: 12, scale: 2 }).notNull().default("0"),
-
-    // Nilai NJOP
-    njopBumi: decimal("NJOP_BUMI", { precision: 15, scale: 2 }).notNull().default("0"),
-    njopBng: decimal("NJOP_BNG", { precision: 15, scale: 2 }).notNull().default("0"),
-    njopSppt: decimal("NJOP_SPPT", { precision: 15, scale: 2 }).notNull().default("0"),
-
-    // Kalkulasi Pajak
-    njoptkpSppt: decimal("NJOPTKP_SPPT", { precision: 15, scale: 2 }).notNull().default("0"),
-    njkpSppt: decimal("NJKP_SPPT", { precision: 15, scale: 2 }).notNull().default("0"),
-    pbbTerhutangSppt: decimal("PBB_TERHUTANG_SPPT", { precision: 15, scale: 2 }).notNull().default("0"),
-    faktorPengurangSppt: decimal("FAKTOR_PENGURANG_SPPT", { precision: 15, scale: 2 }).notNull().default("0"),
-    pbbYgHarusDibayarSppt: decimal("PBB_YG_HARUS_DIBAYAR_SPPT", { precision: 15, scale: 2 }).notNull().default("0"),
-
-    // Status
-    statusPembayaranSppt: char("STATUS_PEMBAYARAN_SPPT", { length: 1 }).notNull().default("0"),
-    statusTagihanSppt: char("STATUS_TAGIHAN_SPPT", { length: 1 }).notNull().default("0"),
-    statusCetakSppt: char("STATUS_CETAK_SPPT", { length: 1 }).notNull().default("0"),
-    statusPembatalan: char("STATUS_PEMBATALAN", { length: 1 }).notNull().default("0"),
+    siklusSppt: tinyint("SIKLUS_SPPT").default(1),
+    kdKanwilBank: varchar("KD_KANWIL_BANK", { length: 2 }),
+    kdKppbbBank: varchar("KD_KPPBB_BANK", { length: 2 }),
+    kdBankTunggal: varchar("KD_BANK_TUNGGAL", { length: 2 }),
+    kdBankPersepsi: varchar("KD_BANK_PERSEPSI", { length: 2 }),
+    kdTp: varchar("KD_TP", { length: 2 }),
 
     // Data WP (snapshot)
-    nmWp: varchar("NM_WP", { length: 30 }),
-    jalanWp: varchar("JALAN_WP", { length: 100 }),
+    nmWp: varchar("NM_WP_SPPT", { length: 30 }),
+    jalanWp: varchar("JLN_WP_SPPT", { length: 30 }),
+    blokKavNoWpSppt: varchar("BLOK_KAV_NO_WP_SPPT", { length: 15 }),
+    rwWpSppt: varchar("RW_WP_SPPT", { length: 2 }),
+    rtWpSppt: varchar("RT_WP_SPPT", { length: 3 }),
+    kelurahanWpSppt: varchar("KELURAHAN_WP_SPPT", { length: 30 }),
+    kotaWpSppt: varchar("KOTA_WP_SPPT", { length: 30 }),
+    kdPosWpSppt: varchar("KD_POS_WP_SPPT", { length: 5 }),
+    npwpSppt: varchar("NPWP_SPPT", { length: 15 }),
+    noPersilSppt: varchar("NO_PERSIL_SPPT", { length: 5 }),
+
+    // Kelas
+    kdKlsTanah: varchar("KD_KLS_TANAH", { length: 3 }),
+    thnAwalKlsTanah: year("THN_AWAL_KLS_TANAH").default(2000),
+    kdKlsBng: varchar("KD_KLS_BNG", { length: 3 }),
+    thnAwalKlsBng: year("THN_AWAL_KLS_BNG").default(2000),
+
+    // Tanggal
+    tglJatuhTempo: date("TGL_JATUH_TEMPO_SPPT"),
+    tglTerbitSppt: datetime("TGL_TERBIT_SPPT"),
+    tglCetakSppt: datetime("TGL_CETAK_SPPT"),
+
+    // Data Fisik (snapshot)
+    luasBumi: bigint("LUAS_BUMI_SPPT", { mode: "number" }).notNull().default(0),
+    luasBng: bigint("LUAS_BNG_SPPT", { mode: "number" }).notNull().default(0),
+
+    // Nilai NJOP
+    njopBumi: bigint("NJOP_BUMI_SPPT", { mode: "number" }).notNull().default(0),
+    njopBng: bigint("NJOP_BNG_SPPT", { mode: "number" }).notNull().default(0),
+    njopSppt: bigint("NJOP_SPPT", { mode: "number" }).notNull().default(0),
+
+    // Kalkulasi Pajak
+    njoptkpSppt: int("NJOPTKP_SPPT").notNull().default(0),
+    njkpSppt: bigint("NJKP_SPPT", { mode: "number" }).notNull().default(0),
+    pbbTerhutangSppt: bigint("PBB_TERHUTANG_SPPT", { mode: "number" }).notNull().default(0),
+    faktorPengurangSppt: bigint("FAKTOR_PENGURANG_SPPT", { mode: "number" }).notNull().default(0),
+    pbbYgHarusDibayarSppt: bigint("PBB_YG_HARUS_DIBAYAR_SPPT", { mode: "number" }).notNull().default(0),
+
+    // Status
+    statusPembayaranSppt: tinyint("STATUS_PEMBAYARAN_SPPT").default(0),
+    statusTagihanSppt: tinyint("STATUS_TAGIHAN_SPPT").default(0),
+    statusCetakSppt: tinyint("STATUS_CETAK_SPPT").default(0),
+    
+    nipPencetakSppt: varchar("NIP_PENCETAK_SPPT", { length: 20 }),
   },
   (table) => [
     primaryKey({
@@ -80,9 +102,8 @@ export const sppt = mysqlTable(
         table.thnPajakSppt,
       ],
     }),
-    index("idx_sppt_status_bayar").on(table.statusPembayaranSppt),
     index("idx_sppt_thn").on(table.thnPajakSppt),
-    nopForeignKey("fk_sppt_spop", table, spop),
+    index("idx_sppt_status_bayar").on(table.statusPembayaranSppt),
   ],
 );
 
@@ -93,7 +114,7 @@ export const historiSppt = mysqlTable(
   {
     id: int("ID").autoincrement().primaryKey(),
     ...nopColumns(),
-    thnPajakSppt: year("THN_PAJAK_SPPT").notNull(),
+    thnPajakSppt: varchar("THN_PAJAK_SPPT", { length: 4 }).notNull().$type<number>(),
     siklusSppt: tinyint("SIKLUS_SPPT").notNull(),
 
     // Snapshot values

@@ -223,4 +223,35 @@ export const objekPajakRouter = os.router({
       const maxUrut = result?.maxUrut ? parseInt(result.maxUrut, 10) : 0
       return { nextNoUrut: String(maxUrut + 1).padStart(4, "0") }
     }),
+
+  // ── Next available NO_FORMULIR_SPOP for current year ──
+  getNextNoFormulir: os
+    .handler(async () => {
+      const year = new Date().getFullYear().toString()
+      const [result] = await db
+        .select({ maxForm: sql<string>`MAX(NO_FORMULIR_SPOP)` })
+        .from(spop)
+        .where(like(spop.noFormulirSpop, `${year}%`))
+
+      let bundle = 1
+      let seq = 1
+      
+      if (result?.maxForm && result.maxForm.length === 11) {
+        const currentBundle = parseInt(result.maxForm.slice(4, 8), 10)
+        const currentSeq = parseInt(result.maxForm.slice(8), 10)
+        
+        if (!isNaN(currentBundle) && !isNaN(currentSeq)) {
+          if (currentSeq >= 999) {
+            bundle = currentBundle + 1
+            seq = 1
+          } else {
+            bundle = currentBundle
+            seq = currentSeq + 1
+          }
+        }
+      }
+
+      const formatted = `${year}${String(bundle).padStart(4, "0")}${String(seq).padStart(3, "0")}`
+      return { nextNoFormulir: formatted }
+    }),
 })

@@ -184,12 +184,12 @@ function PemekaranDetailPanel({ id }: { id: number }) {
                 <div className="grid grid-cols-[1fr,auto,1fr] gap-2 items-end">
                   <div className="space-y-1">
                     <Label className="text-xs">NOP Lama</Label>
-                    <NopInput value={nopLama} onChange={setNopLama} />
+                    <NopInput value={nopLama} onChange={(_, parts) => setNopLama(parts ?? undefined)} />
                   </div>
                   <ArrowRight className="w-5 h-5 text-muted-foreground mb-2" />
                   <div className="space-y-1">
                     <Label className="text-xs">NOP Baru</Label>
-                    <NopInput value={nopBaru} onChange={setNopBaru} />
+                    <NopInput value={nopBaru} onChange={(_, parts) => setNopBaru(parts ?? undefined)} />
                   </div>
                 </div>
                 <Button size="sm" onClick={handleAdd} disabled={!nopLama || !nopBaru || addMutation.isPending}>

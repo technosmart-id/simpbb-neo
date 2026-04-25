@@ -5,7 +5,7 @@ export function createPembayaranSppt(
   sppt: any,
   overrides: Partial<typeof pembayaranSppt.$inferInsert> = {}
 ) {
-  const jmlBayar = parseInt(sppt.pbbYgHarusDibayarSppt);
+  const jmlBayar = sppt.pbbYgHarusDibayarSppt;
   
   return {
     kdPropinsi: sppt.kdPropinsi,

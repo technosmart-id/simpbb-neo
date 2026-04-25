@@ -196,4 +196,29 @@ export const wilayahRouter = os.router({
         kelurahan: kel?.nm ?? "",
       }
     }),
+
+  validateWilayah: os
+    .input(
+      z.object({
+        kdPropinsi: z.string().length(2),
+        kdDati2: z.string().length(2),
+        kdKecamatan: z.string().length(3),
+        kdKelurahan: z.string().length(3),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const [kel] = await db
+        .select({ id: refKelurahan.kdKelurahan })
+        .from(refKelurahan)
+        .where(
+          and(
+            eq(refKelurahan.kdPropinsi, input.kdPropinsi),
+            eq(refKelurahan.kdDati2, input.kdDati2),
+            eq(refKelurahan.kdKecamatan, input.kdKecamatan),
+            eq(refKelurahan.kdKelurahan, input.kdKelurahan),
+          ),
+        )
+
+      return { valid: !!kel }
+    }),
 })

@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google"
+import { Geist, Geist_Mono, Inter, Roboto } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme/theme-provider"
@@ -6,10 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { RPCProvider } from "@/lib/orpc/react"
 import { cn } from "@/lib/utils";
 
-const fontSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
+const inter = Inter({subsets:['latin'],variable:'--font-sans'})
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
@@ -17,6 +14,9 @@ const fontMono = Geist_Mono({
 })
 
 import { Toaster } from "@/components/ui/sonner"
+
+const robotoHeading = Roboto({subsets:['latin'],variable:'--font-heading'});
+
 
 export default function RootLayout({
   children,
@@ -27,7 +27,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", fontSans.variable)}
+      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable, robotoHeading.variable)}
     >
       <body>
         <RPCProvider>

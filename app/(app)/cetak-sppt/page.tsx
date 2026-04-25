@@ -34,19 +34,19 @@ type SpptRow = {
   thnPajakSppt: number
   nmWp: string | null
   jalanWp: string | null
-  luasBumi: string | null
-  njopBumi: string | null
-  luasBng: string | null
-  njopBng: string | null
-  njopSppt: string | null
-  njoptkpSppt: string | null
-  njkpSppt: string | null
-  pbbTerhutangSppt: string | null
-  faktorPengurangSppt: string | null
-  pbbYgHarusDibayarSppt: string
+  luasBumi: string | number | null
+  njopBumi: string | number | null
+  luasBng: string | number | null
+  njopBng: string | number | null
+  njopSppt: string | number | null
+  njoptkpSppt: string | number | null
+  njkpSppt: string | number | null
+  pbbTerhutangSppt: string | number | null
+  faktorPengurangSppt: string | number | null
+  pbbYgHarusDibayarSppt: string | number
   tglJatuhTempo: Date | string | null
-  statusPembayaranSppt: string
-  statusCetakSppt: string
+  statusPembayaranSppt: string | number
+  statusCetakSppt: string | number
 }
 
 const PAGE_SIZE = 20

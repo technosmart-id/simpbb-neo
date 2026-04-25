@@ -99,7 +99,7 @@ export const updateMasalRouter = os.router({
       // For simplicity in mass update: apply NJOPTKP to all SPPT
       // (Full BR-02 compliance would require grouping by nmWp and picking highest)
       for (const row of rows) {
-        if (!input.forceAll && (row.statusPembayaranSppt === 'L' || row.statusPembayaranSppt === '1')) {
+        if (!input.forceAll && (row.statusPembayaranSppt === 1 || row.statusPembayaranSppt === 2)) {
           skipped++
           continue
         }
@@ -124,15 +124,15 @@ export const updateMasalRouter = os.router({
           noUrut: row.noUrut,
           kdJnsOp: row.kdJnsOp,
           thnPajakSppt: row.thnPajakSppt,
-          siklusSppt: row.siklusSppt,
-          njopBumi: row.njopBumi,
-          njopBng: row.njopBng,
-          njopSppt: row.njopSppt,
-          njoptkpSppt: row.njoptkpSppt,
-          njkpSppt: row.njkpSppt,
-          pbbTerhutangSppt: row.pbbTerhutangSppt,
-          faktorPengurangSppt: row.faktorPengurangSppt,
-          pbbYgHarusDibayarSppt: row.pbbYgHarusDibayarSppt,
+          siklusSppt: row.siklusSppt ?? 0,
+          njopBumi: String(row.njopBumi),
+          njopBng: String(row.njopBng),
+          njopSppt: String(row.njopSppt),
+          njoptkpSppt: String(row.njoptkpSppt),
+          njkpSppt: String(row.njkpSppt),
+          pbbTerhutangSppt: String(row.pbbTerhutangSppt),
+          faktorPengurangSppt: String(row.faktorPengurangSppt),
+          pbbYgHarusDibayarSppt: String(row.pbbYgHarusDibayarSppt),
           nipPetugas: input.nipPetugas ?? null,
           keterangan: input.keterangan ?? `Update Masal Tahun ${input.thnPajak}`,
         })
@@ -140,11 +140,11 @@ export const updateMasalRouter = os.router({
         // Update SPPT
         await db.update(sppt)
           .set({
-            njoptkpSppt: String(njoptkp),
-            njkpSppt: String(njkp),
-            pbbTerhutangSppt: String(pbbTerhutang),
-            pbbYgHarusDibayarSppt: String(pbbYgHarusDibayar),
-            siklusSppt: row.siklusSppt + 1,
+            njoptkpSppt: Math.round(njoptkp),
+            njkpSppt: Math.round(njkp),
+            pbbTerhutangSppt: Math.round(pbbTerhutang),
+            pbbYgHarusDibayarSppt: Math.round(pbbYgHarusDibayar),
+            siklusSppt: (row.siklusSppt ?? 0) + 1,
           })
           .where(
             and(

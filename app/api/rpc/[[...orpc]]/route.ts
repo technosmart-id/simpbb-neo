@@ -5,7 +5,7 @@ import { router } from '@/lib/orpc/server'
 const handler = new RPCHandler(router, {
   interceptors: [
     onError((error) => {
-      console.error(error)
+      console.error("[ORPC Error]", error)
     }),
   ],
 })
@@ -14,6 +14,7 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 
 async function handleRequest(request: Request) {
+  console.log(`[ORPC] Request: ${request.method} ${request.url}`)
   const session = await auth.api.getSession({
     headers: await headers(),
   })

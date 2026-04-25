@@ -4,17 +4,16 @@ import { sppt } from "../../schema";
 
 export function createSppt(
   nop: any,
-  thnPajak: string,
+  thnPajak: number,
   luasBumi: number,
   luasBng: number,
   overrides: Partial<typeof sppt.$inferInsert> = {}
 ) {
   const njopBumi = luasBumi * 1000000;
   const njopBng = luasBng * 5000000;
-  const njopSppt = njopBumi + njopBng;
-  const njoptkpSppt = 10000000;
-  const njkpSppt = Math.max(0, njopSppt - njoptkpSppt);
-  const pbbTerhutang = Math.round(njkpSppt * 0.001);
+  const njopTotal = njopBumi + njopBng;
+  const njoptkp = 15000000;
+  const pbbTerhutang = Math.max(0, Math.round((njopTotal - njoptkp) * 0.001));
 
   return {
     kdPropinsi: nop.kdPropinsi,
@@ -31,21 +30,21 @@ export function createSppt(
     kdBankTunggal: "01",
     kdBankPersepsi: "01",
     kdTp: "01",
-    nmWp: randIdName().toUpperCase(),
-    jalanWp: randIdStreetAddress().toUpperCase(),
-    luasBumi,
-    luasBng,
-    njopBumi,
-    njopBng,
-    njopSppt,
-    njoptkpSppt,
-    njkpSppt,
-    pbbTerhutangSppt: pbbTerhutang.toString(),
-    faktorPengurangSppt: "0",
-    pbbYgHarusDibayarSppt: pbbTerhutang.toString(),
-    statusPembayaranSppt: randNumber({ min: 0, max: 2 }).toString(),
-    statusTagihanSppt: "0",
-    statusCetakSppt: "1",
+    nmWp: randIdName().toUpperCase().substring(0, 30),
+    jalanWp: randIdStreetAddress().toUpperCase().substring(0, 30),
+    luasBumi: luasBumi,
+    luasBng: luasBng,
+    njopBumi: njopBumi,
+    njopBng: njopBng,
+    njopSppt: njopTotal,
+    njoptkpSppt: njoptkp,
+    njkpSppt: njopTotal - njoptkp,
+    pbbTerhutangSppt: pbbTerhutang,
+    faktorPengurangSppt: 0,
+    pbbYgHarusDibayarSppt: pbbTerhutang,
+    statusPembayaranSppt: randNumber({ min: 0, max: 1 }),
+    statusTagihanSppt: 0,
+    statusCetakSppt: 1,
     tglTerbitSppt: new Date(`${thnPajak}-01-01`),
     tglCetakSppt: new Date(`${thnPajak}-01-02`),
     ...overrides,

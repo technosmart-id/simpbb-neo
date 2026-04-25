@@ -236,7 +236,7 @@ export default function SpptPerNopPage() {
                   </button>
                   <div className="flex items-center gap-3">
                     <span className="text-muted-foreground">{formatRupiah(Number(s.pbbYgHarusDibayarSppt))}</span>
-                    <PembayaranBadge status={s.statusPembayaranSppt ?? 'belum'} />
+                    <PembayaranBadge status={s.statusPembayaranSppt ?? 0} />
                     <Badge variant="outline" className="text-xs">Siklus {s.siklusSppt}</Badge>
                   </div>
                 </div>
@@ -362,7 +362,7 @@ export default function SpptPerNopPage() {
                   </div>
                   <div className="flex justify-between">
                     <span>Status</span>
-                    <PembayaranBadge status={existingSppt.statusPembayaranSppt ?? 'belum'} />
+                    <PembayaranBadge status={existingSppt.statusPembayaranSppt ?? 0} />
                   </div>
                 </div>
               )}

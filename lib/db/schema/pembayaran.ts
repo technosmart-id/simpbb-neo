@@ -19,7 +19,7 @@ export const pembayaranSppt = mysqlTable(
   "pembayaran_sppt",
   {
     ...nopColumns(),
-    thnPajakSppt: year("THN_PAJAK_SPPT").notNull(),
+    thnPajakSppt: varchar("THN_PAJAK_SPPT", { length: 4 }).notNull().$type<number>(),
     pembayaranKe: tinyint("PEMBAYARAN_KE").notNull(),
     tglPembayaranSppt: date("TGL_PEMBAYARAN_SPPT").notNull(),
     jmlSpptYgDibayar: decimal("JML_SPPT_YG_DIBAYAR", { precision: 15, scale: 2 }).notNull().default("0"),

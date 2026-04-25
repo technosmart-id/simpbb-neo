@@ -18,6 +18,7 @@ export * from "./objek-pajak";
 export * from "./lspop";
 export * from "./op-bersama";
 export * from "./sppt";
+export * from "./sppt-e";
 export * from "./pembayaran";
 export * from "./pelayanan";
 export * from "./pemekaran";
