@@ -91,7 +91,7 @@ function LoginFormContent({ className, ...props }: React.ComponentProps<"div">) 
 	// Demo Akun: fill admin credentials
 	const fillDemoAdmin = () => {
 		setIdentifier("admin");
-		setPassword("Password123#");
+		setPassword("admin123456");
 		setSignInMode("password");
 	};
 
