@@ -1,54 +1,107 @@
 'use client'
 
 import * as React from 'react'
-import { Search } from 'lucide-react'
+import { Search, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { formatRupiah } from '@/components/data-table/column-helpers'
-import { NopInput } from '@/components/nop/nop-input'
+import { orpcClient } from '@/lib/orpc/client'
+import { useQuery } from '@tanstack/react-query'
+import { useORPC } from '@/lib/orpc/react'
+import { formatNop } from '@/lib/utils/nop'
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxList,
+  ComboboxItem,
+  ComboboxEmpty,
+} from '@/components/ui/combobox'
 import { SpopForm } from './_components/spop-form'
+import { LspopForm } from './_components/lspop-form'
 
 export default function ObjekPajakPage() {
+  const orpc = useORPC()
   const [mounted, setMounted] = React.useState(false)
-  const [nopSearch, setNopSearch] = React.useState('')
+  const [searchQuery, setSearchQuery] = React.useState('')
+  const [data, setData] = React.useState<any>(null)
+  const [loading, setLoading] = React.useState(false)
+
+  const deferredSearchQuery = React.useDeferredValue(searchQuery)
+  const searchResults = useQuery(
+    orpc.objekPajak.search.queryOptions({
+      input: { query: deferredSearchQuery, limit: 10 },
+    })
+  )
 
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Mock data for initial state
-  const mockData = {
-    nop: '32.01.010.001.001-0001.0',
-    namaWp: 'BUDI SANTOSO',
-    kecamatan: 'CIBINONG',
-    kelurahan: 'PAKAN SARI',
-    alamatWp: 'JL. RAYA TEGAR BERIMAN NO. 1, CIBINONG, BOGOR',
-    alamatOp: 'JL. RAYA PAKAN SARI NO. 12, RT 01 RW 02',
-    luasBumi: 200,
-    luasBangunan: 150,
-    jumlahBangunan: 1,
-    njopBumi: 1000000000,
-    njopBangunan: 750000000,
-    njopTotal: 1750000000,
+  const handleSelect = async (item: any) => {
+    setLoading(true)
+    try {
+      const res = await orpcClient.objekPajak.getByNop(item)
+      if (res) {
+        setData(res)
+      } else {
+        setData(null)
+      }
+    } catch (err) {
+      console.error("Search failed:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = async () => {
+    // Keep for compatibility or if needed manually
   }
 
   return (
     <div className="flex flex-col gap-3">
       {/* 1. Header & NOP Search */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-card p-3 rounded-xl border shadow-sm">
-        <div className="flex flex-1 max-w-xl gap-2 items-center">
-          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary shrink-0">
-            <Search className="h-5 w-5" />
-          </div>
-          <NopInput
-            value={nopSearch}
-            onChange={(val) => setNopSearch(val)}
-            className="flex-1 h-10 border-none shadow-none focus-visible:ring-0 text-base font-medium"
-          />
-          <Button className="h-10 px-6 font-bold">
-            Cari
+        <div className="flex flex-1 max-w-xl items-center">
+          <Combobox 
+            onValueChange={(val) => {
+              if (val) handleSelect(val)
+            }}
+          >
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <ComboboxInput
+                placeholder="Cari NOP atau Nama Wajib Pajak..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-10 w-full"
+              />
+            </div>
+            <ComboboxContent>
+              <ComboboxList>
+                {searchResults.data?.map((item) => (
+                  <ComboboxItem key={formatNop(item)} value={item}>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-bold text-sm">{formatNop(item)}</span>
+                      <span className="text-[10px] text-muted-foreground leading-none">
+                        {item.nmWp} • {item.jalanOp}
+                      </span>
+                    </div>
+                  </ComboboxItem>
+                ))}
+                <ComboboxEmpty>
+                  {searchResults.isLoading ? "Mencari..." : "Tidak ada hasil."}
+                </ComboboxEmpty>
+              </ComboboxList>
+            </ComboboxContent>
+          </Combobox>
+          <Button 
+            onClick={() => { setData(null); setSearchQuery(''); }}
+            className="ml-2 h-10 px-4 font-bold shadow-sm"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Baru
           </Button>
         </div>
 
@@ -59,22 +112,28 @@ export default function ObjekPajakPage() {
         <div className="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm px-2">
           <div className="flex flex-col">
             <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">Wajib Pajak</span>
-            <span className="font-bold text-foreground truncate max-w-[180px]">{mockData.namaWp}</span>
+            <span className="font-bold text-foreground truncate max-w-[180px]">
+              {data?.subjekPajak?.nmWp ?? "—"}
+            </span>
           </div>
 
           <div className="flex flex-col">
             <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">Wilayah</span>
-            <span className="font-semibold text-foreground">{mockData.kecamatan} / {mockData.kelurahan}</span>
+            <span className="font-semibold text-foreground">
+              {data?.kdKecamatan ?? "—"} / {data?.kdKelurahan ?? "—"}
+            </span>
           </div>
 
           <div className="flex flex-col">
             <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">Luas (m²)</span>
-            <span className="font-semibold text-foreground">T: {mockData.luasBumi} | B: {mockData.luasBangunan}</span>
+            <span className="font-semibold text-foreground">
+              T: {data?.luasBumi ?? 0} | B: {data?.luasBangunan ?? 0}
+            </span>
           </div>
 
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">Total NJOP</span>
-            <span className="font-bold text-primary">{formatRupiah(mockData.njopTotal)}</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">ZNT</span>
+            <span className="font-bold text-primary">{data?.kdZnt ?? "—"}</span>
           </div>
         </div>
       </div>
@@ -90,17 +149,11 @@ export default function ObjekPajakPage() {
         </TabsList>
 
         <TabsContent value="bumi">
-          <SpopForm mockData={mockData} />
+          <SpopForm key={data ? formatNop(data) : 'new'} initialData={data} onSaveSuccess={handleSearch} />
         </TabsContent>
 
         <TabsContent value="bangunan">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-center h-32 text-sm text-muted-foreground border border-dashed rounded bg-muted/10">
-                Tabel data rincian bangunan
-              </div>
-            </CardContent>
-          </Card>
+          <LspopForm initialData={data} />
         </TabsContent>
 
         <TabsContent value="sppt">

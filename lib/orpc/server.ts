@@ -37,6 +37,7 @@ import { updateMasalRouter } from "./routers/update-masal"
 import { pemekaranRouter } from "./routers/pemekaran"
 import { booksRouter } from "./routers/books"
 import { systemRouter } from "./routers/system"
+import { lookupRouter } from "./routers/lookup"
 
 import { os as osBase } from "@orpc/server"
 import { Context, os, requireAuth, requireSession, requireAdmin } from "./base"
@@ -468,6 +469,7 @@ export const router = os.router({
   updateMasal: updateMasalRouter,
   pemekaran: pemekaranRouter,
   system: systemRouter,
+  lookup: lookupRouter,
 
   notifications: os.router({
     list: os

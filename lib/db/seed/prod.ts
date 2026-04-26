@@ -23,6 +23,7 @@ import { ORG_ROLES } from "@/lib/services/authorization-constants";
 import { DEFAULT_USER_PERMISSIONS } from "@/lib/services/authorization-constants";
 import { seedReferensi } from "./referensi";
 import { seedMasterData } from "./master-data";
+import { seedLookups } from "./production-lookup";
 
 const ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com";
 const ADMIN_NAME = process.env.DEFAULT_ADMIN_NAME || "Admin User";
@@ -190,6 +191,7 @@ export async function seedProd() {
 	console.log("📦 Seeding domain data...");
 	await seedReferensi();
 	await seedMasterData();
+	await seedLookups();
 
 	console.log("\n✅ Production seed complete");
 	console.log(`   Email: ${ADMIN_EMAIL}`);

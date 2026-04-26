@@ -4,6 +4,7 @@ import {
   primaryKey,
   foreignKey,
 } from "drizzle-orm/mysql-core";
+import { and, eq } from "drizzle-orm";
 import type { AnyMySqlColumn } from "drizzle-orm/mysql-core";
 
 // ─── NOP Column Factory ───────────────────────────────────────────
@@ -119,3 +120,17 @@ export const longtext = customType<{ data: string }>({
     return "LONGTEXT";
   },
 });
+
+// ─── NOP Where Condition Helper ───────────────────────────────────
+
+export function nopWhere(table: any, parts: any) {
+  return and(
+    eq(table.kdPropinsi, parts.kdPropinsi),
+    eq(table.kdDati2, parts.kdDati2),
+    eq(table.kdKecamatan, parts.kdKecamatan),
+    eq(table.kdKelurahan, parts.kdKelurahan),
+    eq(table.kdBlok, parts.kdBlok),
+    eq(table.noUrut, parts.noUrut),
+    eq(table.kdJnsOp, parts.kdJnsOp)
+  );
+}

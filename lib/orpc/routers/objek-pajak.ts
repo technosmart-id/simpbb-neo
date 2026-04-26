@@ -1,8 +1,9 @@
 import { z } from "zod"
 import { os } from "../context"
 import { db } from "@/lib/db"
-import { spop, datSubjekPajak } from "@/lib/db/schema"
-import { eq, and, like, sql, desc } from "drizzle-orm"
+import { spop, datSubjekPajak, datOpAnggota, datOpInduk, kelasBumi } from "@/lib/db/schema"
+import { eq, and, or, like, sql, desc, lte, gte } from "drizzle-orm"
+import { nopWhere } from "@/lib/db/schema/_columns"
 
 const nopInput = z.object({
   kdPropinsi: z.string().length(2),
@@ -15,6 +16,45 @@ const nopInput = z.object({
 })
 
 export const objekPajakRouter = os.router({
+  // ── Search NOP or Name ──
+  search: os
+    .input(z.object({
+      query: z.string().optional(),
+      limit: z.number().int().min(1).max(50).default(10),
+    }))
+    .handler(async ({ input }) => {
+      const conditions = []
+      if (input.query) {
+        const q = input.query.replace(/[^a-zA-Z0-9]/g, "")
+        conditions.push(
+          or(
+            like(datSubjekPajak.nmWp, `%${input.query}%`),
+            sql`CONCAT(${spop.kdPropinsi}, ${spop.kdDati2}, ${spop.kdKecamatan}, ${spop.kdKelurahan}, ${spop.kdBlok}, ${spop.noUrut}, ${spop.kdJnsOp}) LIKE ${`%${q}%`}`
+          )
+        )
+      }
+
+      const rows = await db
+        .select({
+          kdPropinsi: spop.kdPropinsi,
+          kdDati2: spop.kdDati2,
+          kdKecamatan: spop.kdKecamatan,
+          kdKelurahan: spop.kdKelurahan,
+          kdBlok: spop.kdBlok,
+          noUrut: spop.noUrut,
+          kdJnsOp: spop.kdJnsOp,
+          nmWp: datSubjekPajak.nmWp,
+          jalanOp: spop.jalanOp,
+        })
+        .from(spop)
+        .leftJoin(datSubjekPajak, eq(spop.subjekPajakId, datSubjekPajak.subjekPajakId))
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(desc(spop.tglPendataanOp))
+        .limit(input.limit)
+
+      return rows
+    }),
+
   // ── SPOP List + Search ──
   list: os
     .input(z.object({
@@ -54,19 +94,50 @@ export const objekPajakRouter = os.router({
       return { rows, total: totalResult?.count ?? 0 }
     }),
 
-  // ── Get single SPOP by NOP ──
   getByNop: os
     .input(nopInput)
     .handler(async ({ input }) => {
-      const [row] = await db.select().from(spop).where(and(
-        eq(spop.kdPropinsi, input.kdPropinsi),
-        eq(spop.kdDati2, input.kdDati2),
-        eq(spop.kdKecamatan, input.kdKecamatan),
-        eq(spop.kdKelurahan, input.kdKelurahan),
-        eq(spop.kdBlok, input.kdBlok),
-        eq(spop.noUrut, input.noUrut),
-        eq(spop.kdJnsOp, input.kdJnsOp),
-      ))
+      // 1. Get SPOP joined with Subjek Pajak
+      const [row] = await db
+        .select()
+        .from(spop)
+        .leftJoin(datSubjekPajak, eq(spop.subjekPajakId, datSubjekPajak.subjekPajakId))
+        .where(nopWhere(spop, input))
+
+      if (!row) return null
+
+      // 2. Check if this is an OP Anggota (Member of a joint property)
+      const [anggota] = await db
+        .select()
+        .from(datOpAnggota)
+        .where(nopWhere(datOpAnggota, input))
+
+      // 3. Check if this is an OP Induk (Parent of a joint property)
+      const [induk] = await db
+        .select()
+        .from(datOpInduk)
+        .where(nopWhere(datOpInduk, input))
+
+      return {
+        ...row.spop,
+        subjekPajak: row.dat_subjek_pajak,
+        anggota: anggota ?? null,
+        induk: induk ?? null,
+      }
+    }),
+
+  // ── Get land class and NJOP based on unit value ──
+  getKelasBumi: os
+    .input(z.object({ nilai: z.number() }))
+    .handler(async ({ input }) => {
+      const [row] = await db
+        .select()
+        .from(kelasBumi)
+        .where(and(
+          lte(kelasBumi.nilaiMinimum, String(input.nilai)),
+          gte(kelasBumi.nilaiMaksimum, String(input.nilai))
+        ))
+      
       return row ?? null
     }),
 
@@ -253,5 +324,114 @@ export const objekPajakRouter = os.router({
 
       const formatted = `${year}${String(bundle).padStart(4, "0")}${String(seq).padStart(3, "0")}`
       return { nextNoFormulir: formatted }
+    }),
+
+  // ── Unified Save (Upsert) SPOP + Subjek Pajak ──
+  save: os
+    .input(z.object({
+      spop: z.object({
+        ...nopInput.shape,
+        subjekPajakId: z.string(),
+        noFormulirSpop: z.string().optional(),
+        jnsTransaksiOp: z.string().length(1),
+        jalanOp: z.string(),
+        blokKavNoOp: z.string().optional(),
+        rtOp: z.string().optional(),
+        rwOp: z.string().optional(),
+        kelurahanOp: z.string().optional(),
+        kdStatusWp: z.string().length(1),
+        luasBumi: z.number(),
+        kdZnt: z.string().optional(),
+        jnsBumi: z.string().length(1),
+        nilaiSistemBumi: z.number(),
+        nipPendata: z.string().optional(),
+        nmPendataanOp: z.string().optional(),
+        nipPemeriksaOp: z.string().optional(),
+        nmPemeriksaanOp: z.string().optional(),
+        tglPendataanOp: z.date().optional(),
+        tglPemeriksaanOp: z.date().optional(),
+        noPersil: z.string().optional(),
+      }),
+      subjekPajak: z.object({
+        subjekPajakId: z.string().max(30),
+        nmWp: z.string().max(30),
+        jalanWp: z.string().max(100),
+        blokKavNoWp: z.string().optional(),
+        rwWp: z.string().optional(),
+        rtWp: z.string().optional(),
+        kelurahanWp: z.string().optional(),
+        kotaWp: z.string().optional(),
+        kdPosWp: z.string().optional(),
+        telpWp: z.string().optional(),
+        npwp: z.string().optional(),
+        emailWp: z.string().optional(),
+        statusPekerjaanWp: z.string().length(1),
+      }),
+      anggota: z.object({
+        kdPropinsiInduk: z.string(),
+        kdDati2Induk: z.string(),
+        kdKecamatanInduk: z.string(),
+        kdKelurahanInduk: z.string(),
+        kdBlokInduk: z.string(),
+        noUrutInduk: z.string(),
+        kdJnsOpInduk: z.string(),
+        luasBumiBeban: z.number().optional(),
+        luasBngBeban: z.number().optional(),
+      }).optional(),
+    }))
+    .handler(async ({ input }) => {
+      const { spop: spopData, subjekPajak: wpData, anggota: anggotaData } = input
+      const now = new Date()
+
+      return await db.transaction(async (tx) => {
+        // 1. Upsert Subjek Pajak
+        const [existingWp] = await tx
+          .select()
+          .from(datSubjekPajak)
+          .where(eq(datSubjekPajak.subjekPajakId, wpData.subjekPajakId))
+
+        if (existingWp) {
+          await tx.update(datSubjekPajak).set(wpData).where(eq(datSubjekPajak.subjekPajakId, wpData.subjekPajakId))
+        } else {
+          await tx.insert(datSubjekPajak).values(wpData)
+        }
+
+        // 2. Upsert SPOP
+        const [existingSpop] = await tx
+          .select()
+          .from(spop)
+          .where(nopWhere(spop, spopData))
+
+        const spopValues = {
+          ...spopData,
+          tglPendataanOp: spopData.tglPendataanOp ?? now,
+          tglPemeriksaanOp: spopData.tglPemeriksaanOp ?? now,
+        }
+
+        if (existingSpop) {
+          await tx.update(spop).set(spopValues).where(nopWhere(spop, spopData))
+        } else {
+          await tx.insert(spop).values(spopValues)
+        }
+
+        // 3. Handle OP Anggota (Member of joint property)
+        if (anggotaData) {
+          const [existingAnggota] = await tx
+            .select()
+            .from(datOpAnggota)
+            .where(nopWhere(datOpAnggota, spopData))
+
+          if (existingAnggota) {
+            await tx.update(datOpAnggota).set(anggotaData).where(nopWhere(datOpAnggota, spopData))
+          } else {
+            await tx.insert(datOpAnggota).values({ ...spopData, ...anggotaData })
+          }
+        } else {
+          // If not anggota, ensure record is removed if it was there
+          await tx.delete(datOpAnggota).where(nopWhere(datOpAnggota, spopData))
+        }
+
+        return { success: true }
+      })
     }),
 })
