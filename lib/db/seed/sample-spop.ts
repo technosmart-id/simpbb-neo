@@ -50,10 +50,10 @@ export async function seedSampleSpop() {
   console.log("  🗺️  Seeding wilayah reference data...");
   const { propinsis, dati2s, kecamatans, kelurahans } = getBaseWilayahData();
   
-  await db.insert(refPropinsi).values(propinsis).onDuplicateKeyUpdate({ set: { nmPropinsi: sql`VALUES(NM_PROPINSI)` } });
-  await db.insert(refDati2).values(dati2s).onDuplicateKeyUpdate({ set: { nmDati2: sql`VALUES(NM_DATI2)` } });
-  await db.insert(refKecamatan).values(kecamatans).onDuplicateKeyUpdate({ set: { nmKecamatanOnly: sql`VALUES(NM_KECAMATAN_ONLY)` } });
-  await db.insert(refKelurahan).values(kelurahans).onDuplicateKeyUpdate({ set: { nmKelurahanOnly: sql`VALUES(NM_KELURAHAN_ONLY)` } });
+  await db.insert(refPropinsi).values(propinsis);
+  await db.insert(refDati2).values(dati2s);
+  await db.insert(refKecamatan).values(kecamatans);
+  await db.insert(refKelurahan).values(kelurahans);
 
   // 2. Master Fasilitas
   console.log("  🔧 Seeding master fasilitas...");
@@ -64,7 +64,7 @@ export async function seedSampleSpop() {
     { kdFasilitas: "04", nmFasilitas: "PAGAR", satuanFasilitas: "M", nilaiFasilitas: "200000" },
     { kdFasilitas: "05", nmFasilitas: "LAPANGAN TENIS", satuanFasilitas: "M2", nilaiFasilitas: "300000" },
   ];
-  await db.insert(fasilitas).values(sampleFasilitas).onDuplicateKeyUpdate({ set: { nmFasilitas: sql`VALUES(NM_FASILITAS)` } });
+  await db.insert(fasilitas).values(sampleFasilitas);
 
   // 3. Generate Core Data
   console.log("  🚀 Generating 100 SPOP records and relations...");
@@ -129,14 +129,14 @@ export async function seedSampleSpop() {
 
   // 4. Batch Insert
   console.log(`  👤 Inserting ${subjekPajaks.length} Subjek Pajak...`);
-  await db.insert(datSubjekPajak).values(subjekPajaks).onDuplicateKeyUpdate({ set: { nmWp: sql`VALUES(NM_WP)` } });
+  await db.insert(datSubjekPajak).values(subjekPajaks);
 
   console.log(`  📋 Inserting ${spops.length} SPOP...`);
-  await db.insert(spop).values(spops).onDuplicateKeyUpdate({ set: { jalanOp: sql`VALUES(JALAN_OP)` } });
+  await db.insert(spop).values(spops);
 
   if (bangunans.length > 0) {
     console.log(`  🏗️  Inserting ${bangunans.length} Bangunan...`);
-    await db.insert(datOpBangunan).values(bangunans).onDuplicateKeyUpdate({ set: { luasBng: sql`VALUES(LUAS_BNG)` } });
+    await db.insert(datOpBangunan).values(bangunans);
     
     // Insert JPB specific data
     const jpbTables: Record<string, any> = {
@@ -147,28 +147,28 @@ export async function seedSampleSpop() {
       const data = jpbDataMap[kdJpb];
       if (data && data.length > 0) {
         console.log(`  🏠 Inserting ${data.length} records for JPB ${kdJpb}...`);
-        await db.insert(table).values(data).onDuplicateKeyUpdate({ set: { noBng: sql`VALUES(NO_BNG)` } });
+        await db.insert(table).values(data);
       }
     }
   }
 
   if (fasBangunans.length > 0) {
     console.log(`  🏠 Inserting ${fasBangunans.length} Fasilitas Bangunan...`);
-    await db.insert(datFasilitasBangunan).values(fasBangunans).onDuplicateKeyUpdate({ set: { jmlSatuan: sql`VALUES(JML_SATUAN)` } });
+    await db.insert(datFasilitasBangunan).values(fasBangunans);
   }
 
   if (sppts.length > 0) {
     console.log(`  📊 Inserting ${sppts.length} SPPT...`);
     // Chunking to avoid large packet size
     for (let i = 0; i < sppts.length; i += 200) {
-      await db.insert(sppt).values(sppts.slice(i, i + 200)).onDuplicateKeyUpdate({ set: { pbbYgHarusDibayarSppt: sql`VALUES(PBB_YG_HARUS_DIBAYAR_SPPT)` } });
+      await db.insert(sppt).values(sppts.slice(i, i + 200));
     }
   }
 
   if (pembayarans.length > 0) {
     console.log(`  💰 Inserting ${pembayarans.length} Pembayaran...`);
     for (let i = 0; i < pembayarans.length; i += 200) {
-      await db.insert(pembayaranSppt).values(pembayarans.slice(i, i + 200)).onDuplicateKeyUpdate({ set: { tglPembayaranSppt: sql`VALUES(TGL_PEMBAYARAN_SPPT)` } });
+      await db.insert(pembayaranSppt).values(pembayarans.slice(i, i + 200));
     }
   }
 
