@@ -58,12 +58,20 @@ export const systemRouter = os.router({
         console.log("[SYSTEM] Tables recreated.");
 
         // 3. SEED DATA
-        console.log("[SYSTEM] Seeding production data...");
-        await seedProd();
-        
-        if (IS_DEV || input.includeDevSeed) {
-          console.log("[SYSTEM] Seeding development data...");
-          await seedDev();
+        try {
+          console.log("[SYSTEM] Seeding production data...");
+          await seedProd();
+          console.log("[SYSTEM] Production data seeded.");
+          
+          if (IS_DEV || input.includeDevSeed) {
+            console.log("[SYSTEM] Seeding development data...");
+            await seedDev();
+            console.log("[SYSTEM] Development data seeded.");
+          }
+        } catch (seedError: any) {
+          console.error("[SYSTEM] Seeding failed:", seedError);
+          // Don't throw yet, let's see if we can return a partial success or specific error
+          throw new Error(`Tables recreated but seeding failed: ${seedError.message}`);
         }
 
         console.log("[SYSTEM] Database reset and seeded successfully.");

@@ -8,41 +8,41 @@ import {
 
 export const SAMPLE_REGIONS = [
   {
-    kdPropinsi: "69",
-    nmPropinsi: "SANTUY",
+    kdPropinsi: "51",
+    nmPropinsi: "BALI",
     dati2: [
       {
-        kdDati2: "01",
-        nmDati2: "KOTA REBAHAN",
+        kdDati2: "71",
+        nmDati2: "KOTA DENPASAR",
         kecamatan: [
           {
             kdKecamatan: "010",
-            nmKecamatan: "MAGER",
+            nmKecamatan: "DENPASAR SELATAN",
             kelurahan: [
-              { kdKelurahan: "001", nmKelurahan: "KASUR EMPUK" },
-              { kdKelurahan: "002", nmKelurahan: "BANTAL GULING" },
+              { kdKelurahan: "001", nmKelurahan: "SIDAKARYA" },
+              { kdKelurahan: "002", nmKelurahan: "SESETAN" },
             ],
           },
           {
             kdKecamatan: "020",
-            nmKecamatan: "NGEMIL",
+            nmKecamatan: "DENPASAR TIMUR",
             kelurahan: [
-              { kdKelurahan: "001", nmKelurahan: "GORENGAN PANAS" },
-              { kdKelurahan: "002", nmKelurahan: "ES TEH MANIS" },
+              { kdKelurahan: "001", nmKelurahan: "DANGIN PURI" },
+              { kdKelurahan: "002", nmKelurahan: "SUMERTA" },
             ],
           },
         ],
       },
       {
-        kdDati2: "02",
-        nmDati2: "KABUPATEN NGEGAS",
+        kdDati2: "72",
+        nmDati2: "KABUPATEN BADUNG",
         kecamatan: [
           {
             kdKecamatan: "010",
-            nmKecamatan: "SENGGOL BACOK",
+            nmKecamatan: "KUTA",
             kelurahan: [
-              { kdKelurahan: "001", nmKelurahan: "KNALPOT RACING" },
-              { kdKelurahan: "002", nmKelurahan: "SPION KIRI" },
+              { kdKelurahan: "001", nmKelurahan: "TUBAN" },
+              { kdKelurahan: "002", nmKelurahan: "LEGIAN" },
             ],
           },
         ],
