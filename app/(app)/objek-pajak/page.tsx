@@ -1,7 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { Search, Plus } from 'lucide-react'
+import { Search, Plus, Table2 } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -9,6 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { orpcClient } from '@/lib/orpc/client'
 import { useQuery } from '@tanstack/react-query'
 import { useORPC } from '@/lib/orpc/react'
+import { useSearchParams } from 'next/navigation'
 import { formatNop } from '@/lib/utils/nop'
 import {
   Combobox,
@@ -35,9 +37,25 @@ export default function ObjekPajakPage() {
     })
   )
 
+  const searchParams = useSearchParams()
+
   React.useEffect(() => {
     setMounted(true)
-  }, [])
+    
+    const nopParam = searchParams.get('nop')
+    if (nopParam && nopParam.length === 18) {
+      const nop = {
+        kdPropinsi: nopParam.slice(0, 2),
+        kdDati2: nopParam.slice(2, 4),
+        kdKecamatan: nopParam.slice(4, 7),
+        kdKelurahan: nopParam.slice(7, 10),
+        kdBlok: nopParam.slice(10, 13),
+        noUrut: nopParam.slice(13, 17),
+        kdJnsOp: nopParam.slice(17, 18),
+      }
+      handleSelect(nop)
+    }
+  }, [searchParams])
 
   const handleSelect = async (item: any) => {
     setLoading(true)
@@ -109,6 +127,12 @@ export default function ObjekPajakPage() {
               </ComboboxList>
             </ComboboxContent>
           </Combobox>
+          <Link href="/objek-pajak/list">
+            <Button variant="outline" className="ml-2 h-10 px-4 font-bold border-primary/20 text-primary hover:bg-primary/5">
+              <Table2 className="h-4 w-4 mr-1" />
+              List NOP
+            </Button>
+          </Link>
           <Button 
             onClick={() => { setData(null); setSearchQuery(''); }}
             className="ml-2 h-10 px-4 font-bold shadow-sm"

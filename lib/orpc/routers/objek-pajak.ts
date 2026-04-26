@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { os } from "../context"
 import { db } from "@/lib/db"
-import { spop, datSubjekPajak, datOpAnggota, datOpInduk, kelasBumi } from "@/lib/db/schema"
+import { spop, datSubjekPajak, datOpAnggota, datOpInduk, kelasBumi, datOpBangunan } from "@/lib/db/schema"
 import { eq, and, or, like, sql, desc, lte, gte } from "drizzle-orm"
 import { nopWhere } from "@/lib/db/schema/_columns"
 
@@ -90,6 +90,82 @@ export const objekPajakRouter = os.router({
         .offset(input.offset)
 
       const [totalResult] = await db.select({ count: sql<number>`count(*)` }).from(spop).where(where)
+
+      return { rows, total: totalResult?.count ?? 0 }
+    }),
+
+  // ── SPOP List with Building Details ──
+  listDetails: os
+    .input(z.object({
+      limit: z.number().int().min(1).max(500).default(20),
+      offset: z.number().int().min(0).default(0),
+      kdPropinsi: z.string().optional(),
+      kdDati2: z.string().optional(),
+      kdKecamatan: z.string().optional(),
+      kdKelurahan: z.string().optional(),
+      search: z.string().optional(),
+    }))
+    .handler(async ({ input }) => {
+      const conditions = []
+      if (input.kdPropinsi) conditions.push(eq(spop.kdPropinsi, input.kdPropinsi))
+      if (input.kdDati2) conditions.push(eq(spop.kdDati2, input.kdDati2))
+      if (input.kdKecamatan) conditions.push(eq(spop.kdKecamatan, input.kdKecamatan))
+      if (input.kdKelurahan) conditions.push(eq(spop.kdKelurahan, input.kdKelurahan))
+
+      if (input.search) {
+        const q = input.search.replace(/[^a-zA-Z0-9]/g, "")
+        conditions.push(
+          or(
+            like(datSubjekPajak.nmWp, `%${input.search}%`),
+            sql`CONCAT(${spop.kdPropinsi}, ${spop.kdDati2}, ${spop.kdKecamatan}, ${spop.kdKelurahan}, ${spop.kdBlok}, ${spop.noUrut}, ${spop.kdJnsOp}) LIKE ${`%${q}%`}`
+          )
+        )
+      }
+
+      const where = conditions.length > 0 ? and(...conditions) : undefined
+
+      const rows = await db
+        .select({
+          kdPropinsi: spop.kdPropinsi,
+          kdDati2: spop.kdDati2,
+          kdKecamatan: spop.kdKecamatan,
+          kdKelurahan: spop.kdKelurahan,
+          kdBlok: spop.kdBlok,
+          noUrut: spop.noUrut,
+          kdJnsOp: spop.kdJnsOp,
+          nmWp: datSubjekPajak.nmWp,
+          jalanOp: spop.jalanOp,
+          luasBumi: spop.luasBumi,
+          njopBumi: spop.nilaiSistemBumi,
+          totalLuasBng: sql<number>`COALESCE(SUM(${datOpBangunan.luasBng}), 0)`,
+          totalNilaiBng: sql<number>`COALESCE(SUM(${datOpBangunan.nilaiSistemBng}), 0)`,
+        })
+        .from(spop)
+        .leftJoin(datSubjekPajak, eq(spop.subjekPajakId, datSubjekPajak.subjekPajakId))
+        .leftJoin(datOpBangunan, nopWhere(datOpBangunan, spop))
+        .where(where)
+        .groupBy(
+          spop.kdPropinsi,
+          spop.kdDati2,
+          spop.kdKecamatan,
+          spop.kdKelurahan,
+          spop.kdBlok,
+          spop.noUrut,
+          spop.kdJnsOp,
+          datSubjekPajak.nmWp,
+          spop.jalanOp,
+          spop.luasBumi,
+          spop.nilaiSistemBumi
+        )
+        .orderBy(desc(spop.tglPendataanOp))
+        .limit(input.limit)
+        .offset(input.offset)
+
+      const [totalResult] = await db
+        .select({ count: sql<number>`count(DISTINCT CONCAT(${spop.kdPropinsi}, ${spop.kdDati2}, ${spop.kdKecamatan}, ${spop.kdKelurahan}, ${spop.kdBlok}, ${spop.noUrut}, ${spop.kdJnsOp}))` })
+        .from(spop)
+        .leftJoin(datSubjekPajak, eq(spop.subjekPajakId, datSubjekPajak.subjekPajakId))
+        .where(where)
 
       return { rows, total: totalResult?.count ?? 0 }
     }),

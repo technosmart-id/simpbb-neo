@@ -75,6 +75,7 @@ const formDefaults: LspopFormValues = {
   kdDinding: '1',
   kdLantai: '1',
   kdLangitLangit: '1',
+  nilaiIndividu: '0',
   // JPB
   klsJpb2: '1',
   klsJpb9: '1',
@@ -154,6 +155,8 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
     }),
     enabled: !!initialData?.kdPropinsi,
   })
+
+  const activeBuilding = buildings?.find(b => b.noBng === activeBng)
 
   // ─── Fetch SPOP Data ───
   const { data: spopData } = useQuery({
@@ -255,6 +258,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
           kdDinding: bng.kdDinding || '1',
           kdLantai: bng.kdLantai || '1',
           kdLangitLangit: bng.kdLangitLangit || '1',
+          nilaiIndividu: bng.nilaiIndividu?.toString() || '0',
           // JPB fields mapping
           klsJpb2: jpb.klsJpb2 || jpb.klsJpb9 || '1',
           klsJpb9: jpb.klsJpb9 || jpb.klsJpb2 || '1',
@@ -337,6 +341,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
         kdDinding: values.kdDinding,
         kdLantai: values.kdLantai,
         kdLangitLangit: values.kdLangitLangit,
+        nilaiIndividu: Number(values.nilaiIndividu || 0),
       }
 
       // Handle JPB specific details
@@ -1168,24 +1173,37 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-foreground uppercase">Total</span>
-                  <span className="text-xl text-primary">52,160</span>
+                  <span className="text-xl text-primary">
+                    {(activeBuilding?.nilaiSistemBng || 0).toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-foreground uppercase">Individual</span>
                   <div className="flex items-center gap-2">
-                    <Input type="number" defaultValue={0} className="h-8 w-24 text-right font-mono" />
-                    <Button type="button" size="icon" variant="outline" className="h-8 w-8">
-                      <Search className="h-4 w-4" />
-                    </Button>
+                    <Controller
+                      name="nilaiIndividu"
+                      control={control}
+                      render={({ field }) => (
+                        <Input 
+                          type="number" 
+                          {...field}
+                          className="h-8 w-32 text-right font-mono" 
+                        />
+                      )}
+                    />
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center justify-center p-4 bg-background rounded-lg border border-dashed border-primary/30 mt-4">
                   <span className="text-xs text-foreground uppercase mb-1">NJOP/m²</span>
-                  <span className="text-4xl text-foreground tracking-tighter">823</span>
+                  <span className="text-4xl text-foreground tracking-tighter">
+                    {activeBuilding?.luasBng ? Math.round((activeBuilding.nilaiSistemBng || 0) / activeBuilding.luasBng).toLocaleString() : '0'}
+                  </span>
                   <div className="flex items-center gap-1.5 mt-2">
                     <span className="text-xs font-bold text-foreground uppercase">Kelas</span>
-                    <Badge variant="outline" className="text-lg border-2 border-primary text-primary">023</Badge>
+                    <Badge variant="outline" className="text-lg border-2 border-primary text-primary">
+                      {(activeBuilding as any)?.kdKlasBng || '—'}
+                    </Badge>
                   </div>
                 </div>
               </div>
@@ -1198,15 +1216,17 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
               <div className="space-y-3">
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-foreground uppercase">Tgl Pendataan</span>
-                  <span className="text-xs font-bold uppercase">1/5/2004 12:00:00 AM</span>
+                  <span className="text-xs font-bold uppercase">
+                    {activeBuilding?.tglPendataanBng ? new Date(activeBuilding.tglPendataanBng).toLocaleDateString() : '—'}
+                  </span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-foreground uppercase">NIP Pendata</span>
-                  <span className="text-xs font-bold uppercase">12345678</span>
+                  <span className="text-xs font-bold uppercase">{activeBuilding?.nipPendataBng || '—'}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-foreground uppercase">Nama Pendata</span>
-                  <span className="text-xs font-bold uppercase">Admin</span>
+                  <span className="text-xs font-bold uppercase">{activeBuilding?.nmPendataanOp || '—'}</span>
                 </div>
               </div>
 
@@ -1216,11 +1236,17 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
               <div className="space-y-3">
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-foreground uppercase">Tgl Pemeriksaan</span>
-                  <span className="text-xs font-bold uppercase">1/5/2004 12:00:00 AM</span>
+                  <span className="text-xs font-bold uppercase">
+                    {activeBuilding?.tglPemeriksaanBng ? new Date(activeBuilding.tglPemeriksaanBng).toLocaleDateString() : '—'}
+                  </span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-foreground uppercase">NIP Pemeriksa</span>
-                  <span className="text-xs font-bold uppercase">19690429 199803 1 00</span>
+                  <span className="text-xs font-bold uppercase">{activeBuilding?.nipPemeriksaBng || '—'}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-foreground uppercase">Nama Pemeriksa</span>
+                  <span className="text-xs font-bold uppercase">{activeBuilding?.nmPemeriksaanOpBng || '—'}</span>
                 </div>
               </div>
             </CardContent>
