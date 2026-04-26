@@ -18,7 +18,7 @@ import { auth } from "@/lib/auth";
  */
 const PROTECTED_ROUTES = ["/dashboard", "/notifications", "/settings", "/file-manager", "/backups", "/crud-example", "/examples"];
 const AUTH_ROUTES = ["/sign-in", "/register", "/forgot-password", "/reset-password", "/verify-email"];
-const PUBLIC_API = ["/api/auth", "/api/reference"];
+const PUBLIC_API = ["/api/auth", "/api/reference", "/api/rpc"];
 
 /**
  * Routes that require an active organization
