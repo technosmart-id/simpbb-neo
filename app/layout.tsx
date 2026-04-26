@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { RPCProvider } from "@/lib/orpc/react"
 import { cn } from "@/lib/utils";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'})
+const roboto = Roboto({subsets:['latin'],variable:'--font-sans'})
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
@@ -27,7 +27,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable, robotoHeading.variable)}
+      className={cn("antialiased", fontMono.variable, "font-sans", roboto.variable, robotoHeading.variable)}
     >
       <body>
         <RPCProvider>
