@@ -22,7 +22,7 @@ import { seedSampleSpop } from "./sample-spop";
 
 const ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com";
 const ADMIN_NAME = process.env.DEFAULT_ADMIN_NAME || "Admin User";
-const ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "Password123#";
+const ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || "admin123456";
 
 
 export async function seedDev() {
