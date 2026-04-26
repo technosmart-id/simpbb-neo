@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { os } from "../context"
 import { db } from "@/lib/db"
-import { spop, datSubjekPajak, datOpAnggota, datOpInduk, kelasBumi, datOpBangunan } from "@/lib/db/schema"
+import { spop, datSubjekPajak, datOpAnggota, datOpInduk, kelasBumi, datOpBangunan, sppt, pembayaranSppt } from "@/lib/db/schema"
 import { eq, and, or, like, sql, desc, lte, gte } from "drizzle-orm"
 import { nopWhere } from "@/lib/db/schema/_columns"
 
@@ -509,5 +509,48 @@ export const objekPajakRouter = os.router({
 
         return { success: true }
       })
+    }),
+
+  // ── SPPT History ──
+  getSpptHistory: os
+    .input(nopInput)
+    .handler(async ({ input }) => {
+      return db
+        .select({
+          thnPajakSppt: sppt.thnPajakSppt,
+          nmWp: sppt.nmWp,
+          luasBumi: sppt.luasBumi,
+          luasBng: sppt.luasBng,
+          njopBumi: sppt.njopBumi,
+          njopBng: sppt.njopBng,
+          njopSppt: sppt.njopSppt,
+          njoptkpSppt: sppt.njoptkpSppt,
+          njkpSppt: sppt.njkpSppt,
+          pbbHarusDibayar: sppt.pbbYgHarusDibayarSppt,
+          statusPembayaran: sppt.statusPembayaranSppt,
+          tglTerbit: sppt.tglTerbitSppt,
+          tglJatuhTempo: sppt.tglJatuhTempo,
+        })
+        .from(sppt)
+        .where(nopWhere(sppt, input))
+        .orderBy(desc(sppt.thnPajakSppt))
+    }),
+
+  // ── Tunggakan (Unpaid SPPTs) ──
+  getTunggakan: os
+    .input(nopInput)
+    .handler(async ({ input }) => {
+      return db
+        .select({
+          thnPajakSppt: sppt.thnPajakSppt,
+          pbbHarusDibayar: sppt.pbbYgHarusDibayarSppt,
+          tglJatuhTempo: sppt.tglJatuhTempo,
+        })
+        .from(sppt)
+        .where(and(
+          nopWhere(sppt, input),
+          eq(sppt.statusPembayaranSppt, 0) // 0 = Belum Bayar
+        ))
+        .orderBy(desc(sppt.thnPajakSppt))
     }),
 })

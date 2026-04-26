@@ -22,6 +22,9 @@ import {
 } from '@/components/ui/combobox'
 import { SpopForm } from './_components/spop-form'
 import { LspopForm } from './_components/lspop-form'
+import { SpptTab } from './_components/sppt-tab'
+import { TunggakanTab } from './_components/tunggakan-tab'
+import { InfoTab } from './_components/info-tab'
 
 export default function ObjekPajakPage() {
   const orpc = useORPC()
@@ -194,33 +197,15 @@ export default function ObjekPajakPage() {
         </TabsContent>
 
         <TabsContent value="sppt">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-center h-32 text-sm text-muted-foreground border border-dashed rounded bg-muted/10">
-                Tabel riwayat penerbitan SPPT
-              </div>
-            </CardContent>
-          </Card>
+          <SpptTab initialData={data} />
         </TabsContent>
 
         <TabsContent value="tunggakan">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-center h-32 text-sm text-muted-foreground border border-dashed rounded bg-muted/10">
-                Daftar tagihan yang belum dibayar
-              </div>
-            </CardContent>
-          </Card>
+          <TunggakanTab initialData={data} />
         </TabsContent>
 
         <TabsContent value="info">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-center h-32 text-sm text-muted-foreground border border-dashed rounded bg-muted/10">
-                Informasi koordinat, foto, atau catatan
-              </div>
-            </CardContent>
-          </Card>
+          <InfoTab initialData={data} />
         </TabsContent>
       </Tabs>
     </div>

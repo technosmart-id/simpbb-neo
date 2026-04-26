@@ -75,16 +75,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: <Database />,
     },
     {
-      title: "SPOP",
-      url: "/spop",
-      icon: <FileText />,
-    },
-    {
-      title: "LSPOP",
-      url: "/lspop",
-      icon: <Building2 />,
-    },
-    {
       title: "Pelayanan",
       url: "/pelayanan",
       icon: <ClipboardList />,
@@ -103,11 +93,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Tunggakan",
       url: "/tunggakan",
       icon: <AlertTriangle />,
-    },
-    {
-      title: "Info OP",
-      url: "/info-op",
-      icon: <Search />,
     },
     {
       title: "Laporan",
