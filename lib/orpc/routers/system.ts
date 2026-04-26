@@ -3,6 +3,7 @@ import { z } from "zod"
 import mysql from 'mysql2/promise';
 import { seedProd } from "../../db/seed/prod";
 import { seedDev } from "../../db/seed/dev";
+import "drizzle-kit"; // Force Next.js standalone tracing
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const IS_DEV = process.env.NODE_ENV === "development";

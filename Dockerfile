@@ -38,6 +38,10 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Manually copy DB config and schema for runtime migrations/reset
+COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder --chown=nextjs:nodejs /app/lib/db/schema ./lib/db/schema
+
 # Copy uploads directory
 RUN mkdir -p uploads && chown nextjs:nodejs uploads
 
