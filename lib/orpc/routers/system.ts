@@ -9,8 +9,10 @@ const IS_DEV = process.env.NODE_ENV === "development";
 
 export const systemRouter = os.router({
   resetDb: os
-    .input(z.object({}))
-    .handler(async () => {
+    .input(z.object({
+      includeDevSeed: z.boolean().optional()
+    }))
+    .handler(async ({ input }) => {
       if (!DATABASE_URL) {
         throw new Error("DATABASE_URL is not set");
       }
@@ -59,7 +61,7 @@ export const systemRouter = os.router({
         console.log("[SYSTEM] Seeding production data...");
         await seedProd();
         
-        if (IS_DEV) {
+        if (IS_DEV || input.includeDevSeed) {
           console.log("[SYSTEM] Seeding development data...");
           await seedDev();
         }
