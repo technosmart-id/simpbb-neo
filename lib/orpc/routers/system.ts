@@ -3,7 +3,6 @@ import { z } from "zod"
 import mysql from 'mysql2/promise';
 import { seedProd } from "../../db/seed/prod";
 import { seedDev } from "../../db/seed/dev";
-import "drizzle-kit"; // Force Next.js standalone tracing
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const IS_DEV = process.env.NODE_ENV === "development";
@@ -46,7 +45,7 @@ export const systemRouter = os.router({
         console.log("[SYSTEM] Recreating tables via drizzle-kit push...");
         const { execSync } = await import('child_process');
         
-        execSync('drizzle-kit push --force', {
+        execSync('npx drizzle-kit push --force', {
           env: { 
             ...process.env, 
             NODE_ENV: 'development',

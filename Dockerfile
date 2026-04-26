@@ -28,9 +28,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Install drizzle-kit globally so it's always in the PATH
-RUN npm install -g drizzle-kit@0.31.9
-
 COPY --from=builder /app/public ./public
 
 # Set the correct permission for prerender cache
@@ -41,7 +38,9 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Manually copy DB config and schema for runtime migrations/reset
+# Manually copy node_modules, DB config, and schema for runtime migrations/reset
+# We need the full node_modules because standalone mode strips drizzle-kit deps
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder --chown=nextjs:nodejs /app/lib/db/schema ./lib/db/schema
 
