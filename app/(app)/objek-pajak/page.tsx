@@ -26,7 +26,7 @@ import { SpptTab } from './_components/sppt-tab'
 import { TunggakanTab } from './_components/tunggakan-tab'
 import { InfoTab } from './_components/info-tab'
 
-export default function ObjekPajakPage() {
+function ObjekPajakPageContent() {
   const orpc = useORPC()
   const [mounted, setMounted] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState('')
@@ -209,5 +209,13 @@ export default function ObjekPajakPage() {
         </TabsContent>
       </Tabs>
     </div>
+  )
+}
+
+export default function ObjekPajakPage() {
+  return (
+    <React.Suspense fallback={<div className="flex items-center justify-center h-screen"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
+      <ObjekPajakPageContent />
+    </React.Suspense>
   )
 }
