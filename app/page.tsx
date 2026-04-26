@@ -42,7 +42,7 @@ export default async function Page() {
             SIM-PBB
           </h1>
           <p className="text-base text-white/60 max-w-xs mx-auto leading-relaxed">
-            Sistem Informasi Manajemen{" "}
+            Sistem Informasi Manajemen<br />
             <span className="text-white font-medium">Pajak Bumi dan Bangunan</span>
           </p>
         </div>
