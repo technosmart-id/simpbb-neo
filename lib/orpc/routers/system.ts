@@ -45,8 +45,12 @@ export const systemRouter = os.router({
         // 2. APPLY SCHEMA VIA DRIZZLE PUSH
         console.log("[SYSTEM] Recreating tables via drizzle-kit push...");
         const { execSync } = await import('child_process');
-        execSync('npx drizzle-kit push --force', {
-          env: { ...process.env, NODE_ENV: 'development' },
+        
+        execSync('drizzle-kit push --force', {
+          env: { 
+            ...process.env, 
+            NODE_ENV: 'development',
+          },
           stdio: 'inherit'
         });
 

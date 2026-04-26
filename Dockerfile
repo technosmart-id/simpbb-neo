@@ -28,6 +28,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Install drizzle-kit globally so it's always in the PATH
+RUN npm install -g drizzle-kit@0.31.9
+
 COPY --from=builder /app/public ./public
 
 # Set the correct permission for prerender cache
