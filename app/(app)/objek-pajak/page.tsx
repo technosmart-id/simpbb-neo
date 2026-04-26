@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Search, Plus, Table2 } from 'lucide-react'
+import { Search, Plus, Table2, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
