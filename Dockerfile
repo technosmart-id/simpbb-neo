@@ -38,11 +38,12 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Manually copy node_modules, DB config, and schema for runtime migrations/reset
+# Manually copy node_modules, DB config, and the entire lib folder for runtime assets
 # We need the full node_modules because standalone mode strips drizzle-kit deps
+# We need the lib folder for Casbin models and other runtime file access
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
-COPY --from=builder --chown=nextjs:nodejs /app/lib/db/schema ./lib/db/schema
+COPY --from=builder --chown=nextjs:nodejs /app/lib ./lib
 
 # Copy uploads directory
 RUN mkdir -p uploads && chown nextjs:nodejs uploads
