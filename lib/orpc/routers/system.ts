@@ -10,7 +10,7 @@ const IS_DEV = process.env.NODE_ENV === "development" || process.env.APP_ENV ===
 export const systemRouter = os.router({
   resetDb: os
     .input(z.object({
-      includeDevSeed: z.boolean().optional()
+      includeDevSeed: z.boolean().optional().default(true)
     }))
     .handler(async ({ input }) => {
       console.log(`[DEBUG] NODE_ENV: ${process.env.NODE_ENV}, APP_ENV: ${process.env.APP_ENV}, IS_DEV: ${IS_DEV}, includeDevSeed: ${input.includeDevSeed}`);
