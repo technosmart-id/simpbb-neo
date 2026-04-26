@@ -13,6 +13,8 @@ export const systemRouter = os.router({
       includeDevSeed: z.boolean().optional()
     }))
     .handler(async ({ input }) => {
+      console.log(`[DEBUG] NODE_ENV: ${process.env.NODE_ENV}, APP_ENV: ${process.env.APP_ENV}, IS_DEV: ${IS_DEV}, includeDevSeed: ${input.includeDevSeed}`);
+      
       if (!DATABASE_URL) {
         throw new Error("DATABASE_URL is not set");
       }
