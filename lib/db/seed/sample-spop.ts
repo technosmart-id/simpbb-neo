@@ -19,12 +19,27 @@ import {
   sppt,
   pembayaranSppt,
   fasilitas,
+  datJpb2,
+  datJpb3,
+  datJpb4,
+  datJpb5,
+  datJpb6,
+  datJpb7,
+  datJpb8,
+  datJpb9,
+  datJpb12,
+  datJpb13,
+  datJpb14,
+  datJpb15,
+  datJpb16,
 } from "@/lib/db/schema";
 
+import { randNumber } from "@ngneat/falso";
 import { getBaseWilayahData, getRandomRegion } from "./factories/wilayah";
 import { createSubjekPajak } from "./factories/subjek-pajak";
 import { createSpop } from "./factories/spop";
 import { createDatOpBangunan, createFasilitasBangunan } from "./factories/bangunan";
+import { createJpbData } from "./factories/jpb";
 import { createSppt } from "./factories/sppt";
 import { createPembayaranSppt } from "./factories/pembayaran";
 
@@ -60,6 +75,9 @@ export async function seedSampleSpop() {
   const fasBangunans: any[] = [];
   const sppts: any[] = [];
   const pembayarans: any[] = [];
+  const jpbDataMap: Record<string, any[]> = {
+    '02': [], '03': [], '04': [], '05': [], '06': [], '07': [], '08': [], '09': [], '12': [], '13': [], '14': [], '15': [], '16': []
+  };
 
   for (let i = 0; i < 100; i++) {
     const subjek = createSubjekPajak();
@@ -69,14 +87,30 @@ export async function seedSampleSpop() {
     const s = createSpop(subjek.subjekPajakId!, region, i + 1);
     spops.push(s);
 
-    // 50% chance of having a building
+    // 50% chance of having buildings
     if (Math.random() > 0.5) {
-      const bng = createDatOpBangunan(s, 1);
-      bangunans.push(bng);
+      const bngCount = randNumber({ min: 1, max: 3 });
+      for (let b = 1; b <= bngCount; b++) {
+        const bng = createDatOpBangunan(s, b);
+        bangunans.push(bng);
 
-      // 30% chance of having a facility
-      if (Math.random() > 0.7) {
-        fasBangunans.push(createFasilitasBangunan(s, 1, "04")); // Pagar
+        // Generate JPB-specific data
+        if (bng.kdJpb && jpbDataMap[bng.kdJpb]) {
+          const jpb = createJpbData(s, b, bng.kdJpb);
+          if (jpb) {
+            // Special case for 02 and 09 sharing the same table/structure in UI but separate in schema
+            if (bng.kdJpb === '09') {
+              jpbDataMap['09'].push({ ...jpb, klsJpb9: (jpb as any).klsJpb2 });
+            } else {
+              jpbDataMap[bng.kdJpb].push(jpb);
+            }
+          }
+        }
+
+        // 30% chance of having a facility
+        if (Math.random() > 0.7) {
+          fasBangunans.push(createFasilitasBangunan(s, b, "04")); // Pagar
+        }
       }
     }
 
@@ -103,6 +137,19 @@ export async function seedSampleSpop() {
   if (bangunans.length > 0) {
     console.log(`  🏗️  Inserting ${bangunans.length} Bangunan...`);
     await db.insert(datOpBangunan).values(bangunans).onDuplicateKeyUpdate({ set: { luasBng: sql`VALUES(LUAS_BNG)` } });
+    
+    // Insert JPB specific data
+    const jpbTables: Record<string, any> = {
+      '02': datJpb2, '03': datJpb3, '04': datJpb4, '05': datJpb5, '06': datJpb6, '07': datJpb7, '08': datJpb8, '09': datJpb9, '12': datJpb12, '13': datJpb13, '14': datJpb14, '15': datJpb15, '16': datJpb16
+    };
+    
+    for (const [kdJpb, table] of Object.entries(jpbTables)) {
+      const data = jpbDataMap[kdJpb];
+      if (data && data.length > 0) {
+        console.log(`  🏠 Inserting ${data.length} records for JPB ${kdJpb}...`);
+        await db.insert(table).values(data).onDuplicateKeyUpdate({ set: { noBng: sql`VALUES(NO_BNG)` } });
+      }
+    }
   }
 
   if (fasBangunans.length > 0) {

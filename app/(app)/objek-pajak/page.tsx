@@ -55,8 +55,21 @@ export default function ObjekPajakPage() {
     }
   }
 
-  const handleSearch = async () => {
-    // Keep for compatibility or if needed manually
+  const refreshData = async (nop?: any) => {
+    const target = nop || data
+    if (!target) return
+    
+    setLoading(true)
+    try {
+      const res = await orpcClient.objekPajak.getByNop(target)
+      if (res) {
+        setData(res)
+      }
+    } catch (err) {
+      console.error("Refresh failed:", err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -142,14 +155,14 @@ export default function ObjekPajakPage() {
       <Tabs defaultValue="bumi">
         <TabsList>
           <TabsTrigger value="bumi">Bumi</TabsTrigger>
-          <TabsTrigger value="bangunan">Bangunan</TabsTrigger>
-          <TabsTrigger value="sppt">SPPT</TabsTrigger>
-          <TabsTrigger value="tunggakan">Tunggakan</TabsTrigger>
-          <TabsTrigger value="info">Info</TabsTrigger>
+          <TabsTrigger value="bangunan" disabled={!data}>Bangunan</TabsTrigger>
+          <TabsTrigger value="sppt" disabled={!data}>SPPT</TabsTrigger>
+          <TabsTrigger value="tunggakan" disabled={!data}>Tunggakan</TabsTrigger>
+          <TabsTrigger value="info" disabled={!data}>Info</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bumi">
-          <SpopForm key={data ? formatNop(data) : 'new'} initialData={data} onSaveSuccess={handleSearch} />
+          <SpopForm key={data ? formatNop(data) : 'new'} initialData={data} onSaveSuccess={refreshData} />
         </TabsContent>
 
         <TabsContent value="bangunan">
