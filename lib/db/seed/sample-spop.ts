@@ -55,16 +55,8 @@ export async function seedSampleSpop() {
   await db.insert(refKecamatan).values(kecamatans);
   await db.insert(refKelurahan).values(kelurahans);
 
-  // 2. Master Fasilitas
-  console.log("  🔧 Seeding master fasilitas...");
-  const sampleFasilitas = [
-    { kdFasilitas: "01", nmFasilitas: "AC SENTRAL", satuanFasilitas: "M2", nilaiFasilitas: "500000" },
-    { kdFasilitas: "02", nmFasilitas: "LIFT PENUMPANG", satuanFasilitas: "UNIT", nilaiFasilitas: "150000000" },
-    { kdFasilitas: "03", nmFasilitas: "ESKALATOR", satuanFasilitas: "UNIT", nilaiFasilitas: "120000000" },
-    { kdFasilitas: "04", nmFasilitas: "PAGAR", satuanFasilitas: "M", nilaiFasilitas: "200000" },
-    { kdFasilitas: "05", nmFasilitas: "LAPANGAN TENIS", satuanFasilitas: "M2", nilaiFasilitas: "300000" },
-  ];
-  await db.insert(fasilitas).values(sampleFasilitas);
+  // 2. Master Fasilitas - SKIPPED (Already seeded by seedProd)
+  console.log("  🔧 Master fasilitas already seeded by production seeder.");
 
   // 3. Generate Core Data
   console.log("  🚀 Generating 100 SPOP records and relations...");
