@@ -58,6 +58,20 @@ export const systemRouter = os.router({
         console.log("[SYSTEM] Tables recreated.");
 
         // 3. SEED DATA
+        const logs: string[] = [];
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        // Capture logs to return to UI
+        console.log = (...args) => {
+          logs.push(args.map(a => String(a)).join(" "));
+          originalLog.apply(console, args);
+        };
+        console.error = (...args) => {
+          logs.push("ERROR: " + args.map(a => String(a)).join(" "));
+          originalError.apply(console, args);
+        };
+
         try {
           console.log("[SYSTEM] Seeding production data...");
           await seedProd();
@@ -70,14 +84,21 @@ export const systemRouter = os.router({
           }
         } catch (seedError: any) {
           console.error("[SYSTEM] Seeding failed:", seedError);
-          // Don't throw yet, let's see if we can return a partial success or specific error
-          throw new Error(`Tables recreated but seeding failed: ${seedError.message}`);
+          // Restore original logs before throwing
+          console.log = originalLog;
+          console.error = originalError;
+          throw new Error(`Tables recreated but seeding failed: ${seedError.message}. Logs: ${logs.join("\\n")}`);
+        } finally {
+          // Restore original logs
+          console.log = originalLog;
+          console.error = originalError;
         }
 
         console.log("[SYSTEM] Database reset and seeded successfully.");
         return { 
           success: true, 
-          message: "Database reset and seeded successfully" 
+          message: "Database reset and seeded successfully",
+          logs: logs
         }
       } catch (error: any) {
         console.error("[SYSTEM] Database reset failed:", error);
