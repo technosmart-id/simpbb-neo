@@ -1,152 +1,257 @@
-# Objek Pajak API Documentation
+# 🚀 SimPBB / Traxia API Documentation
 
-Selamat datang, para pejuang kode! Dokumentasi ini dibuat khusus untuk mempermudah kalian memahami bagaimana sistem **Traxia/SimPBB** mengelola data Objek Pajak (NOP). 
+Selamat datang di pusat komando data **SimPBB (Traxia)**. Dokumentasi ini dirancang untuk para engineer yang ingin berinteraksi dengan core system manajemen Pajak Bumi dan Bangunan secara efisien dan *type-safe*.
 
-Sistem ini menggunakan **oRPC**, yang berarti semua endpoint sudah type-safe. 
-
-## Base Configuration
-
-- **Base URL**: `https://simpbb.technosmart.id/api/rpc`
-- **Protocol**: oRPC (Over HTTP POST)
-- **Status**: **PUBLIC** (Tidak memerlukan login untuk router yang dijelaskan di bawah ini).
+Sistem ini menggunakan **oRPC**, sebuah protokol RPC modern yang memastikan integritas data antara server dan client. Meskipun dioptimalkan untuk TypeScript, Anda tetap bisa mengaksesnya menggunakan `fetch` atau `curl` standar.
 
 ---
 
-## HTTP Protocol Details
+## 🛠️ Base Configuration
 
-Meskipun kalian disarankan menggunakan client `useORPC`, kalian tetap bisa memanggil API ini menggunakan `fetch` atau `curl` standar. 
+| Parameter | Value |
+| :--- | :--- |
+| **Base URL** | `https://simpbb.technosmart.id/api/rpc` |
+| **Protocol** | oRPC (Over HTTP POST) |
+| **Auth Strategy** | PUBLIC (Untuk router di bawah ini) |
+| **Content-Type** | `application/json` |
 
-### Aturan Main:
-1. **HTTP Method**: Selalu gunakan **POST**.
-2. **Content-Type**: Harus `application/json`.
-3. **URL Pattern**: `https://simpbb.technosmart.id/api/rpc/[RouterName]/[ProcedureName]`
-4. **Request Body**: Input harus dibungkus dalam key `"json"`.
-5. **Response Body**: Data hasil akan dibungkus dalam key `"json"`.
+---
+
+## 📡 Protocol Specification
+
+Setiap request wajib mengikuti struktur wrapper oRPC:
+
+### Request Wrapper
+```json
+{
+  "json": {
+    "param1": "value",
+    "param2": 123
+  }
+}
+```
+
+### Response Wrapper
+```json
+{
+  "json": {
+    "data": [...],
+    "message": "Success"
+  }
+}
+```
 
 ---
 
 ## 🏗️ Objek Pajak Router (`objekPajak`)
 
-Router utama untuk mengelola data SPOP (Surat Pemberitahuan Objek Pajak).
+Router utama untuk pengelolaan data SPOP (Surat Pemberitahuan Objek Pajak) dan Subjek Pajak (WP).
 
-### `search`
-Mencari NOP atau Nama Wajib Pajak untuk fitur autocompletion.
-- **Method**: `POST`
+### 1. `search`
+Mencari NOP atau Nama Wajib Pajak untuk autocompletion UI.
 - **Path**: `/api/rpc/objekPajak/search`
 - **Input**: `{ "json": { "query": string, "limit"?: number } }`
-- **Example**:
+
+**Example (cURL):**
 ```bash
 curl -X POST https://simpbb.technosmart.id/api/rpc/objekPajak/search \
   -H "Content-Type: application/json" \
-  -d '{"json": {"query": "ARIEFAN"}}'
+  -d '{"json": {"query": "BUDI EMBER", "limit": 5}}'
 ```
 
-### `listDetails`
-Menampilkan daftar NOP dengan detail luas bumi dan bangunan.
-- **Method**: `POST`
+### 2. `listDetails`
+Menampilkan daftar NOP dengan agregasi luas bumi dan bangunan. Sangat berguna untuk tabel utama.
 - **Path**: `/api/rpc/objekPajak/listDetails`
-- **Input**: `{ "json": { "kdPropinsi"?: string, "kdDati2"?: string, "limit": number, "offset": number } }`
-- **Example**:
+- **Input**: `{ "json": { "kdPropinsi"?: string, "kdDati2"?: string, "limit": number, "offset": number, "search"?: string } }`
+
+**Example (cURL):**
 ```bash
 curl -X POST https://simpbb.technosmart.id/api/rpc/objekPajak/listDetails \
   -H "Content-Type: application/json" \
-  -d '{"json": {"limit": 10, "offset": 0}}'
+  -d '{"json": {"kdPropinsi": "32", "limit": 10, "offset": 0}}'
 ```
 
-### `getByNop`
-Mengambil data lengkap satu NOP.
-- **Method**: `POST`
+### 3. `getByNop`
+Mengambil profil lengkap satu NOP, termasuk data Subjek Pajak dan status keanggotaan (Induk/Anggota).
 - **Path**: `/api/rpc/objekPajak/getByNop`
-- **Input**: `{ "json": { "kdPropinsi": "32", "kdDati2": "04", ... } }`
-- **Example**:
+- **Input**: `NOP_OBJECT` (Lihat [Format NOP](#format-nop))
+
+**Example (cURL):**
 ```bash
 curl -X POST https://simpbb.technosmart.id/api/rpc/objekPajak/getByNop \
   -H "Content-Type: application/json" \
   -d '{"json": {"kdPropinsi":"32","kdDati2":"04","kdKecamatan":"010","kdKelurahan":"001","kdBlok":"001","noUrut":"0001","kdJnsOp":"0"}}'
 ```
 
-### `save`
-Menyimpan atau memperbarui data SPOP dan Subjek Pajak.
-- **Method**: `POST`
+### 4. `save` (Upsert)
+Menyimpan atau memperbarui data SPOP dan Subjek Pajak dalam satu transaksi.
 - **Path**: `/api/rpc/objekPajak/save`
-- **Input**: `{ "json": { "spop": {...}, "subjekPajak": {...} } }`
+- **Input**: `{ "json": { "spop": {...}, "subjekPajak": {...}, "anggota"?: {...} } }`
+
+**Example (cURL):**
+```bash
+curl -X POST https://simpbb.technosmart.id/api/rpc/objekPajak/save \
+  -H "Content-Type: application/json" \
+  -d '{
+    "json": {
+      "spop": {
+        "kdPropinsi": "32", "kdDati2": "04", "kdKecamatan": "010", "kdKelurahan": "001", "kdBlok": "001", "noUrut": "0001", "kdJnsOp": "0",
+        "subjekPajakId": "32040100010010001",
+        "jalanOp": "JL. KENANGAN PAHIT NO. 45",
+        "luasBumi": 250,
+        "nilaiSistemBumi": 500000000,
+        "kdStatusWp": "1",
+        "jnsBumi": "1",
+        "jnsTransaksiOp": "1"
+      },
+      "subjekPajak": {
+        "subjekPajakId": "32040100010010001",
+        "nmWp": "BUDI EMBER BOCOR",
+        "jalanWp": "JL. EMBER BOCOR NO. 12",
+        "statusPekerjaanWp": "1"
+      }
+    }
+  }'
+```
+
+### 5. `getSpptHistory`
+Melihat histori tagihan SPPT dari tahun ke tahun untuk satu NOP.
+- **Path**: `/api/rpc/objekPajak/getSpptHistory`
+- **Input**: `NOP_OBJECT`
+
+### 6. `getTunggakan`
+Mengambil daftar SPPT yang belum lunas (status 0).
+- **Path**: `/api/rpc/objekPajak/getTunggakan`
+- **Input**: `NOP_OBJECT`
 
 ---
 
 ## 🏢 LSPOP Router (`lspop`)
 
-Mengelola data Bangunan.
+Manajemen data bangunan (Lampiran SPOP).
 
-### `listByNop`
-Mengambil semua daftar bangunan di satu NOP.
-- **Method**: `POST`
+### 1. `listByNop`
+Mengambil semua daftar bangunan yang terdaftar pada satu NOP beserta detail JPB-nya.
 - **Path**: `/api/rpc/lspop/listByNop`
-- **Input**: `{ "json": { "kdPropinsi": "32", ... } }`
-- **Example**:
-```bash
-curl -X POST https://simpbb.technosmart.id/api/rpc/lspop/listByNop \
-  -H "Content-Type: application/json" \
-  -d '{"json": {"kdPropinsi":"32","kdDati2":"04","kdKecamatan":"010","kdKelurahan":"001","kdBlok":"001","noUrut":"0001","kdJnsOp":"0"}}'
-```
+- **Input**: `NOP_OBJECT`
+
+### 2. `getBuilding`
+Detail spesifik satu bangunan.
+- **Path**: `/api/rpc/lspop/getBuilding`
+- **Input**: `NOP_OBJECT` + `"noBng": number`
+
+### 3. `listFasilitas`
+Daftar fasilitas pada satu bangunan (AC, Lift, Kolam Renang, dll).
+- **Path**: `/api/rpc/lspop/listFasilitas`
+- **Input**: `NOP_OBJECT` + `"noBng": number`
 
 ---
 
 ## 🗺️ Wilayah Router (`wilayah`)
 
-Helper untuk dropdown wilayah.
+Helper untuk data referensi wilayah geografis.
 
-### `listPropinsi`
-- **Method**: `POST`
+### 1. `listPropinsi`
 - **Path**: `/api/rpc/wilayah/listPropinsi`
 - **Input**: `{ "json": {} }`
-- **Example**:
-```bash
-curl -X POST https://simpbb.technosmart.id/api/rpc/wilayah/listPropinsi \
-  -H "Content-Type: application/json" \
-  -d '{"json": {}}'
-```
 
-### `listDati2`
-- **Method**: `POST`
+### 2. `listDati2` (Kabupaten/Kota)
 - **Path**: `/api/rpc/wilayah/listDati2`
 - **Input**: `{ "json": { "kdPropinsi": "32" } }`
+
+### 3. `listKecamatan`
+- **Path**: `/api/rpc/wilayah/listKecamatan`
+- **Input**: `{ "json": { "kdPropinsi": "32", "kdDati2": "04" } }`
+
+### 4. `listKelurahan`
+- **Path**: `/api/rpc/wilayah/listKelurahan`
+- **Input**: `{ "json": { "kdPropinsi": "32", "kdDati2": "04", "kdKecamatan": "010" } }`
+
+### 5. `listBlok`
+Mengambil daftar Blok yang tersedia di suatu Kelurahan.
+- **Path**: `/api/rpc/wilayah/listBlok`
+- **Input**: `{ "json": { "kdPropinsi": "32", "kdDati2": "04", "kdKecamatan": "010", "kdKelurahan": "001" } }`
 
 ---
 
 ## 💰 SPPT Router (`sppt`)
 
-Histori tagihan pajak.
+Akses ke data tagihan dan histori pembayaran pajak.
 
-### `listByNop`
-- **Method**: `POST`
+### 1. `listByNop`
+Histori tagihan pajak untuk satu NOP dari tahun ke tahun.
 - **Path**: `/api/rpc/sppt/listByNop`
-- **Input**: `{ "json": { "kdPropinsi": "32", ... } }`
+- **Input**: `NOP_OBJECT`
+
+### 2. `get`
+Detail tagihan satu tahun pajak tertentu.
+- **Path**: `/api/rpc/sppt/get`
+- **Input**: `NOP_OBJECT` + `"thnPajakSppt": number`
+
+### 3. `list`
+Pencarian SPPT massal dengan filter tahun, wilayah, atau status bayar.
+- **Path**: `/api/rpc/sppt/list`
+- **Input**: `{ "json": { "thnPajak": 2024, "kdPropinsi": "32", "statusPembayaran": "0", "limit": 20, "offset": 0 } }`
 
 ---
 
-## 💡 Contoh Standard Fetch (JS/TS)
+## 🔑 Helper & ID Generators
 
-```javascript
-const response = await fetch('https://simpbb.technosmart.id/api/rpc/objekPajak/search', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    json: {
-      query: "ARIEFAN",
-      limit: 10
-    }
-  })
-});
-const { json: data } = await response.json();
-console.log(data); // Hasil array ada di sini
+Endpoint untuk membantu pengisian formulir data baru.
+
+### 1. `getNextNoUrut`
+Mendapatkan nomor urut NOP berikutnya yang tersedia di satu Blok.
+- **Path**: `/api/rpc/objekPajak/getNextNoUrut`
+- **Input**: `{ "json": { "kdPropinsi": "32", "kdDati2": "04", "kdKecamatan": "010", "kdKelurahan": "001", "kdBlok": "001" } }`
+
+### 2. `getNextNoFormulir`
+Mendapatkan nomor formulir SPOP berikutnya untuk tahun berjalan.
+- **Path**: `/api/rpc/objekPajak/getNextNoFormulir`
+- **Input**: `{ "json": {} }`
+
+### 3. `nextNoBng`
+Mendapatkan nomor bangunan berikutnya untuk satu NOP.
+- **Path**: `/api/rpc/lspop/nextNoBng`
+- **Input**: `NOP_OBJECT`
+
+
+## 📐 Format Data (Penting!)
+
+### Format NOP
+Hampir semua endpoint membutuhkan `NOP_OBJECT` sebagai input. Pastikan format string tepat (leading zero wajib ada).
+
+```json
+{
+  "kdPropinsi": "32",
+  "kdDati2": "04",
+  "kdKecamatan": "010",
+  "kdKelurahan": "001",
+  "kdBlok": "001",
+  "noUrut": "0001",
+  "kdJnsOp": "0"
+}
 ```
 
+### Tips Implementasi
+- **Leading Zeros**: Selalu kirim kode wilayah sebagai string dengan jumlah digit yang sesuai (misal: `"001"` bukan `"1"`).
+- **Numbers**: Luas bumi, luas bangunan, dan nilai (NJOP) dikirim sebagai tipe data `number`.
+
 ---
 
-## Aturan Penting (Jangan Dilanggar!)
+## 💡 Contoh Implementasi Fetch (TS/JS)
 
-1. **JSON Wrapper**: Semua input wajib dibungkus dalam field `json`. Respon juga akan dibungkus dalam field `json`.
-2. **Format NOP**: Gunakan 18 digit angka murni (tanpa titik/strip) dalam input string.
-3. **Data Types**: Pastikan angka dikirim sebagai `number`, bukan string yang berisi angka.
+```typescript
+const fetchNopData = async (nop: any) => {
+  const response = await fetch('https://simpbb.technosmart.id/api/rpc/objekPajak/getByNop', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ json: nop })
+  });
+  
+  const result = await response.json();
+  return result.json; // Akses data di dalam field json
+};
+```
 
-Selamat coding, jangan lupa ngopi!
+Selamat membangun masa depan pajak yang lebih transparan! Jika ada kendala, hubungi tim senior engineer di sebelah Anda. ☕
+
