@@ -66,12 +66,12 @@ export async function seedProd() {
 		console.log(`  ✓ Created admin user (${ADMIN_EMAIL})`);
 	} else {
 		console.log(`  ✓ Admin user exists (${ADMIN_EMAIL})`);
-		// Update password hash to correct format
+		// Update password hash to correct format if needed
 		const passwordHash = await hashPassword(ADMIN_PASSWORD);
 		await db.update(account)
 			.set({ password: passwordHash, updatedAt: new Date() })
 			.where(eq(account.userId, userId));
-		console.log(`  ✓ Updated admin password hash`);
+		console.log(`  ✓ Synced admin password hash`);
 	}
 
 	// Default Org - always ensure admin is a member

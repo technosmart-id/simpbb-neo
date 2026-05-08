@@ -56,38 +56,38 @@ export function TunggakanTab({ initialData }: TunggakanTabProps) {
     <div className="space-y-4">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-destructive/5 border-destructive/20 shadow-none">
+        <Card className="bg-destructive/5 dark:bg-destructive/10 border-destructive/20 shadow-none ring-1 ring-destructive/10">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2 rounded-lg bg-destructive/10 text-destructive">
+            <div className="p-2 rounded-lg bg-destructive/10 text-destructive shadow-sm">
               <AlertCircle className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Tunggakan</p>
-              <p className="text-xl font-bold text-destructive">Rp {totalPokok.toLocaleString()}</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Total Tunggakan</p>
+              <p className="text-xl font-black text-destructive tracking-tight">Rp {totalPokok.toLocaleString()}</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-primary/5 border-primary/20 shadow-none">
+        <Card className="bg-primary/5 dark:bg-primary/10 border-primary/20 shadow-none ring-1 ring-primary/10">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+            <div className="p-2 rounded-lg bg-primary/10 text-primary shadow-sm">
               <Calendar className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Tahun Tertua</p>
-              <p className="text-xl font-bold text-foreground">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Tahun Tertua</p>
+              <p className="text-xl font-black text-foreground tracking-tight">
                 {tunggakan && tunggakan.length > 0 ? Math.min(...tunggakan.map(t => Number(t.thnPajakSppt))) : '—'}
               </p>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-amber-500/5 border-amber-500/20 shadow-none">
+        <Card className="bg-amber-500/5 dark:bg-amber-500/10 border-amber-500/20 shadow-none ring-1 ring-amber-500/10">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600">
+            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-500 shadow-sm">
               <TrendingUp className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Jumlah Item</p>
-              <p className="text-xl font-bold text-foreground">{tunggakan?.length || 0} Tahun</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Jumlah Item</p>
+              <p className="text-xl font-black text-foreground tracking-tight">{tunggakan?.length || 0} Tahun</p>
             </div>
           </CardContent>
         </Card>

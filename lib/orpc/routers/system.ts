@@ -49,15 +49,20 @@ export const systemRouter = os.router({
         console.log("[SYSTEM] Recreating tables via drizzle-kit push...");
         const { execSync } = await import('child_process');
         
-        execSync('npx drizzle-kit push --force', {
-          env: { 
-            ...process.env, 
-            NODE_ENV: 'development',
-          },
-          stdio: 'inherit'
-        });
-
-        console.log("[SYSTEM] Tables recreated.");
+        try {
+          execSync('npx drizzle-kit push --force', {
+            env: { 
+              ...process.env, 
+              NODE_ENV: 'development',
+            },
+            stdio: 'pipe', // Capture output
+            encoding: 'utf-8'
+          });
+          console.log("[SYSTEM] Tables recreated successfully.");
+        } catch (pushError: any) {
+          console.error("[SYSTEM] Drizzle push failed:", pushError.stdout || pushError.message);
+          throw new Error(`Failed to recreate tables: ${pushError.message}`);
+        }
 
         // 3. SEED DATA
         const logs: string[] = [];

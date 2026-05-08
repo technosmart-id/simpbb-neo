@@ -39,7 +39,7 @@ export const kelasTanah = mysqlTable("kelas_tanah", {
   nilaiMaxTanah: decimal("NILAI_MAX_TANAH", { precision: 15, scale: 2 }),
   nilaiPerM2Tanah: decimal("NILAI_PER_M2_TANAH", { precision: 15, scale: 2 }),
 }, (table) => [
-  primaryKey({ columns: [table.kdKlsTanah, table.thnAwalKlsTanah, table.thnAkhirKlsTanah] }),
+  primaryKey({ name: "pk_kelas_tanah", columns: [table.kdKlsTanah, table.thnAwalKlsTanah, table.thnAkhirKlsTanah] }),
 ]);
 
 // ─── tarif ────────────────────────────────────────────────────────

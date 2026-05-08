@@ -57,68 +57,72 @@ export function InfoTab({ initialData }: InfoTabProps) {
       </div>
       <div className="grid gap-4 lg:grid-cols-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
       {/* OP Info */}
-      <Card>
+      <Card className="dark:bg-slate-900/40 dark:backdrop-blur-sm border-muted-foreground/10">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <MapPin className="h-4 w-4" />
+          <CardTitle className="flex items-center gap-2 text-base font-black tracking-tight uppercase">
+            <MapPin className="h-4 w-4 text-primary" />
             Data Objek Pajak
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <div className="flex justify-between"><span className="text-muted-foreground">NOP</span><NopDisplay parts={initialData} /></div>
-          <div className="flex justify-between"><span className="text-muted-foreground">Alamat OP</span><span>{initialData.jalanOp}</span></div>
-          <div className="flex justify-between"><span className="text-muted-foreground">Luas Bumi</span><span>{Number(initialData.luasBumi).toLocaleString('id-ID')} m²</span></div>
-          <div className="flex justify-between"><span className="text-muted-foreground">NJOP Bumi</span><span className="font-mono">{formatRupiah(initialData.nilaiSistemBumi)}</span></div>
-          <div className="flex justify-between"><span className="text-muted-foreground">Jenis Bumi</span><span>{initialData.jnsBumi === '1' ? 'TANAH + BNG' : 'KAVLING'}</span></div>
-          <div className="flex justify-between"><span className="text-muted-foreground">ZNT</span><span>{initialData.kdZnt}</span></div>
+        <CardContent className="space-y-3 text-sm">
+          <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">NOP</span><NopDisplay parts={initialData} /></div>
+          <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Alamat OP</span><span className="font-semibold text-right">{initialData.jalanOp}</span></div>
+          <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Luas Bumi</span><span className="font-semibold">{Number(initialData.luasBumi).toLocaleString('id-ID')} <span className="text-[10px] font-normal text-muted-foreground ml-0.5">m²</span></span></div>
+          <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">NJOP Bumi</span><span className="font-mono font-bold text-primary">{formatRupiah(initialData.nilaiSistemBumi)}</span></div>
+          <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Jenis Bumi</span><span className="font-semibold">{initialData.jnsBumi === '1' ? 'TANAH + BNG' : 'KAVLING'}</span></div>
+          <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">ZNT</span><span className="font-black text-primary">{initialData.kdZnt}</span></div>
         </CardContent>
       </Card>
 
       {/* WP Info */}
-      <Card>
+      <Card className="dark:bg-slate-900/40 dark:backdrop-blur-sm border-muted-foreground/10">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <User className="h-4 w-4" />
+          <CardTitle className="flex items-center gap-2 text-base font-black tracking-tight uppercase">
+            <User className="h-4 w-4 text-primary" />
             Data Wajib Pajak
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm">
+        <CardContent className="space-y-3 text-sm">
           {initialData.subjekPajak ? (
             <>
-              <div className="flex justify-between"><span className="text-muted-foreground">Nama</span><span>{initialData.subjekPajak.nmWp}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Alamat</span><span>{initialData.subjekPajak.jalanWp}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">NPWP</span><span>{initialData.subjekPajak.npwp ?? '-'}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">ID Subjek</span><span className="text-xs text-muted-foreground">{initialData.subjekPajak.subjekPajakId}</span></div>
+              <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Nama</span><span className="font-bold uppercase tracking-tight">{initialData.subjekPajak.nmWp}</span></div>
+              <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Alamat</span><span className="font-semibold text-right">{initialData.subjekPajak.jalanWp}</span></div>
+              <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">NPWP</span><span className="font-mono font-bold">{initialData.subjekPajak.npwp ?? '-'}</span></div>
+              <div className="flex justify-between items-center"><span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">ID Subjek</span><span className="text-[10px] font-mono text-muted-foreground/70">{initialData.subjekPajak.subjekPajakId}</span></div>
             </>
           ) : (
-            <p className="text-muted-foreground">Data WP tidak ditemukan</p>
+            <p className="text-muted-foreground italic text-xs py-4 text-center">Data WP tidak ditemukan</p>
           )}
         </CardContent>
       </Card>
 
       {/* Bangunan */}
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Building2 className="h-4 w-4" />
+      <Card className="lg:col-span-2 dark:bg-slate-900/40 dark:backdrop-blur-sm border-muted-foreground/10 overflow-hidden">
+        <CardHeader className="bg-muted/30 dark:bg-muted/10 border-b border-border/50">
+          <CardTitle className="flex items-center gap-2 text-base font-black tracking-tight uppercase">
+            <Building2 className="h-4 w-4 text-primary" />
             Data Bangunan ({buildings?.length ?? 0})
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {buildings && buildings.length > 0 ? (
-            <div className="space-y-2">
+            <div className="divide-y divide-border/50">
               {buildings.map((b) => (
-                <div key={b.noBng} className="flex justify-between text-sm border-b pb-2 last:border-0">
+                <div key={b.noBng} className="flex justify-between items-center p-4 hover:bg-muted/20 dark:hover:bg-muted/5 transition-colors">
                   <div className="flex flex-col">
-                    <span className="font-medium">Bangunan #{b.noBng} — {b.luasBng} m²</span>
-                    <span className="text-xs text-muted-foreground uppercase">{b.kdJpb} | Dibangun {b.thnDibangunBng || '—'}</span>
+                    <span className="font-bold tracking-tight">Bangunan #{b.noBng} — {b.luasBng} <span className="text-[10px] font-normal text-muted-foreground">m²</span></span>
+                    <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest opacity-70 mt-0.5">{b.kdJpb} | Dibangun {b.thnDibangunBng || '—'}</span>
                   </div>
-                  <span className="font-mono font-bold text-primary">{formatRupiah(b.nilaiSistemBng)}</span>
+                  <span className="font-mono font-bold text-primary bg-primary/5 px-2 py-1 rounded border border-primary/10 shadow-inner">
+                    {formatRupiah(b.nilaiSistemBng)}
+                  </span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground italic">Tidak ada bangunan terdaftar</p>
+            <div className="p-8 text-center">
+              <p className="text-sm text-muted-foreground italic font-medium opacity-50">Tidak ada bangunan terdaftar</p>
+            </div>
           )}
         </CardContent>
       </Card>
