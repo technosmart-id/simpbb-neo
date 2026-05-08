@@ -34,7 +34,7 @@ export const dashboardRouter = os.router({
         .from(sppt)
         .where(and(
           eq(sppt.thnPajakSppt, input.thnPajak),
-          eq(sppt.statusPembayaranSppt, "1"),
+          eq(sppt.statusPembayaranSppt, 1),
         ))
 
       const [belumBayar] = await db
@@ -42,7 +42,7 @@ export const dashboardRouter = os.router({
         .from(sppt)
         .where(and(
           eq(sppt.thnPajakSppt, input.thnPajak),
-          eq(sppt.statusPembayaranSppt, "0"),
+          eq(sppt.statusPembayaranSppt, 0),
         ))
 
       const [pelayananAktif] = await db

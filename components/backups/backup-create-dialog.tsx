@@ -23,14 +23,14 @@ export function BackupCreateDialog({ open, onOpenChange, onSuccess }: BackupCrea
 	const orpc = useORPC()
 
 	const createMutation = useMutation(orpc.backups.create.mutationOptions({
-		onSuccess: (data) => {
+		onSuccess: (data: any) => {
 			onSuccess()
 			onOpenChange(false)
 		},
 		onError: (error: Error) => {
 			console.error('Backup creation failed:', error)
 		}
-	}))
+	})) as any
 
 	const handleCreate = () => {
 		createMutation.mutate({})
@@ -72,8 +72,8 @@ export function BackupCreateDialog({ open, onOpenChange, onSuccess }: BackupCrea
 							<div className="text-center space-y-1">
 								<p className="font-medium">Backup created successfully!</p>
 								<p className="text-sm text-muted-foreground">
-									Size: {formatBytes(createMutation.data.size ?? 0)} •{" "}
-									Duration: {Math.round((createMutation.data.duration ?? 0) / 1000)}s
+									Size: {formatBytes((createMutation.data as any)?.size ?? 0)} •{" "}
+									Duration: {Math.round(((createMutation.data as any)?.duration ?? 0) / 1000)}s
 								</p>
 							</div>
 						</div>

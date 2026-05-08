@@ -23,8 +23,8 @@ type TunggakanRow = {
   kdJnsOp: string
   thnPajakSppt: number
   nmWp: string | null
-  pbbYgHarusDibayarSppt: string
-  statusPembayaranSppt: string
+  pbbYgHarusDibayarSppt: string | number
+  statusPembayaranSppt: string | number
   tglJatuhTempo: Date | string | null
 }
 

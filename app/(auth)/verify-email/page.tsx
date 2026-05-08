@@ -91,7 +91,7 @@ function VerifyEmailPageContent() {
 					<CardContent>
 						{status !== "loading" && (
 							<Button asChild className="w-full">
-								<Link href="/login">Continue to Login</Link>
+								<Link href="/sign-in">Continue to Sign In</Link>
 							</Button>
 						)}
 					</CardContent>

@@ -69,7 +69,7 @@ function ResetPasswordPageContent() {
 				toast.error(data.message || "Failed to reset password");
 			} else {
 				toast.success("Password reset successfully!");
-				router.push("/login");
+				router.push("/sign-in");
 			}
 		} catch {
 			toast.error("Failed to reset password");
@@ -175,7 +175,7 @@ function ResetPasswordPageContent() {
 								</Field>
 								<Field>
 									<Link
-										href="/login"
+										href="/sign-in"
 										className="text-sm text-muted-foreground hover:underline"
 									>
 										Back to login

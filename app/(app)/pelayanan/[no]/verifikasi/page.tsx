@@ -186,13 +186,13 @@ export default function PelayananVerifikasiPage() {
                 <div>
                   <span className="text-muted-foreground">Status Bayar:</span>{' '}
                   <span className="font-medium">
-                    {latestSppt.statusPembayaranSppt === '1' ? 'Lunas' : 'Belum Lunas'}
+                    {latestSppt.statusPembayaranSppt === 1 ? 'Lunas' : 'Belum Lunas'}
                   </span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Status Cetak:</span>{' '}
                   <span className="font-medium">
-                    {latestSppt.statusCetakSppt === '1' ? 'Sudah Dicetak' : 'Belum Dicetak'}
+                    {latestSppt.statusCetakSppt === 1 ? 'Sudah Dicetak' : 'Belum Dicetak'}
                   </span>
                 </div>
               </div>

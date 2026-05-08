@@ -33,14 +33,11 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import {
-	FileIcon,
 	ImageIcon,
 	Trash2,
-	Download,
 	ExternalLink,
 	RefreshCw,
 	FileText,
-	HardDrive,
 	Box,
 	FolderIcon,
 	ChevronRight,
@@ -64,7 +61,6 @@ export default function FileManagerPage() {
 		input: { path: currentPath }
 	}))
 	const statsQuery = useQuery(orpc.files.stats.queryOptions())
-
 	const deleteMutation = useMutation(orpc.files.delete.mutationOptions({
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: orpc.files.key() })
@@ -89,8 +85,8 @@ export default function FileManagerPage() {
 	}))
 
 	const isLoading = listQuery.isLoading || statsQuery.isLoading
-	const items = (listQuery.data ?? []).filter(item => !item.name.startsWith("."))
-	const stats = statsQuery.data ?? { totalSize: 0, fileCount: 0, limit: 100 * 1024 * 1024 * 1024 }
+	const items = (listQuery.data as FileMetadata[] ?? []).filter(item => !item.name.startsWith("."))
+	const stats = (statsQuery.data as { totalSize: number; fileCount: number; limit: number } | undefined) ?? { totalSize: 0, fileCount: 0, limit: 100 * 1024 * 1024 * 1024 }
 
 	const handleRefresh = () => {
 		listQuery.refetch()
@@ -130,11 +126,11 @@ export default function FileManagerPage() {
 					</p>
 				</div>
 				<div className="flex items-center gap-3">
-					{!statsQuery.isLoading && statsQuery.data && (
-						<StorageInfoBar 
-							totalSize={statsQuery.data.totalSize} 
-							fileCount={statsQuery.data.fileCount} 
-							variant="minimal" 
+					{!statsQuery.isLoading && (
+						<StorageInfoBar
+							totalSize={stats.totalSize}
+							fileCount={stats.fileCount}
+							variant="minimal"
 						/>
 					)}
 				</div>

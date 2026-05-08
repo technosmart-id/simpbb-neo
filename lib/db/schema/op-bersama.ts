@@ -16,7 +16,7 @@ export const datOpInduk = mysqlTable(
     ...nopColumns(),
   },
   (table) => [
-    nopPrimaryKey(table),
+    nopPrimaryKey("pk_dat_op_induk", table),
     nopForeignKey("fk_op_induk_spop", table, spop),
   ],
 );
@@ -48,7 +48,7 @@ export const datOpAnggota = mysqlTable(
     njopBngBeban: bigint("NJOP_BNG_BEBAN", { mode: "number" }),
   },
   (table) => [
-    nopPrimaryKey(table),
+    nopPrimaryKey("pk_dat_op_anggota", table),
     nopForeignKey("fk_anggota_spop", table, spop),
   ],
 );
@@ -63,7 +63,7 @@ export const datLegalitasBumi = mysqlTable(
     jnsLegalitas: varchar("JNS_LEGALITAS", { length: 50 }),
   },
   (table) => [
-    nopPrimaryKey(table),
+    nopPrimaryKey("pk_dat_legalitas_bumi", table),
     nopForeignKey("fk_legalitas_spop", table, spop),
   ],
 );

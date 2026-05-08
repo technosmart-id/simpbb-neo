@@ -1,70 +1,20 @@
-import { db } from "../index";
-import { refJnsPelayanan } from "../schema/referensi";
-import { sql } from "drizzle-orm";
+/**
+ * Seed entry point
+ * Run: npm run db:seed
+ */
+
+import { seedProd } from "./prod";
+import { seedDev } from "./dev";
+
+const IS_DEV = process.env.NODE_ENV === "development";
 
 async function main() {
-  console.log("Seed started...");
-
-  // ─── ref_jns_pelayanan ──────────────────────────────────────────
-  console.log("Seeding ref_jns_pelayanan...");
-  await db
-    .insert(refJnsPelayanan)
-    .values([
-      { kdJnsPelayanan: "01", nmJenisPelayanan: "Pendaftaran Data Baru" },
-      { kdJnsPelayanan: "02", nmJenisPelayanan: "Mutasi Objek/Subjek" },
-      { kdJnsPelayanan: "03", nmJenisPelayanan: "Pembetulan SPPT/SKP/STP" },
-      { kdJnsPelayanan: "04", nmJenisPelayanan: "Pembatalan SPPT/SKP" },
-      { kdJnsPelayanan: "05", nmJenisPelayanan: "Salinan SPPT/SKP" },
-      {
-        kdJnsPelayanan: "06",
-        nmJenisPelayanan: "Keberatan Penunjukan Wajib Pajak",
-      },
-      {
-        kdJnsPelayanan: "07",
-        nmJenisPelayanan: "Keberatan Atas Pajak Terhutang",
-      },
-      {
-        kdJnsPelayanan: "08",
-        nmJenisPelayanan: "Pengurangan Atas Besarnya Pajak Terhutang",
-      },
-      {
-        kdJnsPelayanan: "09",
-        nmJenisPelayanan: "Restitusi dan Kompensasi",
-      },
-      {
-        kdJnsPelayanan: "10",
-        nmJenisPelayanan: "Pengurangan Denda Administrasi",
-      },
-      {
-        kdJnsPelayanan: "11",
-        nmJenisPelayanan: "Penentuan Kembali Tanggal Jatuh Tempo",
-      },
-      {
-        kdJnsPelayanan: "12",
-        nmJenisPelayanan: "Penundaan Tanggal Jatuh Tempo SPOP",
-      },
-      {
-        kdJnsPelayanan: "13",
-        nmJenisPelayanan: "Pemberian Informasi PBB",
-      },
-      {
-        kdJnsPelayanan: "14",
-        nmJenisPelayanan: "Pembetulan SK Keberatan",
-      },
-      { kdJnsPelayanan: "15", nmJenisPelayanan: "Mutasi Pemecahan" },
-    ])
-    .onDuplicateKeyUpdate({
-      set: { nmJenisPelayanan: sql`VALUES(NM_JENIS_PELAYANAN)` },
-    });
-
-  console.log("  ✓ 15 jenis pelayanan seeded");
-
-  console.log("Seed finished!");
-  process.exit(0);
+	await seedProd();
+	if (IS_DEV) await seedDev();
+	process.exit(0);
 }
 
 main().catch((err) => {
-  console.error("Seed failed!");
-  console.error(err);
-  process.exit(1);
+	console.error("❌ Seed failed:", err);
+	process.exit(1);
 });

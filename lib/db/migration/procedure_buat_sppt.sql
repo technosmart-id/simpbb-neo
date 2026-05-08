@@ -1,0 +1,365 @@
+DROP PROCEDURE IF EXISTS buat_sppt_per_nop;
+
+DELIMITER //
+
+CREATE PROCEDURE buat_sppt_per_nop(
+        IN NOP VARCHAR (18),
+        IN TAHUN VARCHAR (4),
+        IN NIP_PENCETAK VARCHAR (50)
+)
+BEGIN
+  SET sql_mode := '';
+  SET @NOP := NOP ;
+  SET @TAHUN := TAHUN ;
+  SET @NIP_PENCETAK := NIP_PENCETAK ;
+  SELECT 
+    CAST(NILAI AS UNSIGNED) 
+  FROM
+    konfigurasi 
+  WHERE NAMA = 'PBB_NJOPTKP' INTO @NJOPTKP ;
+  SELECT 
+    CAST(NILAI AS UNSIGNED) 
+  FROM
+    konfigurasi 
+  WHERE NAMA = 'PBB_NJOPTKP_HANYA_UNTUK_BANGUNAN' INTO @NJOPTKP_HANYA_UNTUK_BANGUNAN ;
+  SELECT 
+    CAST(NILAI AS UNSIGNED) 
+  FROM
+    konfigurasi 
+  WHERE NAMA = 'PBB_BATAS_NJOP_TARIF_MIN' INTO @BATAS_NJOP_TARIF_MIN ;
+  SELECT 
+    CAST(NILAI AS UNSIGNED) 
+  FROM
+    konfigurasi 
+  WHERE NAMA = 'PBB_TARIF_BERSYARAT' INTO @TARIF_BERSYARAT ;
+  SELECT 
+    CAST(NILAI AS DECIMAL (5, 3)) 
+  FROM
+    konfigurasi 
+  WHERE NAMA = 'PBB_TARIF' INTO @TARIF ;
+  SELECT 
+    CAST(NILAI AS DECIMAL (5, 3)) 
+  FROM
+    konfigurasi 
+  WHERE NAMA = 'PBB_TARIF_MIN' INTO @TARIF_MIN ;
+  SELECT 
+    CAST(NILAI AS DECIMAL (5, 3)) 
+  FROM
+    konfigurasi 
+  WHERE NAMA = 'PBB_TARIF_MAX' INTO @TARIF_MAX ;
+  SELECT 
+    CAST(NILAI AS DECIMAL (5, 3)) 
+  FROM
+    konfigurasi 
+  WHERE NAMA = 'PBB_DIBAYAR_MIN' INTO @PBB_DIBAYAR_MIN ;
+  SELECT 
+    DATE(
+      CONCAT(
+        @TAHUN,
+        '-',
+        (SELECT 
+          CAST(NILAI AS CHAR) 
+        FROM
+          konfigurasi 
+        WHERE NAMA = 'PBB_JATUH_TEMPO_MONTH'),
+        '-',
+        (SELECT 
+          CAST(NILAI AS CHAR) 
+        FROM
+          konfigurasi 
+        WHERE NAMA = 'PBB_JATUH_TEMPO_DAY')
+      )
+    ) INTO @TGL_JATUH_TEMPO ;
+    
+  SELECT 
+    SUBJEK_PAJAK_ID 
+  FROM
+    spop 
+  WHERE (KD_PROPINSI = SUBSTRING(@NOP, 1, 2)) 
+    AND (KD_DATI2 = SUBSTRING(@NOP, 3, 2)) 
+    AND (KD_KECAMATAN = SUBSTRING(@NOP, 5, 3)) 
+    AND (KD_KELURAHAN = SUBSTRING(@NOP, 8, 3)) 
+    AND (KD_BLOK = SUBSTRING(@NOP, 11, 3)) 
+    AND (NO_URUT = SUBSTRING(@NOP, 14, 4)) 
+    AND (KD_JNS_OP = SUBSTRING(@NOP, 18, 1)) INTO @SUBJEK_PAJAK_ID ;
+  SELECT 
+    IF(SUM(NJOPTKP_SPPT) > 0, 0, @NJOPTKP) 
+  FROM
+    sppt 
+  WHERE THN_PAJAK_SPPT = @TAHUN 
+    AND (
+      KD_PROPINSI,
+      KD_DATI2,
+      KD_KECAMATAN,
+      KD_KELURAHAN,
+      KD_BLOK,
+      NO_URUT,
+      KD_JNS_OP
+    ) IN 
+    (SELECT 
+      KD_PROPINSI,
+      KD_DATI2,
+      KD_KECAMATAN,
+      KD_KELURAHAN,
+      KD_BLOK,
+      NO_URUT,
+      KD_JNS_OP 
+    FROM
+      spop 
+    WHERE SUBJEK_PAJAK_ID = @SUBJEK_PAJAK_ID 
+      AND NOT (
+        (KD_PROPINSI = SUBSTRING(@NOP, 1, 2)) 
+        AND (KD_DATI2 = SUBSTRING(@NOP, 3, 2)) 
+        AND (KD_KECAMATAN = SUBSTRING(@NOP, 5, 3)) 
+        AND (KD_KELURAHAN = SUBSTRING(@NOP, 8, 3)) 
+        AND (KD_BLOK = SUBSTRING(@NOP, 11, 3)) 
+        AND (NO_URUT = SUBSTRING(@NOP, 14, 4)) 
+        AND (KD_JNS_OP = SUBSTRING(@NOP, 18, 1))
+      )) INTO @NJOPTKP ;
+      
+  REPLACE INTO sppt (
+    KD_PROPINSI,
+    KD_DATI2,
+    KD_KECAMATAN,
+    KD_KELURAHAN,
+    KD_BLOK,
+    NO_URUT,
+    KD_JNS_OP,
+    THN_PAJAK_SPPT,
+    SIKLUS_SPPT,
+    NM_WP_SPPT,
+    JLN_WP_SPPT,
+    BLOK_KAV_NO_WP_SPPT,
+    RW_WP_SPPT,
+    RT_WP_SPPT,
+    KELURAHAN_WP_SPPT,
+    KOTA_WP_SPPT,
+    KD_POS_WP_SPPT,
+    NPWP_SPPT,
+    NO_PERSIL_SPPT,
+    KD_KLS_TANAH,
+    THN_AWAL_KLS_TANAH,
+    KD_KLS_BNG,
+    THN_AWAL_KLS_BNG,
+    TGL_JATUH_TEMPO_SPPT,
+    LUAS_BUMI_SPPT,
+    LUAS_BNG_SPPT,
+    NJOP_BUMI_SPPT,
+    NJOP_BNG_SPPT,
+    NJOP_SPPT,
+    NJOPTKP_SPPT,
+    NJKP_SPPT,
+    PBB_TERHUTANG_SPPT,
+    FAKTOR_PENGURANG_SPPT,
+    PBB_YG_HARUS_DIBAYAR_SPPT,
+    STATUS_PEMBAYARAN_SPPT,
+    STATUS_TAGIHAN_SPPT,
+    STATUS_CETAK_SPPT,
+    TGL_TERBIT_SPPT,
+    TGL_CETAK_SPPT,
+    NIP_PENCETAK_SPPT
+  ) 
+  SELECT 
+    KD_PROPINSI,
+    KD_DATI2,
+    KD_KECAMATAN,
+    KD_KELURAHAN,
+    KD_BLOK,
+    NO_URUT,
+    KD_JNS_OP,
+    @TAHUN THN_PAJAK_SPPT,
+    '1' SIKLUS_SPPT,
+    NM_WP,
+    JALAN_WP,
+    BLOK_KAV_NO_WP,
+    RW_WP,
+    RT_WP,
+    KELURAHAN_WP,
+    KOTA_WP,
+    KD_POS_WP,
+    NPWP,
+    NO_PERSIL,
+    KELAS_BUMI KD_KLS_TANAH,
+    2011 THN_AWAL_KLS_TANAH,
+    KELAS_BANGUNAN KD_KLS_BNG,
+    2011 THN_AWAL_KLS_BNG,
+    @TGL_JATUH_TEMPO TGL_JATUH_TEMPO_SPPT,
+    LUAS_BUMI,
+    IFNULL(LUAS_BNG, 0) LUAS_BNG,
+    @NJOP_BUMI := IFNULL(NJOP_BUMI * LUAS_BUMI * 1000, 0),
+    @NJOP_BANGUNAN := IFNULL(NJOP_BANGUNAN, 0) * IFNULL(LUAS_BNG, 0) * 1000,
+    @NJOP := (@NJOP_BUMI + @NJOP_BANGUNAN) NJOP_SPPT,
+    @NJOPTKP NJOPTKP_SPPT,
+    @NJKP := CEIL(
+      IF(
+        @NJOP - @NJOPTKP <= @BATAS_NJOP_TARIF_MIN AND IFNULL(NJOP_BUMI_BEBAN, 0) = 0,
+        @TARIF_MIN / 0.005,
+        @TARIF_MAX / 0.005
+      )
+    ) NJOPTKP_SPPT,
+    @PBB_TERHUTANG := GREATEST(
+      CEIL(((@NJOP + IFNULL(NJOP_BUMI_BEBAN,0) + IFNULL(NJOP_BNG_BEBAN,0)) - @NJOPTKP) * (@NJKP * 0.00005)),
+      0
+    ) PBB_TERHUTANG_SPPT,
+    @FAKTOR_PENGURANG := 0 FAKTOR_PENGURANG_SPPT,
+    CEIL(
+      GREATEST(
+        @PBB_TERHUTANG - @FAKTOR_PENGURANG,
+        @PBB_DIBAYAR_MIN
+      )
+    ) PBB_YG_HARUS_DIBAYAR_SPPT,
+    0 STATUS_PEMBAYARAN_SPPT,
+    0,
+    0,
+    NOW(),
+    NOW(),
+    @NIP_PENCETAK 
+  FROM
+    spop 
+    LEFT JOIN 
+      (SELECT 
+        KD_PROPINSI,
+        KD_DATI2,
+        KD_KECAMATAN,
+        KD_KELURAHAN,
+        KD_BLOK,
+        NO_URUT,
+        KD_JNS_OP,
+        SUM(LUAS_BNG) LUAS_BNG,
+        SUM(
+          IF(
+            NILAI_INDIVIDU > 0,
+            NILAI_INDIVIDU,
+            NILAI_SISTEM_BNG
+          )
+        ) NILAI_SISTEM_BNG 
+      FROM
+        dat_op_bangunan 
+      WHERE AKTIF = '1' 
+        AND (KD_PROPINSI = SUBSTRING(@NOP, 1, 2)) 
+        AND (KD_DATI2 = SUBSTRING(@NOP, 3, 2)) 
+        AND (KD_KECAMATAN = SUBSTRING(@NOP, 5, 3)) 
+        AND (KD_KELURAHAN = SUBSTRING(@NOP, 8, 3)) 
+        AND (KD_BLOK = SUBSTRING(@NOP, 11, 3)) 
+        AND (NO_URUT = SUBSTRING(@NOP, 14, 4)) 
+        AND (KD_JNS_OP = SUBSTRING(@NOP, 18, 1)) 
+      GROUP BY KD_PROPINSI,
+        KD_DATI2,
+        KD_KECAMATAN,
+        KD_KELURAHAN,
+        KD_BLOK,
+        NO_URUT,
+        KD_JNS_OP) dat_op_bangunan USING (
+        KD_PROPINSI,
+        KD_DATI2,
+        KD_KECAMATAN,
+        KD_KELURAHAN,
+        KD_BLOK,
+        NO_URUT,
+        KD_JNS_OP
+      ) 
+    LEFT JOIN dat_subjek_pajak USING (SUBJEK_PAJAK_ID) 
+    LEFT JOIN kelas_bumi 
+      ON GREATEST(
+        NILAI_SISTEM_BUMI / LUAS_BUMI / 1000,
+        0.01
+      ) BETWEEN kelas_bumi.NILAI_MINIMUM + 0.01 
+      AND kelas_bumi.NILAI_MAKSIMUM 
+    LEFT JOIN kelas_bangunan 
+      ON GREATEST(NILAI_SISTEM_BNG / LUAS_BNG / 1000, 0.01) BETWEEN kelas_bangunan.NILAI_MINIMUM + 0.01 
+      AND kelas_bangunan.NILAI_MAKSIMUM 
+    LEFT JOIN dat_op_anggota USING(
+                KD_PROPINSI,
+           KD_DATI2,
+           KD_KECAMATAN,
+           KD_KELURAHAN,
+           KD_BLOK,
+           NO_URUT,
+           KD_JNS_OP)
+  WHERE JNS_BUMI != '4' 
+    AND JNS_TRANSAKSI_OP != '3' 
+    AND (KD_PROPINSI = SUBSTRING(@NOP, 1, 2)) 
+    AND (KD_DATI2 = SUBSTRING(@NOP, 3, 2)) 
+    AND (KD_KECAMATAN = SUBSTRING(@NOP, 5, 3)) 
+    AND (KD_KELURAHAN = SUBSTRING(@NOP, 8, 3)) 
+    AND (KD_BLOK = SUBSTRING(@NOP, 11, 3)) 
+    AND (NO_URUT = SUBSTRING(@NOP, 14, 4)) 
+    AND (KD_JNS_OP = SUBSTRING(@NOP, 18, 1)) 
+  GROUP BY KD_PROPINSI,
+    KD_DATI2,
+    KD_KECAMATAN,
+    KD_KELURAHAN,
+    KD_BLOK,
+    NO_URUT,
+    KD_JNS_OP ;
+    
+  UPDATE 
+    sppt 
+    LEFT JOIN tarif ON (NJOP_BUMI_SPPT + NJOP_BNG_SPPT - NJOPTKP_SPPT) BETWEEN NJOP_MIN AND NJOP_MAX AND TAHUN BETWEEN THN_AWAL AND THN_AKHIR
+    LEFT JOIN sppt_khusus ON 
+                sppt.KD_PROPINSI = sppt_khusus.KD_PROPINSI AND
+                sppt.KD_DATI2 = sppt_khusus.KD_DATI2 AND
+                sppt.KD_KECAMATAN = sppt_khusus.KD_KECAMATAN AND
+                sppt.KD_KELURAHAN = sppt_khusus.KD_KELURAHAN AND
+                sppt.KD_BLOK = sppt_khusus.KD_BLOK AND
+                sppt.NO_URUT = sppt_khusus.NO_URUT AND
+                sppt.KD_JNS_OP = sppt_khusus.KD_JNS_OP
+    LEFT JOIN jenis_sppt ON sppt_khusus.JENIS_SPPT = jenis_sppt.ID
+  SET
+    NJOP_SPPT = @NJOP := (NJOP_BUMI_SPPT + NJOP_BNG_SPPT),
+    NJKP_SPPT = @NJKP := IFNULL(tarif.NILAI_TARIF, 0), -- Simplified for now
+    PBB_TERHUTANG_SPPT = @PBB_TERHUTANG := GREATEST(CEIL((@NJOP - NJOPTKP_SPPT) * IFNULL(tarif.NILAI_TARIF, 0) / 100), 0),
+    FAKTOR_PENGURANG_SPPT = @FAKTOR_PENGURANG := 0,
+    PBB_YG_HARUS_DIBAYAR_SPPT = CEIL(GREATEST( @PBB_TERHUTANG - @FAKTOR_PENGURANG, @PBB_DIBAYAR_MIN)),
+    TGL_CETAK_SPPT = NOW(),
+    TGL_TERBIT_SPPT = NOW()
+  WHERE THN_PAJAK_SPPT = TAHUN 
+    AND (sppt.KD_PROPINSI LIKE CONCAT('%', SUBSTRING(@NOP, 1, 2), '%')) 
+    AND (sppt.KD_DATI2 LIKE CONCAT('%', SUBSTRING(@NOP, 3, 2), '%')) 
+    AND (sppt.KD_KECAMATAN LIKE CONCAT('%', SUBSTRING(@NOP, 5, 3), '%')) 
+    AND (sppt.KD_KELURAHAN LIKE CONCAT('%', SUBSTRING(@NOP, 8, 3), '%')) 
+    AND (sppt.KD_BLOK LIKE CONCAT('%', SUBSTRING(@NOP, 11, 3), '%')) 
+    AND (sppt.NO_URUT LIKE CONCAT('%', SUBSTRING(@NOP, 14, 4), '%')) 
+    AND (sppt.KD_JNS_OP LIKE CONCAT('%', SUBSTRING(@NOP, 18, 1), '%')) ;    
+    
+  REPLACE INTO sppt_op_bersama 
+  SELECT 
+    KD_PROPINSI,
+    KD_DATI2,
+    KD_KECAMATAN,
+    KD_KELURAHAN,
+    KD_BLOK,
+    NO_URUT,
+    KD_JNS_OP,
+    @TAHUN,
+    (SELECT 
+      IFNULL(KELAS_BUMI, 'XXX') 
+    FROM
+      kelas_bumi 
+    WHERE NJOP_BUMI_BEBAN / LUAS_BUMI_BEBAN / 1000 BETWEEN NILAI_MINIMUM 
+      AND NILAI_MAKSIMUM) KD_KLS_BUMI,
+    '2011',
+    (SELECT 
+      IFNULL(KELAS_BANGUNAN, 'XXX') 
+    FROM
+      kelas_bangunan 
+    WHERE NJOP_BNG_BEBAN / LUAS_BNG_BEBAN / 1000 BETWEEN NILAI_MINIMUM 
+      AND NILAI_MAKSIMUM) KD_KLS_BNG,
+    '2011',
+    LUAS_BUMI_BEBAN,
+    LUAS_BNG_BEBAN,
+    NJOP_BUMI_BEBAN,
+    NJOP_BNG_BEBAN 
+  FROM
+    dat_op_anggota 
+  WHERE (KD_PROPINSI = SUBSTRING(@NOP, 1, 2)) 
+    AND (KD_DATI2 = SUBSTRING(@NOP, 3, 2)) 
+    AND (KD_KECAMATAN = SUBSTRING(@NOP, 5, 3)) 
+    AND (KD_KELURAHAN = SUBSTRING(@NOP, 8, 3)) 
+    AND (KD_BLOK = SUBSTRING(@NOP, 11, 3)) 
+    AND (NO_URUT = SUBSTRING(@NOP, 14, 4)) 
+    AND (KD_JNS_OP = SUBSTRING(@NOP, 18, 1)) ;
+    
+END //
+
+DELIMITER ;

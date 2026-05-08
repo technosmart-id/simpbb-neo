@@ -28,6 +28,17 @@ import {
 import { toast } from "sonner"
 import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
+
+// Type assertions for ORPC query results
+type BackupsListResult = { rows: BackupItem[]; total: number }
+type BackupConfigResult = {
+	enabled: boolean
+	retentionDays: number
+	schedule: string
+	runOnStart: boolean
+	backupDir: string
+}
+type DeleteBackupResult = { success: boolean }
 import {
 	Tooltip,
 	TooltipContent,
@@ -44,10 +55,6 @@ type BackupRow = {
 	createdAt: Date
 }
 
-type BackupsListResponse = {
-	rows: BackupRow[]
-	total: number
-}
 
 type BackupConfig = {
 	enabled: boolean
@@ -213,8 +220,8 @@ export default function BackupsPage() {
 		}
 	}))
 
-	const backups = listQuery.data?.rows ?? []
-	const total = listQuery.data?.total ?? 0
+	const backups = (listQuery.data as BackupsListResult | undefined)?.rows ?? []
+	const total = (listQuery.data as BackupsListResult | undefined)?.total ?? 0
 	const totalPages = Math.ceil(total / PAGE_SIZE)
 	const isLoading = listQuery.isLoading
 
@@ -252,7 +259,7 @@ export default function BackupsPage() {
 				<div className="flex items-center justify-between">
 					<div className="space-y-1">
 						<h3 className="text-sm font-medium">Automatic Backup Configuration</h3>
-						<AutoBackupStatus config={configQuery.data} />
+						<AutoBackupStatus config={configQuery.data as BackupConfigResult | undefined} />
 					</div>
 				</div>
 			</div>
@@ -298,7 +305,7 @@ export default function BackupsPage() {
 									</TableCell>
 								</TableRow>
 							) : (
-								backups.map((backup) => {
+								backups.map((backup: BackupItem) => {
 									const { label } = parseBackupFilename(backup.name)
 									return (
 										<TableRow key={backup.name}>

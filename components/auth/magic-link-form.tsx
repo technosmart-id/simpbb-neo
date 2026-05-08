@@ -17,7 +17,7 @@ export function MagicLinkForm() {
 			<CardContent>
 				<p className="text-center text-sm text-muted-foreground">
 					Link expires in 24 hours.{" "}
-					<Link href="/login" className="underline underline-offset-4">
+					<Link href="/sign-in" className="underline underline-offset-4">
 						Back to login
 					</Link>
 				</p>

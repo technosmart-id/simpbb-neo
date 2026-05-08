@@ -1,31 +1,29 @@
 "use client"
 
-import { usePathname } from "next/navigation"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
+
 import { cn } from "@/lib/utils"
 import {
-	UserIcon,
-	Bell,
 	Building2,
+	Shield,
 } from "lucide-react"
 
 const settingsNav = [
-	{
-		title: "Account",
-		href: "/settings",
-		icon: UserIcon,
-	},
-	{
-		title: "Notifications",
-		href: "/settings/notifications",
-		icon: Bell,
-	},
 	{
 		title: "Organizations",
 		href: "/settings/organizations",
 		icon: Building2,
 	},
+	{
+		title: "Roles & Permissions",
+		href: "/settings/roles",
+		icon: Shield,
+	},
 ]
+
+// Routes that should NOT show the org sidebar
+const userScopedRoutes = ["/settings", "/settings/billing"]
 
 export default function SettingsLayout({
 	children,
@@ -34,13 +32,23 @@ export default function SettingsLayout({
 }) {
 	const pathname = usePathname()
 
+	// Don't show org sidebar for user-scoped settings
+	const isUserScoped = userScopedRoutes.some(route => pathname === route || pathname.startsWith(route + "/"))
+
+	if (isUserScoped) {
+		return <div className="flex-1">{children}</div>
+	}
+
 	return (
 		<div className="flex-1 flex flex-col md:flex-row gap-6">
 			{/* Sidebar Navigation */}
 			<aside className="w-full md:w-48 flex-shrink-0">
 				<nav className="sticky top-20 space-y-1">
+					<div className="px-3 py-2 text-xs font-medium text-muted-foreground">
+						Organization Settings
+					</div>
 					{settingsNav.map((item) => {
-						const isActive = pathname === item.href
+						const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
 						const Icon = item.icon
 						return (
 							<Link

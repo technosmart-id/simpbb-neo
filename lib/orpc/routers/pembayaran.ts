@@ -151,10 +151,10 @@ export const pembayaranRouter = os.router({
 
       if (spptRow) {
         const paid = parseFloat(totalPaid?.total ?? "0")
-        const due = parseFloat(spptRow.pbb)
-        let status = "0" // belum
-        if (paid >= due) status = "1" // lunas
-        else if (paid > 0) status = "2" // kurang bayar
+        const due = spptRow.pbb
+        let status = 0 // belum
+        if (paid >= due) status = 1 // lunas
+        else if (paid > 0) status = 2 // kurang bayar
 
         await db.update(sppt)
           .set({ statusPembayaranSppt: status })

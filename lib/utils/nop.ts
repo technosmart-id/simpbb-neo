@@ -14,11 +14,11 @@ export interface NopParts {
 }
 
 /**
- * Format NOP parts into a dot-separated display string
- * e.g. "35.17.010.001.001.0001.0"
+ * Format NOP parts into a standard display string
+ * e.g. "35.17.010.001.001-0001.0"
  */
 export function formatNop(parts: NopParts): string {
-  return `${parts.kdPropinsi}.${parts.kdDati2}.${parts.kdKecamatan}.${parts.kdKelurahan}.${parts.kdBlok}.${parts.noUrut}.${parts.kdJnsOp}`
+  return `${parts.kdPropinsi}.${parts.kdDati2}.${parts.kdKecamatan}.${parts.kdKelurahan}.${parts.kdBlok}-${parts.noUrut}.${parts.kdJnsOp}`
 }
 
 /**

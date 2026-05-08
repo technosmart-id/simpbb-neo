@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import { authClient } from "@/lib/auth/client";
+import { useORPC } from "@/lib/orpc/react";
+import { useMutation } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -25,6 +27,9 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Loader2Icon, KeyRound, Sparkles, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+
+// reCAPTCHA v3 site key from env
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!;
 
 type IdentifierType = "email" | "username" | "phone" | "unknown";
 type SignInMode = "password" | "magic-link" | "email-otp";
@@ -62,13 +67,78 @@ function detectIdentifierType(value: string): IdentifierType {
 	return "unknown";
 }
 
-export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * Validate that a callback URL is relative to prevent open redirects
+ */
+function isValidCallbackURL(url: string | null): string {
+	if (!url) return "/dashboard";
+	if (url.startsWith("/") && !url.startsWith("//")) return url;
+	return "/dashboard";
+}
+
+function LoginFormContent({ className, ...props }: React.ComponentProps<"div">) {
 	const router = useRouter();
+	const orpc = useORPC();
+	const searchParams = useSearchParams();
+	const callbackURL = isValidCallbackURL(searchParams.get("callbackURL"));
 	const [loading, setLoading] = useState(false);
 	const [identifier, setIdentifier] = useState("");
 	const [password, setPassword] = useState("");
 	const [signInMode, setSignInMode] = useState<SignInMode>("password");
 	const [emailForPasswordless, setEmailForPasswordless] = useState("");
+	const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+
+	// Demo Akun: fill admin credentials
+	const fillDemoAdmin = () => {
+		setIdentifier("admin");
+		setPassword("Password123");
+		setSignInMode("password");
+	};
+
+	// Reset DB: trigger via oRPC
+	const resetDb = useMutation(orpc.system.resetDb.mutationOptions({
+		onSuccess: () => {
+			toast.success("Database reset and seeded successfully!");
+			setLoading(false);
+		},
+		onError: (err: any) => {
+			toast.error(`Reset failed: ${err.message}`);
+			setLoading(false);
+		},
+	}));
+
+	const handleResetDb = async () => {
+		if (!confirm("Are you sure? This will drop all tables, migrate, and re-seed the database.")) return;
+		setLoading(true);
+		resetDb.mutate({});
+	};
+
+	// Execute reCAPTCHA v3 and get token
+	const executeRecaptcha = async (): Promise<string | null> => {
+		if (typeof window === "undefined" || !window.grecaptcha?.execute) {
+			console.error("grecaptcha not ready");
+			return null;
+		}
+		try {
+			const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: "login" });
+			console.log("Token:", token?.slice(0, 30) + "...");
+			return token;
+		} catch (err) {
+			console.error("Captcha error:", err);
+			return null;
+		}
+	};
+
+	// Load reCAPTCHA v3 script
+	useEffect(() => {
+		if (typeof window !== "undefined" && !window.grecaptcha) {
+			const script = document.createElement("script");
+			script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+			script.async = true;
+			script.defer = true;
+			document.head.appendChild(script);
+		}
+	}, []);
 
 	const detectedType = detectIdentifierType(identifier);
 	const isIdentifierValid = detectedType !== "unknown" || identifier.length === 0;
@@ -83,121 +153,128 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 			return;
 		}
 
+		setLoading(true);
+
+		// Execute reCAPTCHA v3
+		const token = await executeRecaptcha();
+
 		// Strip @ from username if present
 		let finalIdentifier = trimmedIdentifier;
 		if (detectedType === "username" && trimmedIdentifier.startsWith("@")) {
 			finalIdentifier = trimmedIdentifier.slice(1);
 		}
 
-		setLoading(true);
-
 		if (signInMode === "magic-link") {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			await (authClient.signIn as any).magicLink(
-				{
-					email: emailForPasswordless,
-					callbackURL: "/dashboard",
+			const result = await ((authClient.signIn as any).magicLink as any)({
+				email: emailForPasswordless,
+				callbackURL: callbackURL,
+				fetchOptions: {
+					headers: {
+						"x-captcha-response": token,
+					},
 				},
-				{
-					onRequest: () => setLoading(true),
-					onResponse: () => setLoading(false),
-					onError: (ctx: AuthCallbackContext) => {
-						toast.error(ctx.error?.message || "Failed to send magic link");
-					},
-					onSuccess: () => {
-						toast.success("Magic link sent! Check your email.");
-						setIdentifier("");
-						setEmailForPasswordless("");
-						setSignInMode("password");
-					},
-				} as AuthCallbackOptions
-			);
+			});
+			setLoading(false);
+			if (result?.error) {
+				toast.error(result.error.message || "Failed to send magic link");
+			} else {
+				toast.success("Magic link sent! Check your email.");
+				setIdentifier("");
+				setEmailForPasswordless("");
+				setSignInMode("password");
+			}
 			return;
 		}
 
 		if (signInMode === "email-otp") {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			await (authClient.signIn as any).emailOtp(
-				{
-					email: emailForPasswordless,
-					callbackURL: "/dashboard",
+			const result = await ((authClient.signIn as any).emailOtp as any)({
+				email: emailForPasswordless,
+				callbackURL: callbackURL,
+				fetchOptions: {
+					headers: {
+						"x-captcha-response": token,
+					},
 				},
-				{
-					onRequest: () => setLoading(true),
-					onResponse: () => setLoading(false),
-					onError: (ctx: AuthCallbackContext) => {
-						toast.error(ctx.error?.message || "Failed to send OTP");
-					},
-					onSuccess: () => {
-						toast.success("OTP sent! Check your email.");
-						setIdentifier("");
-						setEmailForPasswordless("");
-						setSignInMode("password");
-					},
-				} as AuthCallbackOptions
-			);
+			});
+			setLoading(false);
+			if (result?.error) {
+				toast.error(result.error.message || "Failed to send OTP");
+			} else {
+				toast.success("OTP sent! Check your email.");
+				setIdentifier("");
+				setEmailForPasswordless("");
+				setSignInMode("password");
+			}
 			return;
 		}
 
 		// Password-based sign in
 		if (detectedType === "email") {
-			await authClient.signIn.email(
-				{
-					email: finalIdentifier,
-					password,
-					callbackURL: "/dashboard",
-				},
-				{
-					onRequest: () => setLoading(true),
-					onResponse: () => setLoading(false),
-					onError: (ctx: AuthCallbackContext) => {
-						toast.error(ctx.error?.message || "Failed to sign in");
-					},
-					onSuccess: () => {
-						toast.success("Signed in successfully!");
-						router.push("/dashboard");
-					},
-				} as AuthCallbackOptions
-			);
-		} else if (detectedType === "username") {
-			await authClient.signIn.username(
-				{
-					username: finalIdentifier,
-					password,
-					callbackURL: "/dashboard",
-				},
-				{
-					onRequest: () => setLoading(true),
-					onResponse: () => setLoading(false),
-					onError: (ctx: AuthCallbackContext) => {
-						toast.error(ctx.error?.message || "Failed to sign in");
-					},
-					onSuccess: () => {
-						toast.success("Signed in successfully!");
-						router.push("/dashboard");
-					},
-				} as AuthCallbackOptions
-			);
-		} else if (detectedType === "phone") {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			await (authClient.signIn.phoneNumber as any)(
-				{
-					phoneNumber: finalIdentifier,
-					password,
-					callbackURL: "/dashboard",
+			const result = await (authClient.signIn.email as any)({
+				email: finalIdentifier,
+				password,
+				callbackURL: callbackURL,
+				fetchOptions: {
+					headers: {
+						"x-captcha-response": token,
+					},
 				},
-				{
-					onRequest: () => setLoading(true),
-					onResponse: () => setLoading(false),
-					onError: (ctx: AuthCallbackContext) => {
-						toast.error(ctx.error?.message || "Failed to sign in");
+			});
+			setLoading(false);
+			if (result?.error) {
+				toast.error(result.error.message || "Failed to sign in");
+			} else {
+				toast.success("Signed in successfully!");
+				router.push(callbackURL);
+			}
+			return;
+		}
+
+		if (detectedType === "username") {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const result = await (authClient.signIn.username as any)({
+				username: finalIdentifier,
+				password,
+				callbackURL: callbackURL,
+				fetchOptions: {
+					headers: {
+						"x-captcha-response": token,
 					},
-					onSuccess: () => {
-						toast.success("Signed in successfully!");
-						router.push("/dashboard");
+				},
+			});
+			setLoading(false);
+			if (result?.error) {
+				toast.error(result.error.message || "Failed to sign in");
+			} else {
+				toast.success("Signed in successfully!");
+				router.push(callbackURL);
+			}
+			return;
+		}
+
+		if (detectedType === "phone") {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const result = await ((authClient.signIn as any).phoneNumber as any)({
+				phoneNumber: finalIdentifier,
+				password,
+				callbackURL: callbackURL,
+				fetchOptions: {
+					headers: {
+						"x-captcha-response": token,
 					},
-				} as AuthCallbackOptions
-			);
+				},
+			});
+			setLoading(false);
+			if (result?.error) {
+				toast.error(result.error.message || "Failed to sign in");
+			} else {
+				toast.success("Signed in successfully!");
+				router.push(callbackURL);
+			}
+			return;
 		}
 	};
 
@@ -249,7 +326,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 	const handleGoogleLogin = () => {
 		authClient.signIn.social({
 			provider: "google",
-			callbackURL: "/dashboard",
+			callbackURL: callbackURL,
 		});
 	};
 
@@ -367,6 +444,30 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 								</Field>
 							)}
 
+							{/* Demo & Reset Buttons */}
+							<div className="grid grid-cols-2 gap-2">
+								<Button
+									type="button"
+									variant="outline"
+									className="w-full"
+									onClick={fillDemoAdmin}
+									disabled={loading}
+								>
+									<Sparkles className="h-4 w-4 mr-2 text-yellow-500" />
+									Demo Akun
+								</Button>
+								<Button
+									type="button"
+									variant="outline"
+									className="w-full text-destructive hover:bg-destructive/10"
+									onClick={handleResetDb}
+									disabled={loading}
+								>
+									<Loader2Icon className={cn("h-4 w-4 mr-2", resetDb.isPending && "animate-spin")} />
+									Reset DB
+								</Button>
+							</div>
+
 							{/* Sign In Button */}
 							<Field>
 								<Button
@@ -374,7 +475,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 									className="w-full"
 									disabled={loading || !isIdentifierValid || (!isPasswordlessMode && !password)}
 								>
-									{loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+									{loading && !resetDb.isPending && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
 									{isPasswordlessMode ? "Send" : "Sign in"}
 								</Button>
 							</Field>
@@ -429,5 +530,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 				and <a href="#">Privacy Policy</a>.
 			</FieldDescription>
 		</div>
+	);
+}
+
+export function LoginForm(props: React.ComponentProps<"div">) {
+	return (
+		<Suspense fallback={<div className="h-96 flex items-center justify-center"><Loader2Icon className="animate-spin" /></div>}>
+			<LoginFormContent {...props} />
+		</Suspense>
 	);
 }

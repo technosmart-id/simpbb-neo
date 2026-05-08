@@ -123,7 +123,7 @@ function PembayaranBaruForm() {
         <CardContent className="space-y-3">
           <div className="space-y-1">
             <Label>NOP (18 digit) *</Label>
-            <NopInput value={nopParts} onChange={setNopParts} />
+            <NopInput value={nopParts} onChange={(_, parts) => setNopParts(parts ?? undefined)} />
           </div>
           <div className="space-y-1 max-w-xs">
             <Label>Tahun Pajak *</Label>
@@ -164,7 +164,7 @@ function PembayaranBaruForm() {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Status:</span>{' '}
-                  <PembayaranBadge status={sppt.statusPembayaranSppt ?? 'belum'} />
+                  <PembayaranBadge status={sppt.statusPembayaranSppt ?? 0} />
                 </div>
                 <div>
                   <span className="text-muted-foreground">NJOP:</span>{' '}
@@ -180,7 +180,7 @@ function PembayaranBaruForm() {
                     ? new Date(sppt.tglJatuhTempo).toLocaleDateString('id-ID', { dateStyle: 'long' })
                     : '-'}
                 </div>
-                {sppt.statusPembayaranSppt === 'lunas' && (
+                {sppt.statusPembayaranSppt === 1 && (
                   <div className="col-span-2">
                     <Badge variant="default" className="bg-green-600">LUNAS</Badge>
                     <span className="text-muted-foreground ml-2 text-xs">

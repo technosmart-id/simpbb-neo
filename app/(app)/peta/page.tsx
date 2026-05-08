@@ -32,8 +32,14 @@ export default function PetaPage() {
     enabled: !!searchNop,
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const spop = spopQuery.data as any
+  interface SpopData {
+    jlnOp?: string | null;
+    luasBumi?: string | number | null;
+    wp?: { nmWp?: string | null } | null;
+    koordinat?: string | null;
+  }
+
+  const spop = spopQuery.data as SpopData | undefined
 
   // Default center: Indonesia
   const [mapCenter, setMapCenter] = React.useState<[number, number]>([-2.5, 118.0])
@@ -66,7 +72,7 @@ export default function PetaPage() {
           <div className="flex items-end gap-2">
             <div className="space-y-1 flex-1">
               <label className="text-sm font-medium">Cari Objek Pajak</label>
-              <NopInput value={nop} onChange={setNop} />
+              <NopInput value={nop} onChange={(_, parts) => setNop(parts ?? undefined)} />
             </div>
             <Button onClick={handleSearch} disabled={!nop || spopQuery.isLoading}>
               {spopQuery.isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}

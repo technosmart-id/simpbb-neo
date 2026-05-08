@@ -1,23 +1,21 @@
 "use client"
 
 import * as React from "react"
+import { useEffect, useState } from "react"
+import { authClient } from "@/lib/auth/client"
 
 import { NavMain } from "@/components/layouts/nav-main"
 import { NavDeveloper } from "@/components/layouts/nav-developer"
 import { NavUser } from "@/components/layouts/nav-user"
-import { TeamSwitcher } from "@/components/layouts/team-switcher"
+import { OrganizationSwitcher } from "@/components/layouts/organization-switcher"
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-} from "@/components/ui/sidebar"
-import {
-  GalleryVerticalEndIcon,
+  MapIcon as MapIconLucide,
   LayoutDashboardIcon,
-  FileText,
+  HardDrive,
+  Archive,
   Building2,
+  Shield,
+  FileText,
   ClipboardList,
   CreditCard,
   Printer,
@@ -26,46 +24,55 @@ import {
   BarChart3,
   BookOpen,
   Settings,
-  Users,
-  Shield,
-  Globe,
-  Map,
+  Map as MapIcon,
   RefreshCw,
   GitBranch,
   ScrollText,
-  HardDrive,
-  Archive,
+  Database,
 } from "lucide-react"
 
-// This is sample data — should be replaced with Better Auth session data
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "SIM-PBB",
-      logo: <GalleryVerticalEndIcon />,
-      plan: "Bapenda",
-    },
-  ],
-  navMain: [
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+} from "@/components/ui/sidebar"
+
+interface SessionUser {
+  name: string
+  email: string
+  avatar: string | null
+  role?: string | null
+}
+
+interface NavItem {
+  title: string
+  url: string
+  icon: React.ReactNode
+  items?: {
+    title: string
+    url: string
+  }[]
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = useState<SessionUser>({
+    name: "Loading...",
+    email: "",
+    avatar: null,
+  })
+
+  const [navMain] = useState<NavItem[]>([
     {
       title: "Dashboard",
       url: "/dashboard",
       icon: <LayoutDashboardIcon />,
     },
     {
-      title: "SPOP",
-      url: "/spop",
-      icon: <FileText />,
-    },
-    {
-      title: "LSPOP",
-      url: "/lspop",
-      icon: <Building2 />,
+      title: "Objek Pajak",
+      url: "/objek-pajak",
+      icon: <Database />,
     },
     {
       title: "Pelayanan",
@@ -86,11 +93,6 @@ const data = {
       title: "Tunggakan",
       url: "/tunggakan",
       icon: <AlertTriangle />,
-    },
-    {
-      title: "Info OP",
-      url: "/info-op",
-      icon: <Search />,
     },
     {
       title: "Laporan",
@@ -124,10 +126,10 @@ const data = {
     {
       title: "Peta",
       url: "/peta",
-      icon: <Map />,
+      icon: <MapIcon />,
     },
     {
-      title: "Pengaturan",
+      title: "Pengaturan Utama",
       url: "#",
       icon: <Settings />,
       items: [
@@ -157,21 +159,54 @@ const data = {
       url: "/backups",
       icon: <Archive />,
     },
-  ],
-}
+  ])
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  useEffect(() => {
+    // Fetch session data on mount
+    authClient.getSession({
+      fetchOptions: {
+        onSuccess: (ctx) => {
+          const sessionUser = ctx.data?.user
+          if (sessionUser) {
+            setUser({
+              name: sessionUser.name,
+              email: sessionUser.email,
+              avatar: sessionUser.image,
+              role: sessionUser.role,
+            })
+          }
+        },
+      },
+    })
+  }, [])
+
+  const orgSettings = [
+    {
+      title: "Organizations",
+      url: "/settings/organizations",
+      icon: <Building2 />,
+    },
+    {
+      title: "Roles",
+      url: "/settings/roles",
+      icon: <Shield />,
+    },
+  ]
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <OrganizationSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMain} />
         <NavDeveloper />
+        <div className="mt-4">
+          <NavMain items={orgSettings} />
+        </div>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
