@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useORPC } from '@/lib/orpc/react'
 import { NopInput } from '@/components/nop/nop-input'
+import { NopSearchDialog } from '@/components/nop/nop-search-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,8 +19,9 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
-import { ArrowLeft, Save } from 'lucide-react'
+import { ArrowLeft, Save, Search } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 
 // 15 standard document types for PBB pelayanan
@@ -82,9 +84,14 @@ export default function PelayananBaruPage() {
   const createMutation = useMutation(
     orpc.pelayanan.create.mutationOptions({
       onSuccess: (_, vars) => {
+        toast.success(`Berkas ${vars.noPelayanan} berhasil didaftarkan`)
         qc.invalidateQueries({ queryKey: ['pelayanan'] })
         router.push(`/pelayanan/${vars.noPelayanan}`)
       },
+      onError: (err) => {
+        console.error('Failed to save pelayanan:', err)
+        toast.error('Gagal menyimpan berkas: ' + (err instanceof Error ? err.message : String(err)))
+      }
     }),
   )
 
@@ -94,9 +101,28 @@ export default function PelayananBaruPage() {
     )
   }
 
+  function handleNopSelect(parts: import('@/lib/utils/nop').NopParts, details: any) {
+    setNopParts(parts)
+    if (details.jalanOp) setLetakOp(details.jalanOp)
+    if (details.nmWp) setNamaPemohon(details.nmWp)
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!noPelayanan || !kdJnsPelayanan) return
+    
+    if (!noPelayanan) {
+      toast.error('Nomor Pelayanan harus diisi')
+      return
+    }
+    if (!kdJnsPelayanan) {
+      toast.error('Jenis Pelayanan harus dipilih')
+      return
+    }
+    if (!tanggalPelayanan) {
+      toast.error('Tanggal Pelayanan harus diisi')
+      return
+    }
+
     createMutation.mutate({
       noPelayanan,
       kdJnsPelayanan,
@@ -148,7 +174,7 @@ export default function PelayananBaruPage() {
               <Input
                 value={noPelayanan}
                 onChange={(e) => setNoPelayanan(e.target.value)}
-                placeholder="Auto-generate"
+                placeholder={nextNoQuery.isLoading ? "Sedang membuat nomor..." : "Auto-generate"}
                 className="font-mono"
                 required
               />
@@ -167,7 +193,7 @@ export default function PelayananBaruPage() {
             <Label>Jenis Pelayanan *</Label>
             <Select value={kdJnsPelayanan} onValueChange={setKdJnsPelayanan} required>
               <SelectTrigger>
-                <SelectValue placeholder="Pilih jenis pelayanan..." />
+                <SelectValue placeholder={jnsPelayananQuery.isLoading ? "Memuat..." : "Pilih jenis pelayanan..."} />
               </SelectTrigger>
               <SelectContent>
                 {jnsPelayananQuery.data?.map((j) => (
@@ -193,7 +219,18 @@ export default function PelayananBaruPage() {
       {!isKolektif && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">NOP Objek Pajak</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">NOP Objek Pajak</CardTitle>
+              <NopSearchDialog 
+                onSelect={handleNopSelect} 
+                trigger={
+                  <Button type="button" variant="outline" size="sm" className="h-8">
+                    <Search className="w-3.5 h-3.5 mr-2" />
+                    Cari NOP
+                  </Button>
+                }
+              />
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-1">
