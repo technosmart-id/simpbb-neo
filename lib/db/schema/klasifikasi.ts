@@ -58,7 +58,7 @@ export const tarif = mysqlTable("tarif", {
 export const jenisSppt = mysqlTable(
   "jenis_sppt",
   {
-    id: int("ID").primaryKey(),
+    id: int("ID").autoincrement().primaryKey(),
     name: varchar("NAME", { length: 100 }).notNull(),
     tarifKhusus: decimal("TARIF_KHUSUS", { precision: 8, scale: 4 }),
     njkpKhusus: int("NJKP_KHUSUS"),

@@ -12,10 +12,9 @@ import { Badge } from "@/components/ui/badge"
 
 type JenisSppt = {
   id: number
-  kode: string
-  nama: string
+  name: string
   tarifKhusus: string | null
-  aktif: number
+  njkpKhusus: number | null
 }
 
 // ─── Columns ─────────────────────────────────────────────────────
@@ -26,11 +25,7 @@ const columns: ColumnDef<JenisSppt>[] = [
     header: "ID",
   },
   {
-    accessorKey: "kode",
-    header: ({ column }) => <SortableHeader column={column} label="Kode" />,
-  },
-  {
-    accessorKey: "nama",
+    accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} label="Nama" />,
   },
   {
@@ -47,15 +42,12 @@ const columns: ColumnDef<JenisSppt>[] = [
     },
   },
   {
-    accessorKey: "aktif",
-    header: "Status",
+    accessorKey: "njkpKhusus",
+    header: "NJKP (%)",
     cell: ({ row }) => {
-      const aktif = row.original.aktif === 1
-      return (
-        <Badge variant={aktif ? "default" : "secondary"}>
-          {aktif ? "Aktif" : "Nonaktif"}
-        </Badge>
-      )
+      const val = row.original.njkpKhusus
+      if (val == null) return <span className="text-muted-foreground">-</span>
+      return <span className="font-mono text-sm">{val}%</span>
     },
   },
 ]
@@ -80,7 +72,7 @@ export default function JenisSpptPage() {
         columns={columns}
         data={jenisSpptQuery.data ?? []}
         isLoading={jenisSpptQuery.isLoading}
-        searchColumn="nama"
+        searchColumn="name"
         searchPlaceholder="Cari jenis SPPT..."
         emptyMessage="Tidak ada data jenis SPPT."
         // TODO: Add/Edit/Delete buttons — need mutation endpoints for jenis SPPT CRUD

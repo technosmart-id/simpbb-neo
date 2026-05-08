@@ -485,7 +485,7 @@ export const objekPajakRouter = os.router({
         luasBumiBeban: z.number().optional(),
         luasBngBeban: z.number().optional(),
       }).optional(),
-    })).handler(async ({ input, ctx }) => {
+    })).handler(async ({ input, context: ctx }) => {
       const { spop: spopData, subjekPajak: wpData, anggota: anggotaData } = input
       const now = new Date()
 
@@ -617,6 +617,7 @@ export const objekPajakRouter = os.router({
       return db
         .select({
           thnPajakSppt: sppt.thnPajakSppt,
+          nmWp: sppt.nmWp,
           pbbHarusDibayar: sppt.pbbYgHarusDibayarSppt,
           tglJatuhTempo: sppt.tglJatuhTempo,
         })

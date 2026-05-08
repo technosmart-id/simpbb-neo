@@ -35,14 +35,11 @@ export const penggunaRouter = os.router({
           nip: pbbUserProfile.nip,
           nama: pbbUserProfile.nama,
           jabatan: pbbUserProfile.jabatan,
-          statusAktif: pbbUserProfile.statusAktif,
-          lastLogin: pbbUserProfile.lastLogin,
           userId: pbbUserProfile.userId,
-          createdAt: pbbUserProfile.createdAt,
         })
         .from(pbbUserProfile)
         .where(where)
-        .orderBy(desc(pbbUserProfile.createdAt))
+        .orderBy(desc(pbbUserProfile.id))
         .limit(input.limit)
         .offset(input.offset)
 
@@ -92,7 +89,6 @@ export const penggunaRouter = os.router({
         nip: input.nip ?? null,
         nama: input.nama ?? null,
         jabatan: input.jabatan ?? null,
-        statusAktif: 1,
       })
 
       return { success: true, id: result[0].insertId }
@@ -106,7 +102,6 @@ export const penggunaRouter = os.router({
         nip: z.string().optional(),
         nama: z.string().optional(),
         jabatan: z.string().optional(),
-        statusAktif: z.number().min(0).max(1).optional(),
       }),
     )
     .handler(async ({ input }) => {
@@ -116,7 +111,6 @@ export const penggunaRouter = os.router({
       if (updates.nip !== undefined) setValues.nip = updates.nip
       if (updates.nama !== undefined) setValues.nama = updates.nama
       if (updates.jabatan !== undefined) setValues.jabatan = updates.jabatan
-      if (updates.statusAktif !== undefined) setValues.statusAktif = updates.statusAktif
 
       if (Object.keys(setValues).length === 0) {
         return { success: true }
@@ -152,7 +146,7 @@ export const penggunaRouter = os.router({
       // TODO: hash password
       await db
         .update(pbbUserProfile)
-        .set({ password: input.newPassword, failedAttempts: 0, lockedUntil: null })
+        .set({ password: input.newPassword })
         .where(eq(pbbUserProfile.id, input.id))
       return { success: true }
     }),

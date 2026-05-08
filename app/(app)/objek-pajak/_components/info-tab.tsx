@@ -122,6 +122,7 @@ export function InfoTab({ initialData }: InfoTabProps) {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }

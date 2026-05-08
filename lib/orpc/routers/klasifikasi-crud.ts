@@ -125,17 +125,15 @@ export const klasifikasiCrudRouter = os.router({
   // ── Jenis SPPT CRUD ──
   createJenisSppt: os
     .input(z.object({
-      kode: z.string().min(1).max(10),
-      nama: z.string().min(1).max(100),
+      name: z.string().min(1).max(100),
       tarifKhusus: z.string().optional(),
-      aktif: z.number().min(0).max(1).default(1),
+      njkpKhusus: z.number().optional(),
     }))
     .handler(async ({ input }) => {
       await db.insert(jenisSppt).values({
-        kode: input.kode,
-        nama: input.nama,
+        name: input.name,
         tarifKhusus: input.tarifKhusus ?? null,
-        aktif: input.aktif,
+        njkpKhusus: input.njkpKhusus ?? null,
       })
       return { success: true }
     }),
@@ -143,14 +141,13 @@ export const klasifikasiCrudRouter = os.router({
   updateJenisSppt: os
     .input(z.object({
       id: z.number(),
-      kode: z.string().min(1).max(10),
-      nama: z.string().min(1).max(100),
+      name: z.string().min(1).max(100),
       tarifKhusus: z.string().optional(),
-      aktif: z.number().min(0).max(1),
+      njkpKhusus: z.number().optional(),
     }))
     .handler(async ({ input }) => {
       await db.update(jenisSppt)
-        .set({ kode: input.kode, nama: input.nama, tarifKhusus: input.tarifKhusus ?? null, aktif: input.aktif })
+        .set({ name: input.name, tarifKhusus: input.tarifKhusus ?? null, njkpKhusus: input.njkpKhusus ?? null })
         .where(eq(jenisSppt.id, input.id))
       return { success: true }
     }),

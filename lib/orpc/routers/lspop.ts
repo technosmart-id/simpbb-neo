@@ -129,8 +129,9 @@ export const lspopRouter = os.router({
       kdLangitLangit: z.string().optional(),
       nilaiSistemBng: z.number().default(0),
       jpbDetails: z.any().optional(),
+      nipPendataBng: z.string().optional(),
     }))
-    .handler(async ({ input, ctx }) => {
+    .handler(async ({ input, context: ctx }) => {
       const { jpbDetails, ...bngData } = input
       const now = new Date()
       const year = now.getFullYear().toString()
@@ -204,7 +205,7 @@ export const lspopRouter = os.router({
       nilaiSistemBng: z.number().optional(),
       jpbDetails: z.any().optional(),
     }))
-    .handler(async ({ input, ctx }) => {
+    .handler(async ({ input, context: ctx }) => {
       const { kdPropinsi, kdDati2, kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, noBng, jpbDetails, ...updates } = input
       const now = new Date()
       const year = now.getFullYear().toString()

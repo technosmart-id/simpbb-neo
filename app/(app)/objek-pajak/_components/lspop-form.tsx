@@ -1253,7 +1253,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                   <div className="flex items-center gap-1.5 mt-2">
                     <span className="text-xs font-bold text-foreground uppercase">Kelas</span>
                     <Badge variant="outline" className="text-lg border-2 border-primary text-primary">
-                      {bngKelasInfo?.kelasBangunan || activeBuilding?.kdKlasBng || '—'}
+                      {bngKelasInfo?.kelasBangunan || '—'}
                     </Badge>
                   </div>
                 </div>
@@ -1275,10 +1275,6 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                   <span className="text-xs font-bold text-foreground uppercase">NIP Pendata</span>
                   <span className="text-xs font-bold uppercase">{activeBuilding?.nipPendataBng || '—'}</span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-foreground uppercase">Nama Pendata</span>
-                  <span className="text-xs font-bold uppercase">{activeBuilding?.nmPendataanOp || '—'}</span>
-                </div>
               </div>
 
               <Separator className="my-4" />
@@ -1294,10 +1290,6 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-foreground uppercase">NIP Pemeriksa</span>
                   <span className="text-xs font-bold uppercase">{activeBuilding?.nipPemeriksaBng || '—'}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-foreground uppercase">Nama Pemeriksa</span>
-                  <span className="text-xs font-bold uppercase">{activeBuilding?.nmPemeriksaanOpBng || '—'}</span>
                 </div>
               </div>
             </CardContent>
