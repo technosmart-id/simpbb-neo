@@ -140,6 +140,8 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
     })
   )
 
+  const [bngKelasInfo, setBngKelasInfo] = React.useState<any>(null)
+
   // ─── Fetch NOP Buildings ───
   const { data: buildings, refetch: refetchBuildings } = useQuery({
     ...orpc.lspop.listByNop.queryOptions({
@@ -299,6 +301,29 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
   const saveLspop = useMutation(orpc.lspop.create.mutationOptions())
   const updateLspop = useMutation(orpc.lspop.update.mutationOptions())
   const saveFasilitas = useMutation(orpc.lspop.setFasilitas.mutationOptions())
+
+  // Auto-calculate Building Class
+  const watchNilaiSistemBng = watch('nilaiSistemBng')
+  const watchLuasBng = watch('luasBng')
+
+  React.useEffect(() => {
+    const nilai = Number(watchNilaiSistemBng || 0)
+    const luas = Number(watchLuasBng || 0)
+    if (nilai > 0 && luas > 0) {
+      const perM2 = Math.round(nilai / luas)
+      const fetchKelas = async () => {
+        try {
+          const res = await orpcClient.objekPajak.getKelasBng({ nilai: perM2 })
+          setBngKelasInfo(res)
+        } catch (err) {
+          console.error("Failed to fetch building class:", err)
+        }
+      }
+      fetchKelas()
+    } else {
+      setBngKelasInfo(null)
+    }
+  }, [watchNilaiSistemBng, watchLuasBng])
 
   const onSubmit = async (values: LspopFormValues) => {
     if (!initialData) return toast.error("Data NOP tidak ditemukan")
@@ -942,6 +967,32 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                   </div>
                 )}
 
+                {/* JPB 13 */}
+                {watchJpb === '13' && (
+                  <div className="space-y-2 border-l pl-10 border-dashed">
+                    <Badge variant="outline" className="mb-2 bg-primary/5 text-primary border-primary/20 rounded-none text-[10px] uppercase">Apartemen</Badge>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
+                      <label className="md:col-span-6 text-xs text-foreground uppercase">Kelas Bangunan</label>
+                      <div className="md:col-span-6">
+                        <Controller
+                          name="klsJpb13"
+                          control={control}
+                          render={({ field }) => (
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger className="h-8 w-full font-bold bg-muted/10">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {lookups?.['50']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {['01', '10', '11'].includes(watchJpb) && (
                   <div className="flex flex-col items-center justify-center space-y-2 border-l pl-10 border-dashed text-muted-foreground opacity-50">
                     <Building2 className="h-10 w-10 mb-2" />
@@ -1202,7 +1253,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                   <div className="flex items-center gap-1.5 mt-2">
                     <span className="text-xs font-bold text-foreground uppercase">Kelas</span>
                     <Badge variant="outline" className="text-lg border-2 border-primary text-primary">
-                      {(activeBuilding as any)?.kdKlasBng || '—'}
+                      {bngKelasInfo?.kelasBangunan || activeBuilding?.kdKlasBng || '—'}
                     </Badge>
                   </div>
                 </div>

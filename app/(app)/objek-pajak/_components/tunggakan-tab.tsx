@@ -13,8 +13,12 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, AlertCircle, TrendingUp, Calendar } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Loader2, AlertCircle, TrendingUp, Calendar, Printer, FileDown } from 'lucide-react'
 import { format, differenceInDays } from 'date-fns'
+import { downloadTunggakanPdf } from '@/lib/utils/pdf/tunggakan-generator'
+import { parseNop } from '@/lib/utils/nop'
+import { toast } from 'sonner'
 
 interface TunggakanTabProps {
   initialData: any
@@ -87,6 +91,31 @@ export function TunggakanTab({ initialData }: TunggakanTabProps) {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2 font-bold uppercase text-[10px]"
+          disabled={!tunggakan || tunggakan.length === 0}
+          onClick={() => {
+            if (!tunggakan) return
+            downloadTunggakanPdf({
+              nopParts: initialData,
+              nmWp: tunggakan[0]?.nmWp || 'Unknown',
+              items: tunggakan.map(t => ({
+                thnPajakSppt: t.thnPajakSppt,
+                tglJatuhTempo: t.tglJatuhTempo,
+                pbbHarusDibayar: t.pbbHarusDibayar || 0
+              }))
+            })
+            toast.success("PDF Tunggakan berhasil dibuat")
+          }}
+        >
+          <Printer className="h-3.5 w-3.5" />
+          Cetak Tunggakan
+        </Button>
       </div>
 
       <div className="rounded-xl border bg-card overflow-hidden">

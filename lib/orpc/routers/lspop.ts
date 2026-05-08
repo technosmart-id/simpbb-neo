@@ -17,7 +17,8 @@ import {
   datJpb14,
   datJpb15,
   datJpb16,
-  spop
+  spop,
+  pbbUserProfile
 } from "@/lib/db/schema"
 import { eq, and, sql } from "drizzle-orm"
 
@@ -129,28 +130,58 @@ export const lspopRouter = os.router({
       nilaiSistemBng: z.number().default(0),
       jpbDetails: z.any().optional(),
     }))
-    .handler(async ({ input }) => {
+    .handler(async ({ input, ctx }) => {
       const { jpbDetails, ...bngData } = input
-      await db.insert(datOpBangunan).values({
-        ...bngData,
-        kdJpb: input.kdJpb ?? null,
-        thnDibangunBng: input.thnDibangunBng ?? '0',
-        thnRenovasiBng: input.thnRenovasiBng ?? null,
-        kondisiBng: input.kondisiBng ?? null,
-        jnsKonstruksiBng: input.jnsKonstruksiBng ?? null,
-        jnsAtapBng: input.jnsAtapBng ?? null,
-        kdDinding: input.kdDinding ?? null,
-        kdLantai: input.kdLantai ?? null,
-        kdLangitLangit: input.kdLangitLangit ?? null,
-        aktif: 1,
-      })
+      const now = new Date()
+      const year = now.getFullYear().toString()
 
-      if (jpbDetails && input.kdJpb) {
-        const table = jpbTableMap[input.kdJpb]
-        if (table) {
-          await db.insert(table).values({ ...baseNop(input), noBng: input.noBng, ...jpbDetails })
+      // Resolve Petugas Identity
+      let nip = input.nipPendataBng
+      if (ctx.session?.user?.id) {
+        const [profile] = await db
+          .select()
+          .from(pbbUserProfile)
+          .where(eq(pbbUserProfile.userId, ctx.session.user.id))
+        if (profile) {
+          nip = profile.nip ?? nip
         }
       }
+
+      await db.transaction(async (tx) => {
+        await tx.insert(datOpBangunan).values({
+          ...bngData,
+          kdJpb: input.kdJpb ?? null,
+          thnDibangunBng: input.thnDibangunBng ?? '0',
+          thnRenovasiBng: input.thnRenovasiBng ?? null,
+          kondisiBng: input.kondisiBng ?? null,
+          jnsKonstruksiBng: input.jnsKonstruksiBng ?? null,
+          jnsAtapBng: input.jnsAtapBng ?? null,
+          kdDinding: input.kdDinding ?? null,
+          kdLantai: input.kdLantai ?? null,
+          kdLangitLangit: input.kdLangitLangit ?? null,
+          nipPendataBng: nip,
+          tglPendataanBng: now,
+          tglPerekamanBng: now,
+          aktif: 1,
+        })
+
+        if (jpbDetails && input.kdJpb) {
+          const table = jpbTableMap[input.kdJpb]
+          if (table) {
+            await tx.insert(table).values({ ...baseNop(input), noBng: input.noBng, ...jpbDetails })
+          }
+        }
+
+        // Call CAV Procedure
+        await tx.execute(sql`
+          CALL PENILAIAN_BNG(
+            ${input.kdPropinsi}, ${input.kdDati2}, ${input.kdKecamatan}, 
+            ${input.kdKelurahan}, ${input.kdBlok}, ${input.noUrut}, 
+            ${input.kdJnsOp}, ${input.noBng}, ${input.kdJpb ?? '01'}, 
+            ${input.luasBng}, ${input.jmlLantaiBng}, ${year}, 1, @out_nilai
+          )
+        `)
+      })
 
       return { success: true }
     }),
@@ -173,40 +204,62 @@ export const lspopRouter = os.router({
       nilaiSistemBng: z.number().optional(),
       jpbDetails: z.any().optional(),
     }))
-    .handler(async ({ input }) => {
+    .handler(async ({ input, ctx }) => {
       const { kdPropinsi, kdDati2, kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, noBng, jpbDetails, ...updates } = input
-      const setValues: Record<string, any> = {}
-      for (const [k, v] of Object.entries(updates)) {
-        if (v !== undefined) setValues[k] = v
-      }
-      
-      if (Object.keys(setValues).length > 0) {
-        await db.update(datOpBangunan).set(setValues).where(
-          and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)),
-        )
-      }
+      const now = new Date()
+      const year = now.getFullYear().toString()
 
-      if (jpbDetails) {
-        const [current] = await db.select({ kdJpb: datOpBangunan.kdJpb }).from(datOpBangunan)
-          .where(and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)))
-          .limit(1)
+      return await db.transaction(async (tx) => {
+        const setValues: Record<string, any> = {}
+        for (const [k, v] of Object.entries(updates)) {
+          if (v !== undefined) setValues[k] = v
+        }
         
-        const oldKdJpb = current?.kdJpb
-        const newKdJpb = updates.kdJpb || oldKdJpb
+        if (Object.keys(setValues).length > 0) {
+          await tx.update(datOpBangunan).set(setValues).where(
+            and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)),
+          )
+        }
 
-        // If usage changed, cleanup old table
-        if (oldKdJpb && newKdJpb && oldKdJpb !== newKdJpb) {
-          const oldTable = jpbTableMap[oldKdJpb]
-          if (oldTable) {
-            await db.delete(oldTable).where(and(nopWhere(oldTable, input), eq(oldTable.noBng, noBng)))
+        if (jpbDetails) {
+          const [current] = await tx.select({ kdJpb: datOpBangunan.kdJpb }).from(datOpBangunan)
+            .where(and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)))
+            .limit(1)
+          
+          const oldKdJpb = current?.kdJpb
+          const newKdJpb = updates.kdJpb || oldKdJpb
+
+          // If usage changed, cleanup old table
+          if (oldKdJpb && newKdJpb && oldKdJpb !== newKdJpb) {
+            const oldTable = jpbTableMap[oldKdJpb]
+            if (oldTable) {
+              await tx.delete(oldTable).where(and(nopWhere(oldTable, input), eq(oldTable.noBng, noBng)))
+            }
+          }
+
+          const table = newKdJpb ? jpbTableMap[newKdJpb] : null
+          if (table) {
+            await tx.insert(table).values({ ...baseNop(input), noBng, ...jpbDetails }).onDuplicateKeyUpdate({ set: jpbDetails })
           }
         }
 
-        const table = newKdJpb ? jpbTableMap[newKdJpb] : null
-        if (table) {
-          await db.insert(table).values({ ...baseNop(input), noBng, ...jpbDetails }).onDuplicateKeyUpdate({ set: jpbDetails })
+        // Call CAV Procedure to recalculate
+        const [latest] = await tx.select({ kdJpb: datOpBangunan.kdJpb, luasBng: datOpBangunan.luasBng, jmlLantaiBng: datOpBangunan.jmlLantaiBng })
+          .from(datOpBangunan)
+          .where(and(nopWhere(datOpBangunan, input), eq(datOpBangunan.noBng, noBng)))
+          .limit(1)
+
+        if (latest) {
+          await tx.execute(sql`
+            CALL PENILAIAN_BNG(
+              ${kdPropinsi}, ${kdDati2}, ${kdKecamatan}, 
+              ${kdKelurahan}, ${kdBlok}, ${noUrut}, 
+              ${kdJnsOp}, ${noBng}, ${latest.kdJpb ?? '01'}, 
+              ${latest.luasBng}, ${latest.jmlLantaiBng}, ${year}, 1, @out_nilai
+            )
+          `)
         }
-      }
+      })
 
       return { success: true }
     }),

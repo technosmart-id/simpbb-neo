@@ -4,9 +4,12 @@ import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useORPC } from '@/lib/orpc/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MapPin, User, Building2 } from 'lucide-react'
+import { MapPin, User, Building2, Printer } from 'lucide-react'
 import { formatRupiah } from '@/components/data-table/column-helpers'
 import { NopDisplay } from '@/components/nop/nop-display'
+import { Button } from '@/components/ui/button'
+import { downloadInfoPdf } from '@/lib/utils/pdf/info-generator'
+import { toast } from 'sonner'
 
 interface InfoTabProps {
   initialData: any
@@ -33,7 +36,26 @@ export function InfoTab({ initialData }: InfoTabProps) {
   if (!initialData) return null
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2 font-bold uppercase text-[10px]"
+          onClick={() => {
+            downloadInfoPdf({
+              nopParts: initialData,
+              spop: initialData,
+              buildings: buildings || []
+            })
+            toast.success("PDF Informasi Objek berhasil dibuat")
+          }}
+        >
+          <Printer className="h-3.5 w-3.5" />
+          Cetak Informasi
+        </Button>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
       {/* OP Info */}
       <Card>
         <CardHeader>

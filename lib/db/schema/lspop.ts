@@ -50,13 +50,14 @@ export const datOpBangunan = mysqlTable(
 
     // Petugas Pendataan
     tglPendataanBng: datetime("TGL_PENDATAAN_BNG"),
-    nmPendataanOp: varchar("NM_PENDATAAN_OP", { length: 200 }),
-    nipPendataBng: varchar("NIP_PENDATA_BNG", { length: 30 }),
+    nipPendataBng: char("NIP_PENDATA_BNG", { length: 30 }),
 
     // Petugas Pemeriksaan
     tglPemeriksaanBng: datetime("TGL_PEMERIKSAAN_BNG"),
-    nmPemeriksaanOpBng: varchar("NM_PEMERIKSAAN_OP_BNG", { length: 200 }),
-    nipPemeriksaBng: varchar("NIP_PEMERIKSA_BNG", { length: 30 }),
+    nipPemeriksaBng: char("NIP_PEMERIKSA_BNG", { length: 30 }),
+
+    tglPerekamanBng: datetime("TGL_PEREKAMAN_BNG"),
+    nipPerekamBng: char("NIP_PEREKAM_BNG", { length: 30 }),
 
     tglKunjunganKembali: datetime("TGL_KUNJUNGAN_KEMBALI"),
     aktif: tinyint("AKTIF").notNull().default(1),

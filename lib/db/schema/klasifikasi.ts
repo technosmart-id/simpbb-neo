@@ -6,6 +6,7 @@ import {
   int,
   year,
   tinyint,
+  primaryKey,
   uniqueIndex,
 } from "drizzle-orm/mysql-core";
 
@@ -13,19 +14,33 @@ import {
 
 export const kelasBumi = mysqlTable("kelas_bumi", {
   kelasBumi: varchar("KELAS_BUMI", { length: 5 }).primaryKey(),
-  nilaiMinimum: decimal("NILAI_MINIMUM", { precision: 15, scale: 2 }).notNull(),
-  nilaiMaksimum: decimal("NILAI_MAKSIMUM", { precision: 15, scale: 2 }).notNull(),
-  njopBumi: decimal("NJOP_BUMI", { precision: 15, scale: 2 }).notNull(),
+  nilaiMinimum: decimal("NILAI_MINIMUM", { precision: 8, scale: 2 }).notNull(),
+  nilaiMaksimum: decimal("NILAI_MAKSIMUM", { precision: 8, scale: 2 }).notNull(),
+  njopBumi: decimal("NJOP_BUMI", { precision: 8, scale: 2 }).notNull(),
 });
 
 // ─── kelas_bangunan ───────────────────────────────────────────────
 
 export const kelasBangunan = mysqlTable("kelas_bangunan", {
   kelasBangunan: varchar("KELAS_BANGUNAN", { length: 5 }).primaryKey(),
-  nilaiMinimum: decimal("NILAI_MINIMUM", { precision: 15, scale: 2 }).notNull(),
-  nilaiMaksimum: decimal("NILAI_MAKSIMUM", { precision: 15, scale: 2 }).notNull(),
-  njopBangunan: decimal("NJOP_BANGUNAN", { precision: 15, scale: 2 }).notNull(),
+  nilaiMinimum: decimal("NILAI_MINIMUM", { precision: 8, scale: 2 }).notNull(),
+  nilaiMaksimum: decimal("NILAI_MAKSIMUM", { precision: 8, scale: 2 }).notNull(),
+  njopBangunan: decimal("NJOP_BANGUNAN", { precision: 8, scale: 2 }).notNull(),
 });
+
+// ─── kelas_tanah ──────────────────────────────────────────────────
+// Note: This table is often used for historical land classes or specific cycles.
+
+export const kelasTanah = mysqlTable("kelas_tanah", {
+  kdKlsTanah: char("KD_KLS_TANAH", { length: 3 }).notNull(),
+  thnAwalKlsTanah: char("THN_AWAL_KLS_TANAH", { length: 4 }).notNull(),
+  thnAkhirKlsTanah: char("THN_AKHIR_KLS_TANAH", { length: 4 }).notNull(),
+  nilaiMinTanah: decimal("NILAI_MIN_TANAH", { precision: 15, scale: 2 }),
+  nilaiMaxTanah: decimal("NILAI_MAX_TANAH", { precision: 15, scale: 2 }),
+  nilaiPerM2Tanah: decimal("NILAI_PER_M2_TANAH", { precision: 15, scale: 2 }),
+}, (table) => [
+  primaryKey({ columns: [table.kdKlsTanah, table.thnAwalKlsTanah, table.thnAkhirKlsTanah] }),
+]);
 
 // ─── tarif ────────────────────────────────────────────────────────
 
@@ -43,13 +58,11 @@ export const tarif = mysqlTable("tarif", {
 export const jenisSppt = mysqlTable(
   "jenis_sppt",
   {
-    id: int("ID").autoincrement().primaryKey(),
-    kode: varchar("KODE", { length: 10 }).notNull(),
-    nama: varchar("NAMA", { length: 100 }).notNull(),
+    id: int("ID").primaryKey(),
+    name: varchar("NAME", { length: 100 }).notNull(),
     tarifKhusus: decimal("TARIF_KHUSUS", { precision: 8, scale: 4 }),
-    aktif: tinyint("AKTIF").notNull().default(1),
-  },
-  (table) => [uniqueIndex("uk_jenis_sppt_kode").on(table.kode)],
+    njkpKhusus: int("NJKP_KHUSUS"),
+  }
 );
 
 // ─── fasilitas ────────────────────────────────────────────────────
