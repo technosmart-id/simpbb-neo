@@ -44,4 +44,9 @@ export const lookupRouter = os.router({
 
       return results;
     }),
+  getJenisSppt: os
+    .handler(async () => {
+      const { jenisSppt } = await import('@/lib/db/schema');
+      return db.select().from(jenisSppt).orderBy(asc(jenisSppt.id));
+    }),
 });

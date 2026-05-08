@@ -140,6 +140,8 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
     })
   )
 
+  const [bngKelasInfo, setBngKelasInfo] = React.useState<any>(null)
+
   // ─── Fetch NOP Buildings ───
   const { data: buildings, refetch: refetchBuildings } = useQuery({
     ...orpc.lspop.listByNop.queryOptions({
@@ -299,6 +301,29 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
   const saveLspop = useMutation(orpc.lspop.create.mutationOptions())
   const updateLspop = useMutation(orpc.lspop.update.mutationOptions())
   const saveFasilitas = useMutation(orpc.lspop.setFasilitas.mutationOptions())
+
+  // Auto-calculate Building Class
+  const watchNilaiSistemBng = watch('nilaiSistemBng')
+  const watchLuasBng = watch('luasBng')
+
+  React.useEffect(() => {
+    const nilai = Number(watchNilaiSistemBng || 0)
+    const luas = Number(watchLuasBng || 0)
+    if (nilai > 0 && luas > 0) {
+      const perM2 = Math.round(nilai / luas)
+      const fetchKelas = async () => {
+        try {
+          const res = await orpcClient.objekPajak.getKelasBng({ nilai: perM2 })
+          setBngKelasInfo(res)
+        } catch (err) {
+          console.error("Failed to fetch building class:", err)
+        }
+      }
+      fetchKelas()
+    } else {
+      setBngKelasInfo(null)
+    }
+  }, [watchNilaiSistemBng, watchLuasBng])
 
   const onSubmit = async (values: LspopFormValues) => {
     if (!initialData) return toast.error("Data NOP tidak ditemukan")
@@ -553,7 +578,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         {/* LEFT COLUMN: Core Details */}
         <div className="xl:col-span-8 space-y-4">
-          <Card>
+          <Card className="dark:bg-slate-900/40 dark:backdrop-blur-sm border-muted-foreground/10">
             <CardContent>
               <SectionTitle title="Rincian Data Bangunan" icon={Building2} />
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
@@ -568,7 +593,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                         control={control}
                         render={({ field }) => (
                           <Select onValueChange={field.onChange} value={field.value}>
-                            <SelectTrigger className="h-8 w-full font-bold uppercase bg-muted/20">
+                            <SelectTrigger className="h-8 w-full font-bold uppercase bg-muted/20 dark:bg-muted/5 border-muted-foreground/10 focus:ring-primary/30 transition-all">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -599,7 +624,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
                     <label className="md:col-span-2 text-xs text-foreground uppercase">Luas</label>
                     <div className="md:col-span-4">
-                      <Input type="number" {...register('luasBng')} className="h-8 font-mono bg-yellow-50/50" />
+                      <Input type="number" {...register('luasBng')} className="h-8 font-mono bg-yellow-50/50 dark:bg-yellow-950/20 dark:text-yellow-200 border-yellow-200/50 dark:border-yellow-900/50 transition-all" />
                     </div>
                     <label className="md:col-span-3 text-right pr-2 text-xs text-foreground uppercase">Th Dibangun</label>
                     <div className="md:col-span-3">
@@ -632,7 +657,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {lookups?.['21']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                              {lookups?.['21']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                             </SelectContent>
                           </Select>
                         )}
@@ -664,7 +689,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.[f.group]?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                {lookups?.[f.group]?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           )}
@@ -693,7 +718,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.['45']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                {lookups?.['45']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           )}
@@ -732,7 +757,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.['82']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                {lookups?.['82']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           )}
@@ -760,7 +785,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.[watchJpb === '04' ? '46' : '52']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                {lookups?.[watchJpb === '04' ? '46' : '52']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           )}
@@ -786,7 +811,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.['50']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                {lookups?.['50']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           )}
@@ -814,7 +839,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.[watchJpb === '06' ? '47' : '49']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                {lookups?.[watchJpb === '06' ? '47' : '49']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           )}
@@ -840,7 +865,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.['28']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                {lookups?.['28']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           )}
@@ -859,7 +884,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.['51']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                {lookups?.['51']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                               </SelectContent>
                             </Select>
                           )}
@@ -905,7 +930,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {lookups?.['09']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                    {lookups?.['09']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                                   </SelectContent>
                                 </Select>
                               )}
@@ -931,7 +956,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {lookups?.['48']?.map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                                  {lookups?.['48']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
                                 </SelectContent>
                               </Select>
                             )}
@@ -939,6 +964,32 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                         </div>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* JPB 13 */}
+                {watchJpb === '13' && (
+                  <div className="space-y-2 border-l pl-10 border-dashed">
+                    <Badge variant="outline" className="mb-2 bg-primary/5 text-primary border-primary/20 rounded-none text-[10px] uppercase">Apartemen</Badge>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
+                      <label className="md:col-span-6 text-xs text-foreground uppercase">Kelas Bangunan</label>
+                      <div className="md:col-span-6">
+                        <Controller
+                          name="klsJpb13"
+                          control={control}
+                          render={({ field }) => (
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger className="h-8 w-full font-bold bg-muted/10">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {lookups?.['50']?.filter(i => i.value !== '').map(i => <SelectItem key={i.value} value={i.value}>{i.label}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -1202,7 +1253,7 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                   <div className="flex items-center gap-1.5 mt-2">
                     <span className="text-xs font-bold text-foreground uppercase">Kelas</span>
                     <Badge variant="outline" className="text-lg border-2 border-primary text-primary">
-                      {(activeBuilding as any)?.kdKlasBng || '—'}
+                      {bngKelasInfo?.kelasBangunan || '—'}
                     </Badge>
                   </div>
                 </div>
@@ -1224,10 +1275,6 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                   <span className="text-xs font-bold text-foreground uppercase">NIP Pendata</span>
                   <span className="text-xs font-bold uppercase">{activeBuilding?.nipPendataBng || '—'}</span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-foreground uppercase">Nama Pendata</span>
-                  <span className="text-xs font-bold uppercase">{activeBuilding?.nmPendataanOp || '—'}</span>
-                </div>
               </div>
 
               <Separator className="my-4" />
@@ -1243,10 +1290,6 @@ export function LspopForm({ initialData, onSaveSuccess }: LspopFormProps) {
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-foreground uppercase">NIP Pemeriksa</span>
                   <span className="text-xs font-bold uppercase">{activeBuilding?.nipPemeriksaBng || '—'}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-foreground uppercase">Nama Pemeriksa</span>
-                  <span className="text-xs font-bold uppercase">{activeBuilding?.nmPemeriksaanOpBng || '—'}</span>
                 </div>
               </div>
             </CardContent>

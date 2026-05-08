@@ -1,8 +1,8 @@
 import { z } from "zod"
 import { os } from "../context"
 import { db } from "@/lib/db"
-import { spop, datSubjekPajak, datOpAnggota, datOpInduk, kelasBumi, datOpBangunan, sppt, pembayaranSppt } from "@/lib/db/schema"
-import { eq, and, or, like, sql, desc, lte, gte } from "drizzle-orm"
+import { spop, datSubjekPajak, datOpAnggota, datOpInduk, kelasBumi, datOpBangunan, sppt, pbbUserProfile } from "@/lib/db/schema"
+import { eq, and, or, lte, gte, like, sql, desc } from "drizzle-orm"
 import { nopWhere } from "@/lib/db/schema/_columns"
 
 const nopInput = z.object({
@@ -202,6 +202,21 @@ export const objekPajakRouter = os.router({
       }
     }),
 
+  searchJalan: os
+    .input(z.object({
+      query: z.string().optional(),
+      limit: z.number().int().min(1).max(100).default(50),
+    }))
+    .handler(async ({ input }) => {
+      const rows = await db
+        .selectDistinct({ jalanOp: spop.jalanOp })
+        .from(spop)
+        .where(input.query ? like(spop.jalanOp, `%${input.query}%`) : undefined)
+        .limit(input.limit)
+      
+      return rows.map(r => r.jalanOp)
+    }),
+
   // ── Get land class and NJOP based on unit value ──
   getKelasBumi: os
     .input(z.object({ nilai: z.number() }))
@@ -212,6 +227,21 @@ export const objekPajakRouter = os.router({
         .where(and(
           lte(kelasBumi.nilaiMinimum, String(input.nilai)),
           gte(kelasBumi.nilaiMaksimum, String(input.nilai))
+        ))
+      
+      return row ?? null
+    }),
+
+  getKelasBng: os
+    .input(z.object({ nilai: z.number() }))
+    .handler(async ({ input }) => {
+      const { kelasBangunan } = await import('@/lib/db/schema')
+      const [row] = await db
+        .select()
+        .from(kelasBangunan)
+        .where(and(
+          lte(kelasBangunan.nilaiMinimum, String(input.nilai)),
+          gte(kelasBangunan.nilaiMaksimum, String(input.nilai))
         ))
       
       return row ?? null
@@ -427,6 +457,7 @@ export const objekPajakRouter = os.router({
         tglPendataanOp: z.date().optional(),
         tglPemeriksaanOp: z.date().optional(),
         noPersil: z.string().optional(),
+        jenisSpptKhusus: z.string().optional(),
       }),
       subjekPajak: z.object({
         subjekPajakId: z.string().max(30),
@@ -454,12 +485,30 @@ export const objekPajakRouter = os.router({
         luasBumiBeban: z.number().optional(),
         luasBngBeban: z.number().optional(),
       }).optional(),
-    }))
-    .handler(async ({ input }) => {
+    })).handler(async ({ input, context: ctx }) => {
       const { spop: spopData, subjekPajak: wpData, anggota: anggotaData } = input
       const now = new Date()
 
       return await db.transaction(async (tx) => {
+        // 0. Resolve Petugas Identity from Session
+        let nip = spopData.nipPendata
+        let nama = spopData.nmPendataanOp
+
+        if (ctx.session?.user?.id) {
+          const [profile] = await tx
+            .select()
+            .from(pbbUserProfile)
+            .where(eq(pbbUserProfile.userId, ctx.session.user.id))
+          
+          if (profile) {
+            nip = profile.nip ?? nip
+            nama = profile.nama ?? nama
+          } else {
+            // Fallback to Better Auth user name if profile not found
+            nama = ctx.session.user.name ?? nama
+          }
+        }
+
         // 1. Upsert Subjek Pajak
         const [existingWp] = await tx
           .select()
@@ -480,6 +529,8 @@ export const objekPajakRouter = os.router({
 
         const spopValues = {
           ...spopData,
+          nipPendata: nip,
+          nmPendataanOp: nama,
           tglPendataanOp: spopData.tglPendataanOp ?? now,
           tglPemeriksaanOp: spopData.tglPemeriksaanOp ?? now,
         }
@@ -505,6 +556,29 @@ export const objekPajakRouter = os.router({
         } else {
           // If not anggota, ensure record is removed if it was there
           await tx.delete(datOpAnggota).where(nopWhere(datOpAnggota, spopData))
+        }
+
+        // 4. Handle SPPT Khusus (Peruntukan)
+        const { spptKhusus } = await import('@/lib/db/schema')
+        if (spopData.jenisSpptKhusus) {
+          const [existingKhusus] = await tx
+            .select()
+            .from(spptKhusus)
+            .where(nopWhere(spptKhusus, spopData))
+          
+          const khususValues = {
+            ...spopData,
+            jenisSppt: spopData.jenisSpptKhusus,
+            tahap: 1, // Default tahap 1
+          }
+
+          if (existingKhusus) {
+            await tx.update(spptKhusus).set(khususValues).where(nopWhere(spptKhusus, spopData))
+          } else {
+            await tx.insert(spptKhusus).values(khususValues)
+          }
+        } else {
+          await tx.delete(spptKhusus).where(nopWhere(spptKhusus, spopData))
         }
 
         return { success: true }
@@ -543,6 +617,7 @@ export const objekPajakRouter = os.router({
       return db
         .select({
           thnPajakSppt: sppt.thnPajakSppt,
+          nmWp: sppt.nmWp,
           pbbHarusDibayar: sppt.pbbYgHarusDibayarSppt,
           tglJatuhTempo: sppt.tglJatuhTempo,
         })

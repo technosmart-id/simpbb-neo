@@ -13,8 +13,12 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, AlertCircle, TrendingUp, Calendar } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Loader2, AlertCircle, TrendingUp, Calendar, Printer, FileDown, CheckCircle2 } from 'lucide-react'
 import { format, differenceInDays } from 'date-fns'
+import { downloadTunggakanPdf } from '@/lib/utils/pdf/tunggakan-generator'
+import { parseNop } from '@/lib/utils/nop'
+import { toast } from 'sonner'
 
 interface TunggakanTabProps {
   initialData: any
@@ -26,13 +30,13 @@ export function TunggakanTab({ initialData }: TunggakanTabProps) {
   const { data: tunggakan, isLoading } = useQuery({
     ...orpc.objekPajak.getTunggakan.queryOptions({
       input: {
-        kdPropinsi: initialData.kdPropinsi,
-        kdDati2: initialData.kdDati2,
-        kdKecamatan: initialData.kdKecamatan,
-        kdKelurahan: initialData.kdKelurahan,
-        kdBlok: initialData.kdBlok,
-        noUrut: initialData.noUrut,
-        kdJnsOp: initialData.kdJnsOp,
+        kdPropinsi: initialData?.kdPropinsi ?? '',
+        kdDati2: initialData?.kdDati2 ?? '',
+        kdKecamatan: initialData?.kdKecamatan ?? '',
+        kdKelurahan: initialData?.kdKelurahan ?? '',
+        kdBlok: initialData?.kdBlok ?? '',
+        noUrut: initialData?.noUrut ?? '',
+        kdJnsOp: initialData?.kdJnsOp ?? '',
       }
     }),
     enabled: !!initialData,
@@ -52,41 +56,66 @@ export function TunggakanTab({ initialData }: TunggakanTabProps) {
     <div className="space-y-4">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-destructive/5 border-destructive/20 shadow-none">
+        <Card className="bg-destructive/5 dark:bg-destructive/10 border-destructive/20 shadow-none ring-1 ring-destructive/10">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2 rounded-lg bg-destructive/10 text-destructive">
+            <div className="p-2 rounded-lg bg-destructive/10 text-destructive shadow-sm">
               <AlertCircle className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Tunggakan</p>
-              <p className="text-xl font-bold text-destructive">Rp {totalPokok.toLocaleString()}</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Total Tunggakan</p>
+              <p className="text-xl font-black text-destructive tracking-tight">Rp {totalPokok.toLocaleString()}</p>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-primary/5 border-primary/20 shadow-none">
+        <Card className="bg-primary/5 dark:bg-primary/10 border-primary/20 shadow-none ring-1 ring-primary/10">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+            <div className="p-2 rounded-lg bg-primary/10 text-primary shadow-sm">
               <Calendar className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Tahun Tertua</p>
-              <p className="text-xl font-bold text-foreground">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Tahun Tertua</p>
+              <p className="text-xl font-black text-foreground tracking-tight">
                 {tunggakan && tunggakan.length > 0 ? Math.min(...tunggakan.map(t => Number(t.thnPajakSppt))) : '—'}
               </p>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-amber-500/5 border-amber-500/20 shadow-none">
+        <Card className="bg-amber-500/5 dark:bg-amber-500/10 border-amber-500/20 shadow-none ring-1 ring-amber-500/10">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600">
+            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-500 shadow-sm">
               <TrendingUp className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Jumlah Item</p>
-              <p className="text-xl font-bold text-foreground">{tunggakan?.length || 0} Tahun</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-70">Jumlah Item</p>
+              <p className="text-xl font-black text-foreground tracking-tight">{tunggakan?.length || 0} Tahun</p>
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2 font-bold uppercase text-[10px]"
+          disabled={!tunggakan || tunggakan.length === 0}
+          onClick={() => {
+            if (!tunggakan) return
+            downloadTunggakanPdf({
+              nopParts: initialData,
+              nmWp: tunggakan[0]?.nmWp || 'Unknown',
+              items: tunggakan.map(t => ({
+                thnPajakSppt: t.thnPajakSppt,
+                tglJatuhTempo: t.tglJatuhTempo,
+                pbbHarusDibayar: t.pbbHarusDibayar || 0
+              }))
+            })
+            toast.success("PDF Tunggakan berhasil dibuat")
+          }}
+        >
+          <Printer className="h-3.5 w-3.5" />
+          Cetak Tunggakan
+        </Button>
       </div>
 
       <div className="rounded-xl border bg-card overflow-hidden">
@@ -138,4 +167,3 @@ export function TunggakanTab({ initialData }: TunggakanTabProps) {
   )
 }
 
-import { CheckCircle2 } from 'lucide-react'

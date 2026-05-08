@@ -15,6 +15,21 @@ import {
 } from "@/components/ui/select"
 import { formatRupiah } from '@/components/data-table/column-helpers'
 import { NopInput } from '@/components/nop/nop-input'
+import { Check, ChevronsUpDown, Search } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { orpcClient } from '@/lib/orpc/client'
 import { useQuery } from '@tanstack/react-query'
 import { useORPC } from '@/lib/orpc/react'
@@ -76,6 +91,9 @@ const spopFormSchema = z.object({
   // Beban (Joint Property)
   luasBumiBeban: z.number().optional(),
   luasBngBeban: z.number().optional(),
+  
+  // SPPT Khusus (Peruntukan)
+  jenisSpptKhusus: z.string().optional(),
 })
 
 type SpopFormValues = z.infer<typeof spopFormSchema>
@@ -90,6 +108,8 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
   const [mounted, setMounted] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const [kelasInfo, setKelasInfo] = React.useState<{ kelasBumi: string, njopBumi: string } | null>(null)
+  const [jalanOpen, setJalanOpen] = React.useState(false)
+  const [jalanQuery, setJalanQuery] = React.useState('')
 
   const { data: lookups } = useQuery(
     orpc.lookup.getMultipleGroups.queryOptions({
@@ -97,13 +117,25 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
     })
   )
 
+  const { data: jenisSpptList } = useQuery(
+    orpc.lookup.getJenisSppt.queryOptions({})
+  )
+
+  const { data: jalanSuggestions } = useQuery({
+    ...orpc.objekPajak.searchJalan.queryOptions({
+      input: { query: jalanQuery }
+    }),
+    enabled: jalanQuery.length > 2
+  })
+
   const defaultValues: Partial<SpopFormValues> = React.useMemo(() => {
     if (!initialData) return {
         kdStatusWp: '1',
         jnsTransaksiOp: '1',
         jnsBumi: '1',
         statusPekerjaanWp: '1',
-        kotaWp: 'DENPASAR'
+        kotaWp: 'DENPASAR',
+        jenisSpptKhusus: 'none'
     }
 
     const spop = initialData
@@ -167,6 +199,7 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
 
       luasBumiBeban: anggota.luasBumiBeban || 0,
       luasBngBeban: anggota.luasBngBeban || 0,
+      jenisSpptKhusus: spop.jenisSpptKhusus || 'none',
     }
   }, [initialData])
 
@@ -260,6 +293,7 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
           kdBlokAsal: nopAsal?.kdBlok,
           noUrutAsal: nopAsal?.noUrut,
           kdJnsOpAsal: nopAsal?.kdJnsOp,
+          jenisSpptKhusus: values.jenisSpptKhusus === 'none' ? undefined : values.jenisSpptKhusus,
         },
         subjekPajak: {
           subjekPajakId: values.subjekPajakId,
@@ -305,7 +339,7 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit as any)}>
-      <Card>
+      <Card className="dark:bg-slate-900/40 dark:backdrop-blur-sm border-muted-foreground/10">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
             {/* 2.1 Informasi Umum */}
@@ -401,10 +435,27 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
                     />
                     
                     <Field className="gap-0.5">
-                      <FieldLabel className="text-xs">Peruntukan</FieldLabel>
+                      <FieldLabel className="text-xs">Peruntukan (SPPT Khusus)</FieldLabel>
                       <FieldContent>
-                        {/* Ariefan: handle later */}
-                        <Input placeholder="Peruntukan..." className="uppercase" disabled />
+                        <Controller
+                          name="jenisSpptKhusus"
+                          control={control}
+                          render={({ field }) => (
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Bukan SPPT Khusus" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Bukan SPPT Khusus</SelectItem>
+                                {jenisSpptList?.map((item) => (
+                                  <SelectItem key={item.id} value={item.id.toString()}>
+                                    {item.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
                       </FieldContent>
                     </Field>
                     <Field className="gap-0.5">
@@ -421,7 +472,53 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
                 <Field className="md:col-span-6 gap-0.5">
                   <FieldLabel className="text-xs">Jalan</FieldLabel>
                   <FieldContent>
-                    <Input {...register('jalanOp')} className="uppercase" />
+                    <Controller
+                      name="jalanOp"
+                      control={control}
+                      render={({ field }) => (
+                        <Popover open={jalanOpen} onOpenChange={setJalanOpen}>
+                          <PopoverTrigger asChild>
+                            <div className="relative group">
+                              <Input 
+                                {...field} 
+                                className="uppercase pr-10" 
+                                autoComplete="off"
+                                onChange={(e) => {
+                                  field.onChange(e)
+                                  setJalanQuery(e.target.value)
+                                  if (!jalanOpen) setJalanOpen(true)
+                                }}
+                              />
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                                <Search className="h-3.5 w-3.5" />
+                              </div>
+                            </div>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]" align="start">
+                            <Command>
+                              <CommandList>
+                                <CommandEmpty>Tidak ada saran jalan.</CommandEmpty>
+                                <CommandGroup heading="Saran Jalan">
+                                  {jalanSuggestions?.map((j) => (
+                                    <CommandItem
+                                      key={j}
+                                      value={j}
+                                      onSelect={() => {
+                                        setValue('jalanOp', j)
+                                        setJalanOpen(false)
+                                      }}
+                                    >
+                                      <Check className={cn("mr-2 h-4 w-4", field.value === j ? "opacity-100" : "opacity-0")} />
+                                      {j}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      )}
+                    />
                     {errors.jalanOp && <p className="text-[10px] text-destructive font-bold">{errors.jalanOp.message as string}</p>}
                   </FieldContent>
                 </Field>
@@ -480,7 +577,7 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
                                 <SelectValue placeholder="Pilih Jenis Bumi" />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.['20']?.map((item) => (
+                                {lookups?.['20']?.filter(item => item.value !== '').map((item) => (
                                   <SelectItem key={item.value} value={item.value}>
                                     {item.label}
                                   </SelectItem>
@@ -503,17 +600,17 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
                   </FieldContent>
                 </Field>
                 <Field className="md:col-span-4 gap-0.5">
-                  <FieldLabel className="text-xs">Kelas Bumi</FieldLabel>
-                  <FieldContent className="flex items-center h-10 px-3 bg-muted/30 rounded-md border border-input text-sm font-semibold">
-                    {kelasInfo?.kelasBumi || "—"}
-                  </FieldContent>
-                </Field>
-                <Field className="md:col-span-4 gap-0.5">
-                  <FieldLabel className="text-xs">NJOP Bumi</FieldLabel>
-                  <FieldContent className="flex items-center h-10 px-3 bg-primary/5 text-primary rounded-md border border-primary/20 text-sm font-bold">
-                    {kelasInfo ? formatRupiah(parseFloat(kelasInfo.njopBumi) * (watch('luasBumi') || 0)) : "Rp 0"}
-                  </FieldContent>
-                </Field>
+                   <FieldLabel className="text-xs">Kelas Bumi</FieldLabel>
+                   <FieldContent className="flex items-center h-10 px-3 bg-muted/30 dark:bg-muted/10 rounded-md border border-input text-sm font-semibold transition-colors">
+                     {kelasInfo?.kelasBumi || "—"}
+                   </FieldContent>
+                 </Field>
+                 <Field className="md:col-span-4 gap-0.5">
+                   <FieldLabel className="text-xs">NJOP Bumi</FieldLabel>
+                   <FieldContent className="flex items-center h-10 px-3 bg-primary/5 dark:bg-primary/10 text-primary rounded-md border border-primary/20 dark:border-primary/30 text-sm font-bold shadow-inner">
+                     {kelasInfo ? formatRupiah(parseFloat(kelasInfo.njopBumi) * (watch('luasBumi') || 0)) : "Rp 0"}
+                   </FieldContent>
+                 </Field>
 
                 {watchNopBersama && (
                   <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-4 gap-2.5 pt-4 border-t border-dashed mt-2">
@@ -568,7 +665,7 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
                                 <SelectValue placeholder="Pilih Status WP" />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.['10']?.map((item) => (
+                                {lookups?.['10']?.filter(item => item.value !== '').map((item) => (
                                   <SelectItem key={item.value} value={item.value}>
                                     {item.label}
                                   </SelectItem>
@@ -599,7 +696,7 @@ export function SpopForm({ initialData, onSaveSuccess }: SpopFormProps) {
                                 <SelectValue placeholder="Pilih Pekerjaan" />
                               </SelectTrigger>
                               <SelectContent>
-                                {lookups?.['08']?.map((item) => (
+                                {lookups?.['08']?.filter(item => item.value !== '').map((item) => (
                                   <SelectItem key={item.value} value={item.value}>
                                     {item.label}
                                   </SelectItem>

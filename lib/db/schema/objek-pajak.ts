@@ -13,7 +13,7 @@ import { nopColumns, nopPrimaryKey } from "./_columns";
 export const datSubjekPajak = mysqlTable("dat_subjek_pajak", {
   subjekPajakId: varchar("SUBJEK_PAJAK_ID", { length: 30 }).primaryKey(),
   nmWp: varchar("NM_WP", { length: 30 }).notNull(),
-  jalanWp: varchar("JALAN_WP", { length: 100 }).notNull(),
+  jalanWp: varchar("JALAN_WP", { length: 30 }).notNull(),
   blokKavNoWp: varchar("BLOK_KAV_NO_WP", { length: 15 }),
   rwWp: varchar("RW_WP", { length: 2 }),
   rtWp: varchar("RT_WP", { length: 3 }),
@@ -22,7 +22,7 @@ export const datSubjekPajak = mysqlTable("dat_subjek_pajak", {
   kdPosWp: varchar("KD_POS_WP", { length: 5 }),
   telpWp: varchar("TELP_WP", { length: 20 }),
   npwp: varchar("NPWP", { length: 16 }),
-  emailWp: varchar("EMAIL_WP", { length: 100 }),
+  emailWp: varchar("EMAIL_WP", { length: 50 }),
   statusPekerjaanWp: char("STATUS_PEKERJAAN_WP", { length: 1 }).notNull(),
 });
 

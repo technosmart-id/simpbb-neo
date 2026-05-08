@@ -41,13 +41,13 @@ export function SpptTab({ initialData }: SpptTabProps) {
   const { data: history, isLoading } = useQuery({
     ...orpc.objekPajak.getSpptHistory.queryOptions({
       input: {
-        kdPropinsi: initialData.kdPropinsi,
-        kdDati2: initialData.kdDati2,
-        kdKecamatan: initialData.kdKecamatan,
-        kdKelurahan: initialData.kdKelurahan,
-        kdBlok: initialData.kdBlok,
-        noUrut: initialData.noUrut,
-        kdJnsOp: initialData.kdJnsOp,
+        kdPropinsi: initialData?.kdPropinsi ?? '',
+        kdDati2: initialData?.kdDati2 ?? '',
+        kdKecamatan: initialData?.kdKecamatan ?? '',
+        kdKelurahan: initialData?.kdKelurahan ?? '',
+        kdBlok: initialData?.kdBlok ?? '',
+        noUrut: initialData?.noUrut ?? '',
+        kdJnsOp: initialData?.kdJnsOp ?? '',
       }
     }),
     enabled: !!initialData,
@@ -93,23 +93,23 @@ export function SpptTab({ initialData }: SpptTabProps) {
   }
 
   return (
-    <Card className="animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-hidden">
-      <CardHeader className="bg-muted/30 border-b py-4">
+    <Card className="animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-hidden dark:bg-slate-900/40 dark:backdrop-blur-md border-muted-foreground/10 shadow-xl dark:shadow-primary/5">
+      <CardHeader className="bg-muted/30 dark:bg-muted/10 border-b border-border/50 py-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-             <div className="p-2 rounded-lg bg-primary/10 text-primary">
+             <div className="p-2 rounded-lg bg-primary/10 text-primary ring-1 ring-primary/20 shadow-sm">
                <FileText className="h-5 w-5" />
              </div>
              <div>
-               <CardTitle className="text-lg">Detail SPPT Tahun {currentSppt.thnPajakSppt}</CardTitle>
+               <CardTitle className="text-lg font-black tracking-tight">Detail SPPT Tahun {currentSppt.thnPajakSppt}</CardTitle>
                <div className="flex items-center gap-2 mt-0.5">
-                  <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest px-2 py-0">SIKLUS 1</Badge>
-                  <span className="text-xs text-muted-foreground uppercase font-medium">Salinan Resmi</span>
+                  <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest px-2 py-0 border-primary/30 text-primary">SIKLUS 1</Badge>
+                  <span className="text-[10px] text-muted-foreground uppercase font-black tracking-wider opacity-70">Salinan Resmi</span>
                </div>
              </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-background p-1.5 rounded-lg border shadow-sm">
+          <div className="flex items-center gap-2 bg-background/50 dark:bg-slate-950/50 p-1.5 rounded-lg border border-border/50 shadow-sm backdrop-blur-sm">
             <Button 
               variant="ghost" 
               size="icon" 
@@ -199,7 +199,7 @@ export function SpptTab({ initialData }: SpptTabProps) {
           </div>
 
           {/* Right Column: Calculations & Payment */}
-          <div className="p-6 space-y-8 bg-muted/10">
+          <div className="p-6 space-y-8 bg-muted/10 dark:bg-slate-950/20">
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-widest">
                 <DollarSign className="h-3.5 w-3.5" />

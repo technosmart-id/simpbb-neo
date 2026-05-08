@@ -96,7 +96,7 @@ function ObjekPajakPageContent() {
   return (
     <div className="flex flex-col gap-3">
       {/* 1. Header & NOP Search */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-card p-3 rounded-xl border shadow-sm">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-card dark:bg-card/50 backdrop-blur-sm p-3 rounded-xl border shadow-sm dark:shadow-primary/5">
         <div className="flex flex-1 max-w-xl items-center">
           <Combobox 
             onValueChange={(val) => {
@@ -109,71 +109,76 @@ function ObjekPajakPageContent() {
                 placeholder="Cari NOP atau Nama Wajib Pajak..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-10 w-full"
+                className="pl-10 h-10 w-full bg-background/50 focus-visible:ring-primary/30 transition-all"
               />
             </div>
-            <ComboboxContent>
+            <ComboboxContent className="dark:bg-slate-900/95 dark:backdrop-blur-md">
               <ComboboxList>
                 {searchResults.data?.map((item) => (
-                  <ComboboxItem key={formatNop(item)} value={item}>
+                  <ComboboxItem key={formatNop(item)} value={item} className="cursor-pointer">
                     <div className="flex flex-col gap-0.5">
-                      <span className="font-bold text-sm">{formatNop(item)}</span>
+                      <span className="font-bold text-sm text-foreground">{formatNop(item)}</span>
                       <span className="text-[10px] text-muted-foreground leading-none">
                         {item.nmWp} • {item.jalanOp}
                       </span>
                     </div>
                   </ComboboxItem>
                 ))}
-                <ComboboxEmpty>
-                  {searchResults.isLoading ? "Mencari..." : "Tidak ada hasil."}
+                <ComboboxEmpty className="py-6 text-center text-xs text-muted-foreground">
+                  {searchResults.isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span>Mencari...</span>
+                    </div>
+                  ) : "Tidak ada hasil."}
                 </ComboboxEmpty>
               </ComboboxList>
             </ComboboxContent>
           </Combobox>
           <Link href="/objek-pajak/list">
-            <Button variant="outline" className="ml-2 h-10 px-4 font-bold border-primary/20 text-primary hover:bg-primary/5">
-              <Table2 className="h-4 w-4 mr-1" />
-              List NOP
+            <Button variant="outline" className="ml-2 h-10 px-4 font-bold border-primary/20 text-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors">
+              <Table2 className="h-4 w-4 mr-1.5" />
+              List
             </Button>
           </Link>
           <Button 
             onClick={() => { setData(null); setSearchQuery(''); }}
-            className="ml-2 h-10 px-4 font-bold shadow-sm"
+            className="ml-2 h-10 px-4 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
           >
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="h-4 w-4 mr-1.5" />
             Baru
           </Button>
         </div>
 
         <div className="hidden xl:block">
-          <Separator orientation="vertical" className="h-10" />
+          <Separator orientation="vertical" className="h-10 opacity-50" />
         </div>
 
         <div className="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm px-2">
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">Wajib Pajak</span>
-            <span className="font-bold text-foreground truncate max-w-[180px]">
+            <span className="text-[9px] font-black text-muted-foreground uppercase leading-tight tracking-widest opacity-70">Wajib Pajak</span>
+            <span className="font-bold text-foreground truncate max-w-[180px] text-sm">
               {data?.subjekPajak?.nmWp ?? "—"}
             </span>
           </div>
 
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">Wilayah</span>
-            <span className="font-semibold text-foreground">
+            <span className="text-[9px] font-black text-muted-foreground uppercase leading-tight tracking-widest opacity-70">Wilayah</span>
+            <span className="font-semibold text-foreground text-sm">
               {data?.kdKecamatan ?? "—"} / {data?.kdKelurahan ?? "—"}
             </span>
           </div>
 
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">Luas (m²)</span>
-            <span className="font-semibold text-foreground">
+            <span className="text-[9px] font-black text-muted-foreground uppercase leading-tight tracking-widest opacity-70">Luas (m²)</span>
+            <span className="font-semibold text-foreground text-sm">
               T: {data?.luasBumi ?? 0} | B: {data?.luasBangunan ?? 0}
             </span>
           </div>
 
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">ZNT</span>
-            <span className="font-bold text-primary">{data?.kdZnt ?? "—"}</span>
+            <span className="text-[9px] font-black text-muted-foreground uppercase leading-tight tracking-widest opacity-70">ZNT</span>
+            <span className="font-black text-primary text-sm">{data?.kdZnt ?? "—"}</span>
           </div>
         </div>
       </div>

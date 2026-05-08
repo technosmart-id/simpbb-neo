@@ -42,7 +42,7 @@ export const klasifikasiRouter = os.router({
 
   // Jenis SPPT
   listJenisSppt: os.handler(async () => {
-    return db.select().from(jenisSppt).orderBy(jenisSppt.kode)
+    return db.select().from(jenisSppt).orderBy(jenisSppt.id)
   }),
 
   // Fasilitas

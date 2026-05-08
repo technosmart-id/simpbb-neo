@@ -8,6 +8,7 @@ import {
   date,
   datetime,
   year,
+  smallint,
   text,
   double,
   primaryKey,
@@ -150,16 +151,11 @@ export const spptKhusus = mysqlTable(
   "sppt_khusus",
   {
     ...nopColumns(),
-    jenisSppt: int("JENIS_SPPT").notNull(),
-    keterangan: varchar("KETERANGAN", { length: 200 }),
+    jenisSppt: varchar("JENIS_SPPT", { length: 10 }),
+    tahap: smallint("TAHAP"),
   },
   (table) => [
     nopPrimaryKey("pk_sppt_khusus", table),
-    foreignKey({
-      name: "fk_sppt_khusus_jenis",
-      columns: [table.jenisSppt],
-      foreignColumns: [jenisSppt.id],
-    }),
   ],
 );
 
