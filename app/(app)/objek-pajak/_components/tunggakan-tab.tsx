@@ -14,7 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Loader2, AlertCircle, TrendingUp, Calendar, Printer, FileDown } from 'lucide-react'
+import { Loader2, AlertCircle, TrendingUp, Calendar, Printer, FileDown, CheckCircle2 } from 'lucide-react'
 import { format, differenceInDays } from 'date-fns'
 import { downloadTunggakanPdf } from '@/lib/utils/pdf/tunggakan-generator'
 import { parseNop } from '@/lib/utils/nop'
@@ -30,13 +30,13 @@ export function TunggakanTab({ initialData }: TunggakanTabProps) {
   const { data: tunggakan, isLoading } = useQuery({
     ...orpc.objekPajak.getTunggakan.queryOptions({
       input: {
-        kdPropinsi: initialData.kdPropinsi,
-        kdDati2: initialData.kdDati2,
-        kdKecamatan: initialData.kdKecamatan,
-        kdKelurahan: initialData.kdKelurahan,
-        kdBlok: initialData.kdBlok,
-        noUrut: initialData.noUrut,
-        kdJnsOp: initialData.kdJnsOp,
+        kdPropinsi: initialData?.kdPropinsi ?? '',
+        kdDati2: initialData?.kdDati2 ?? '',
+        kdKecamatan: initialData?.kdKecamatan ?? '',
+        kdKelurahan: initialData?.kdKelurahan ?? '',
+        kdBlok: initialData?.kdBlok ?? '',
+        noUrut: initialData?.noUrut ?? '',
+        kdJnsOp: initialData?.kdJnsOp ?? '',
       }
     }),
     enabled: !!initialData,
@@ -167,4 +167,3 @@ export function TunggakanTab({ initialData }: TunggakanTabProps) {
   )
 }
 
-import { CheckCircle2 } from 'lucide-react'

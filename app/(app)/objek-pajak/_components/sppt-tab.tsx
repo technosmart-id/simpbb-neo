@@ -41,13 +41,13 @@ export function SpptTab({ initialData }: SpptTabProps) {
   const { data: history, isLoading } = useQuery({
     ...orpc.objekPajak.getSpptHistory.queryOptions({
       input: {
-        kdPropinsi: initialData.kdPropinsi,
-        kdDati2: initialData.kdDati2,
-        kdKecamatan: initialData.kdKecamatan,
-        kdKelurahan: initialData.kdKelurahan,
-        kdBlok: initialData.kdBlok,
-        noUrut: initialData.noUrut,
-        kdJnsOp: initialData.kdJnsOp,
+        kdPropinsi: initialData?.kdPropinsi ?? '',
+        kdDati2: initialData?.kdDati2 ?? '',
+        kdKecamatan: initialData?.kdKecamatan ?? '',
+        kdKelurahan: initialData?.kdKelurahan ?? '',
+        kdBlok: initialData?.kdBlok ?? '',
+        noUrut: initialData?.noUrut ?? '',
+        kdJnsOp: initialData?.kdJnsOp ?? '',
       }
     }),
     enabled: !!initialData,

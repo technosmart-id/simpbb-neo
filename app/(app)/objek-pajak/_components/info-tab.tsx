@@ -21,13 +21,13 @@ export function InfoTab({ initialData }: InfoTabProps) {
   const { data: buildings } = useQuery({
     ...orpc.lspop.listByNop.queryOptions({
       input: {
-        kdPropinsi: initialData.kdPropinsi,
-        kdDati2: initialData.kdDati2,
-        kdKecamatan: initialData.kdKecamatan,
-        kdKelurahan: initialData.kdKelurahan,
-        kdBlok: initialData.kdBlok,
-        noUrut: initialData.noUrut,
-        kdJnsOp: initialData.kdJnsOp,
+        kdPropinsi: initialData?.kdPropinsi ?? '',
+        kdDati2: initialData?.kdDati2 ?? '',
+        kdKecamatan: initialData?.kdKecamatan ?? '',
+        kdKelurahan: initialData?.kdKelurahan ?? '',
+        kdBlok: initialData?.kdBlok ?? '',
+        noUrut: initialData?.noUrut ?? '',
+        kdJnsOp: initialData?.kdJnsOp ?? '',
       }
     }),
     enabled: !!initialData,
