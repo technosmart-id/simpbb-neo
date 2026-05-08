@@ -115,6 +115,8 @@ function LoginFormContent({ className, ...props }: React.ComponentProps<"div">) 
 
 	// Execute reCAPTCHA v3 and get token
 	const executeRecaptcha = async (): Promise<string | null> => {
+		return "disabled"; // Return a dummy token since verification is disabled
+		/*
 		if (typeof window === "undefined" || !window.grecaptcha?.execute) {
 			console.error("grecaptcha not ready");
 			return null;
@@ -127,10 +129,12 @@ function LoginFormContent({ className, ...props }: React.ComponentProps<"div">) 
 			console.error("Captcha error:", err);
 			return null;
 		}
+		*/
 	};
 
 	// Load reCAPTCHA v3 script
 	useEffect(() => {
+		/*
 		if (typeof window !== "undefined" && !window.grecaptcha) {
 			const script = document.createElement("script");
 			script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
@@ -138,6 +142,7 @@ function LoginFormContent({ className, ...props }: React.ComponentProps<"div">) 
 			script.defer = true;
 			document.head.appendChild(script);
 		}
+		*/
 	}, []);
 
 	const detectedType = detectIdentifierType(identifier);

@@ -179,10 +179,10 @@ export const auth = betterAuth({
 		}),
 
 		// 8. Captcha
-		captcha({
+		/* captcha({
 			provider: "google-recaptcha",
 			secretKey: process.env.RECAPTCHA_SECRET_KEY!,
-		}),
+		}), */
 
 		// 9. OpenAPI - API documentation
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
