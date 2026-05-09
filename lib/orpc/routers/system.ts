@@ -24,6 +24,10 @@ export const systemRouter = os.router({
         console.log("[SYSTEM] Resetting database tables...");
         connection = await mysql.createConnection(DATABASE_URL);
         
+        // Log MySQL version for debugging
+        const [versionResult]: any = await connection.query('SELECT VERSION() as version;');
+        console.log(`[SYSTEM] MySQL Version: ${versionResult[0].version}`);
+        
         // 1. DROP ALL TABLES & VIEWS
         await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
         const [rows]: any = await connection.query('SHOW FULL TABLES;');
