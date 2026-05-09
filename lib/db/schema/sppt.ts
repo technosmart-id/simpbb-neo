@@ -86,6 +86,7 @@ export const sppt = mysqlTable(
     statusPembayaranSppt: tinyint("STATUS_PEMBAYARAN_SPPT").default(0),
     statusTagihanSppt: tinyint("STATUS_TAGIHAN_SPPT").default(0),
     statusCetakSppt: tinyint("STATUS_CETAK_SPPT").default(0),
+    statusPembatalan: char("STATUS_PEMBATALAN", { length: 1 }).notNull().default('0'),
     
     nipPencetakSppt: varchar("NIP_PENCETAK_SPPT", { length: 20 }),
   },

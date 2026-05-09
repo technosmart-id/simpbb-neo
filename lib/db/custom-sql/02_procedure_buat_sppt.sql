@@ -1,6 +1,5 @@
 DROP PROCEDURE IF EXISTS buat_sppt_per_nop;
-
-DELIMITER //
+--> statement-breakpoint
 
 CREATE PROCEDURE buat_sppt_per_nop(
         IN NOP VARCHAR (18),
@@ -360,6 +359,4 @@ BEGIN
     AND (NO_URUT = SUBSTRING(@NOP, 14, 4)) 
     AND (KD_JNS_OP = SUBSTRING(@NOP, 18, 1)) ;
     
-END //
-
-DELIMITER ;
+END;

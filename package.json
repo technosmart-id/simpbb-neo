@@ -17,7 +17,7 @@
     "db:seed": "tsx lib/db/seed",
     "db:seed:prod": "tsx lib/db/seed/prod",
     "db:seed:dev": "tsx lib/db/seed/dev",
-    "db:reset": "tsx scripts/reset-db.ts && drizzle-kit push && npm run db:seed",
+    "db:reset": "tsx scripts/reset-db.ts && drizzle-kit push && tsx scripts/apply-custom-sql.ts && npm run db:seed",
     "auth:generate": "tsx scripts/generate-auth.ts",
     "backup:now": "tsx scripts/backup-manual.ts",
     "backup:daemon": "tsx scripts/backup-runner.ts"

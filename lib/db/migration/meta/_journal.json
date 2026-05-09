@@ -5,57 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1774029652034,
-      "tag": "0000_warm_jack_power",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1774198235332,
-      "tag": "0001_strange_bloodstrike",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1742688000000,
-      "tag": "0002_casbin_first_migration",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1774002551876,
-      "tag": "0003_simpbb-legacy-schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1774002551877,
-      "tag": "0004_create_views",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1774404425433,
-      "tag": "0005_far_orphan",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1774423328144,
-      "tag": "0006_solid_proudstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1777025462968,
-      "tag": "0007_redundant_shadow_king",
+      "when": 1778300269992,
+      "tag": "0000_melted_deathstrike",
       "breakpoints": true
     }
   ]

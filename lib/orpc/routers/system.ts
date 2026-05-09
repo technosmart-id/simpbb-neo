@@ -59,9 +59,14 @@ export const systemRouter = os.router({
             encoding: 'utf-8'
           });
           console.log("[SYSTEM] Tables recreated successfully.");
+
+          // Apply Custom SQL (Views & Procedures)
+          const { applyCustomSql } = await import('../../../scripts/apply-custom-sql');
+          await applyCustomSql(console.log, console.error);
+
         } catch (pushError: any) {
-          console.error("[SYSTEM] Drizzle push failed:", pushError.stdout || pushError.message);
-          throw new Error(`Failed to recreate tables: ${pushError.message}`);
+          console.error("[SYSTEM] Drizzle push or Custom SQL failed:", pushError.stdout || pushError.message);
+          throw new Error(`Failed to recreate tables/views: ${pushError.message}`);
         }
 
         // 3. SEED DATA
