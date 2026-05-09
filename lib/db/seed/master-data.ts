@@ -2,11 +2,15 @@ import { db } from "../index";
 import { kelasBumi, kelasBangunan, tarif, fasilitas, konfigurasi } from "../schema";
 import { sql } from "drizzle-orm";
 import mysql from 'mysql2/promise';
+import { seedValuationData } from "./valuation-data";
 
 export async function seedMasterData() {
   console.log("📊 Seeding official SISMIOP master data...");
 
-  // 0. Konfigurasi from Production
+  // 0. Valuation Reference Data from Production
+  await seedValuationData();
+
+  // 0.5. Konfigurasi from Production
   console.log("  ⚙️  Seeding konfigurasi from production backup...");
   const PROD_DB = 'mysql://simpbb:af1u5nyk62vgugfm@203.130.255.4:33063/simpbb';
   const prodConn = await mysql.createConnection(PROD_DB);

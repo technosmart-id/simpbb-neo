@@ -58,6 +58,10 @@ async function main() {
     await connection.end();
     console.log("[SYSTEM] Tables recreated via migrations.");
 
+    // Apply Custom SQL (Views & Procedures)
+    const { applyCustomSql } = await import('./apply-custom-sql');
+    await applyCustomSql(console.log, console.error);
+
     // 3. SEED DATA
     console.log("[SYSTEM] Seeding production data...");
     await seedProd();
