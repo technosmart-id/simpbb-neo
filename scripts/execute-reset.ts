@@ -34,25 +34,18 @@ async function main() {
       await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
     }
 
-    // 2. APPLY MIGRATIONS
-    const migrationDir = join(process.cwd(), "lib/db/migration");
-    const migrationFiles = readdirSync(migrationDir)
-      .filter(f => f.endsWith(".sql"))
-      .sort();
-
-    console.log(`[SYSTEM] Found ${migrationFiles.length} migration files.`);
-
-    for (const file of migrationFiles) {
-      console.log(`[SYSTEM] Applying migration: ${file}`);
-      const migrationSQL = readFileSync(join(migrationDir, file), "utf-8");
-      const statements = migrationSQL
-        .split("--> statement-breakpoint")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
-
-      for (const statement of statements) {
-        await connection.query(statement);
-      }
+    // 2. APPLY SCHEMA VIA MANUAL MIGRATIONS
+    console.log("[SYSTEM] Recreating tables via manual migrations...");
+    const { applyMigrations } = await import('../lib/db/migrate-helper');
+    
+    try {
+      const migrationConn = await mysql.createConnection(DATABASE_URL);
+      await applyMigrations(migrationConn, console.log);
+      await migrationConn.end();
+      console.log("[SYSTEM] Tables recreated successfully.");
+    } catch (pushError: any) {
+      console.error("[SYSTEM] Migration failed:", pushError.message);
+      process.exit(1);
     }
 
     await connection.end();

@@ -50,10 +50,10 @@ export async function seedSampleSpop() {
   console.log("  🗺️  Seeding wilayah reference data...");
   const { propinsis, dati2s, kecamatans, kelurahans } = getBaseWilayahData();
   
-  await db.insert(refPropinsi).values(propinsis);
-  await db.insert(refDati2).values(dati2s);
-  await db.insert(refKecamatan).values(kecamatans);
-  await db.insert(refKelurahan).values(kelurahans);
+  await db.insert(refPropinsi).values(propinsis).onDuplicateKeyUpdate({ set: { nmPropinsi: sql`VALUES(NM_PROPINSI)` } });
+  await db.insert(refDati2).values(dati2s).onDuplicateKeyUpdate({ set: { nmDati2: sql`VALUES(NM_DATI2)` } });
+  await db.insert(refKecamatan).values(kecamatans).onDuplicateKeyUpdate({ set: { nmKecamatan: sql`VALUES(NM_KECAMATAN)` } });
+  await db.insert(refKelurahan).values(kelurahans).onDuplicateKeyUpdate({ set: { nmKelurahan: sql`VALUES(NM_KELURAHAN)` } });
 
   // 2. Master Fasilitas - SKIPPED (Already seeded by seedProd)
   console.log("  🔧 Master fasilitas already seeded by production seeder.");

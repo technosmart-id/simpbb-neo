@@ -14,13 +14,17 @@ export async function seedMasterData() {
   console.log("  ⚙️  Seeding konfigurasi from production backup...");
   const PROD_DB = 'mysql://simpbb:af1u5nyk62vgugfm@203.130.255.4:33063/simpbb';
   const prodConn = await mysql.createConnection(PROD_DB);
+  let kdPropinsi = '51';
+  let kdDati2 = '72';
   try {
     const [rows]: any = await prodConn.execute('SELECT NAMA, NILAI FROM konfigurasi');
     const configData = rows.map((row: any) => ({
       nama: row.NAMA,
       nilai: row.NILAI instanceof Buffer ? row.NILAI.toString() : row.NILAI,
     }));
-    
+
+    kdPropinsi = configData.find(c => c.nama === 'KD_PROPINSI')?.nilai || '51';
+    kdDati2 = configData.find(c => c.nama === 'KD_DATI2')?.nilai || '72';
     // Chunking insert for konfigurasi
     for (let i = 0; i < configData.length; i += 50) {
       await db.insert(konfigurasi).values(configData.slice(i, i + 50)).onDuplicateKeyUpdate({
@@ -98,10 +102,10 @@ export async function seedMasterData() {
   // 3. Tarif
   console.log("  💸 Seeding tarif...");
   const dataTarif = [
-    { thnAwal: 1970, thnAkhir: 2023, njopMin: "0", njopMax: "1000000000", nilaiTarif: "0.1000" },
-    { thnAwal: 1970, thnAkhir: 2023, njopMin: "1000000001", njopMax: "999999999999", nilaiTarif: "0.2000" },
-    { thnAwal: 2024, thnAkhir: 2155, njopMin: "0", njopMax: "1000000000", nilaiTarif: "0.1000" },
-    { thnAwal: 2024, thnAkhir: 2155, njopMin: "1000000001", njopMax: "999999999999", nilaiTarif: "0.2000" },
+    { kdPropinsi, kdDati2, thnAwal: "1970", thnAkhir: "2023", njopMin: "0", njopMax: "1000000000", nilaiTarif: "0.001", njkp: 0 },
+    { kdPropinsi, kdDati2, thnAwal: "1970", thnAkhir: "2023", njopMin: "1000000001", njopMax: "999999999999", nilaiTarif: "0.002", njkp: 0 },
+    { kdPropinsi, kdDati2, thnAwal: "2024", thnAkhir: "2155", njopMin: "0", njopMax: "1000000000", nilaiTarif: "0.001", njkp: 0 },
+    { kdPropinsi, kdDati2, thnAwal: "2024", thnAkhir: "2155", njopMin: "1000000001", njopMax: "999999999999", nilaiTarif: "0.002", njkp: 0 },
   ];
   await db.insert(tarif).values(dataTarif).onDuplicateKeyUpdate({
     set: {

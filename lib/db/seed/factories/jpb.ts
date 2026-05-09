@@ -55,8 +55,8 @@ export function createJpbData(nop: any, noBng: number, kdJpb: string) {
       return {
         ...base,
         klsJpb5: randNumber({ min: 1, max: 4 }).toString(),
-        luasJpb5DgnAcSent: '0',
-        luasJpb5LainDgnAcSent: '0',
+        luasKmrJpb5DgnAcSent: '0',
+        luasRngLainJpb5DgnAcSent: '0',
       };
     case '06':
       return {
@@ -85,7 +85,7 @@ export function createJpbData(nop: any, noBng: number, kdJpb: string) {
     case '12':
       return {
         ...base,
-        typeKonstruksiJpb12: randItem(['1', '2', '3']),
+        typeJpb12: randItem(['1', '2', '3']),
       };
     case '13':
       return {
@@ -93,7 +93,7 @@ export function createJpbData(nop: any, noBng: number, kdJpb: string) {
         klsJpb13: randNumber({ min: 1, max: 4 }).toString(),
         jmlJpb13: randNumber({ min: 1, max: 10 }).toString(),
         luasJpb13DgnAcSent: '0',
-        luasJpb13Lain_DGN_AC_SENT: '0',
+        luasJpb13LainDgnAcSent: '0',
       };
     case '14':
       return {

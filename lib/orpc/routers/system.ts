@@ -49,21 +49,16 @@ export const systemRouter = os.router({
         await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
         await connection.end();
 
-        // 2. APPLY SCHEMA VIA DRIZZLE MIGRATE
-        console.log("[SYSTEM] Recreating tables via drizzle-kit migrate...");
-        const { execSync } = await import('child_process');
+        // 2. APPLY SCHEMA VIA MANUAL MIGRATIONS
+        console.log("[SYSTEM] Recreating tables via manual migrations...");
         
         try {
-          // Use direct path to binary to avoid npx update checks/noise
-          const output = execSync('./node_modules/.bin/drizzle-kit migrate', {
-            env: { 
-              ...process.env, 
-              NODE_ENV: 'development',
-            },
-            stdio: 'pipe', 
-            encoding: 'utf-8'
-          });
-          console.log("[SYSTEM] Drizzle migrate output:", output);
+          const { applyMigrations } = await import('../../db/migrate-helper');
+          // We need a fresh connection to run the migrations if the previous one was closed
+          const migrationConn = await mysql.createConnection(DATABASE_URL);
+          await applyMigrations(migrationConn, console.log);
+          await migrationConn.end();
+
           console.log("[SYSTEM] Tables recreated successfully.");
 
           // Apply Custom SQL (Views & Procedures)
@@ -71,9 +66,8 @@ export const systemRouter = os.router({
           await applyCustomSql(console.log, console.error);
 
         } catch (pushError: any) {
-          const errorMessage = pushError.stderr || pushError.stdout || pushError.message;
-          console.error("[SYSTEM] Drizzle push or Custom SQL failed:", errorMessage);
-          throw new Error(`Failed to recreate tables/views: ${errorMessage}`);
+          console.error("[SYSTEM] Migration or Custom SQL failed:", pushError.message);
+          throw new Error(`Failed to recreate tables/views: ${pushError.message}`);
         }
 
         // 3. SEED DATA
@@ -106,7 +100,7 @@ export const systemRouter = os.router({
           // Restore original logs before throwing
           console.log = originalLog;
           console.error = originalError;
-          throw new Error(`Tables recreated but seeding failed: ${seedError.message}. Logs: ${logs.join("\\n")}`);
+          throw new Error(`Tables recreated but seeding failed: ${seedError.message}. See server logs for details.`);
         } finally {
           // Restore original logs
           console.log = originalLog;

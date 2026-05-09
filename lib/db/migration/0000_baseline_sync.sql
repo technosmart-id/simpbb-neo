@@ -193,6 +193,31 @@ CREATE TABLE `member_roles` (
 	CONSTRAINT `unique_member_role` UNIQUE(`member_id`,`role_id`,`role_type`)
 );
 --> statement-breakpoint
+CREATE TABLE `org_roles` (
+	`id` varchar(36) NOT NULL,
+	`organization_id` varchar(36) NOT NULL,
+	`name` varchar(100) NOT NULL,
+	`slug` varchar(100) NOT NULL,
+	`description` text,
+	`is_default_role` boolean NOT NULL DEFAULT false,
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`created_by` varchar(36) NOT NULL,
+	CONSTRAINT `org_roles_id` PRIMARY KEY(`id`),
+	CONSTRAINT `org_roles_org_slug_idx` UNIQUE(`organization_id`,`slug`)
+);
+--> statement-breakpoint
+CREATE TABLE `resource_ownership` (
+	`id` varchar(36) NOT NULL,
+	`resource_type` varchar(100) NOT NULL,
+	`resource_id` varchar(36) NOT NULL,
+	`owner_id` varchar(36) NOT NULL,
+	`organization_id` varchar(36) NOT NULL,
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT `resource_ownership_id` PRIMARY KEY(`id`),
+	CONSTRAINT `resource_ownership_unique_idx` UNIQUE(`resource_type`,`resource_id`,`owner_id`)
+);
+--> statement-breakpoint
 CREATE TABLE `notifications` (
 	`id` varchar(36) NOT NULL,
 	`user_id` varchar(36) NOT NULL,
@@ -218,20 +243,6 @@ CREATE TABLE `notification_preferences` (
 	CONSTRAINT `notification_preferences_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `org_roles` (
-	`id` varchar(36) NOT NULL,
-	`organization_id` varchar(36) NOT NULL,
-	`name` varchar(100) NOT NULL,
-	`slug` varchar(100) NOT NULL,
-	`description` text,
-	`is_default_role` boolean NOT NULL DEFAULT false,
-	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`created_by` varchar(36) NOT NULL,
-	CONSTRAINT `org_roles_id` PRIMARY KEY(`id`),
-	CONSTRAINT `org_roles_org_slug_idx` UNIQUE(`organization_id`,`slug`)
-);
---> statement-breakpoint
 CREATE TABLE `books` (
 	`id` serial AUTO_INCREMENT NOT NULL,
 	`title` varchar(255) NOT NULL,
@@ -248,100 +259,69 @@ CREATE TABLE `books` (
 	CONSTRAINT `books_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `resource_ownership` (
-	`id` varchar(36) NOT NULL,
-	`resource_type` varchar(100) NOT NULL,
-	`resource_id` varchar(36) NOT NULL,
-	`owner_id` varchar(36) NOT NULL,
-	`organization_id` varchar(36) NOT NULL,
-	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	CONSTRAINT `resource_ownership_id` PRIMARY KEY(`id`),
-	CONSTRAINT `resource_ownership_unique_idx` UNIQUE(`resource_type`,`resource_id`,`owner_id`)
-);
---> statement-breakpoint
-CREATE TABLE `jalan` (
-	`ID` int AUTO_INCREMENT NOT NULL,
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`NM_JALAN` varchar(100) NOT NULL,
-	CONSTRAINT `jalan_ID` PRIMARY KEY(`ID`)
-);
---> statement-breakpoint
 CREATE TABLE `ref_dati2` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
 	`NM_DATI2` varchar(30) NOT NULL,
 	CONSTRAINT `pk_ref_dati2` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`)
 );
 --> statement-breakpoint
+CREATE TABLE `ref_jns_pelayanan` (
+	`KD_JNS_PELAYANAN` char(2) NOT NULL,
+	`NM_JENIS_PELAYANAN` varchar(50) NOT NULL,
+	CONSTRAINT `ref_jns_pelayanan_KD_JNS_PELAYANAN` PRIMARY KEY(`KD_JNS_PELAYANAN`)
+);
+--> statement-breakpoint
 CREATE TABLE `ref_kecamatan` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`NM_KECAMATAN` varchar(30),
-	`NM_KECAMATAN_ONLY` varchar(30) NOT NULL,
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`NM_KECAMATAN` varchar(30) NOT NULL,
 	CONSTRAINT `pk_ref_kecamatan` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`)
 );
 --> statement-breakpoint
 CREATE TABLE `ref_kelurahan` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_SEKTOR` char(2) NOT NULL DEFAULT '00',
-	`NM_KELURAHAN` varchar(30),
-	`NM_KELURAHAN_ONLY` varchar(30) NOT NULL,
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`KD_KELURAHAN` varchar(3) NOT NULL,
+	`KD_SEKTOR` varchar(2) NOT NULL,
+	`NM_KELURAHAN` varchar(30) NOT NULL,
 	`NO_KELURAHAN` smallint,
 	`KD_POS_KELURAHAN` varchar(5),
-	CONSTRAINT `pk_ref_kelurahan` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_SEKTOR`)
+	CONSTRAINT `pk_ref_kelurahan` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`)
 );
 --> statement-breakpoint
 CREATE TABLE `ref_propinsi` (
-	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_PROPINSI` varchar(2) NOT NULL,
 	`NM_PROPINSI` varchar(30) NOT NULL,
 	CONSTRAINT `ref_propinsi_KD_PROPINSI` PRIMARY KEY(`KD_PROPINSI`)
 );
 --> statement-breakpoint
-CREATE TABLE `ref_jns_pelayanan` (
-	`KD_JNS_PELAYANAN` char(2) NOT NULL,
-	`NM_JENIS_PELAYANAN` varchar(100) NOT NULL,
-	CONSTRAINT `ref_jns_pelayanan_KD_JNS_PELAYANAN` PRIMARY KEY(`KD_JNS_PELAYANAN`)
-);
---> statement-breakpoint
-CREATE TABLE `ref_kategori` (
-	`KATEGORI` varchar(100) NOT NULL,
-	`KODE` char(2) NOT NULL,
-	`NAMA` varchar(100) NOT NULL,
-	CONSTRAINT `ref_kategori_KATEGORI_KODE_pk` PRIMARY KEY(`KATEGORI`,`KODE`)
-);
---> statement-breakpoint
 CREATE TABLE `akses` (
 	`AKSES` varchar(50) NOT NULL,
-	`AKTIF` tinyint NOT NULL DEFAULT 1,
+	`AKTIF` tinyint(1),
 	CONSTRAINT `akses_AKSES` PRIMARY KEY(`AKSES`)
 );
 --> statement-breakpoint
 CREATE TABLE `group_akses` (
 	`HAK_AKSES` varchar(30) NOT NULL,
 	`AKSES` varchar(50) NOT NULL,
-	CONSTRAINT `group_akses_HAK_AKSES_AKSES_pk` PRIMARY KEY(`HAK_AKSES`,`AKSES`)
+	CONSTRAINT `pk_group_akses` PRIMARY KEY(`HAK_AKSES`,`AKSES`)
 );
 --> statement-breakpoint
 CREATE TABLE `login` (
 	`ID` int AUTO_INCREMENT NOT NULL,
 	`USERNAME` varchar(20) NOT NULL,
-	`PASSWORD` varchar(255) NOT NULL DEFAULT 'd41d8cd98f00b204e9800998ecf8427e',
-	`HAK_AKSES` varchar(30) NOT NULL,
-	`NIP` varchar(30) DEFAULT '-',
-	`NAMA` varchar(200) DEFAULT '-',
-	`JABATAN` varchar(200) DEFAULT '-',
-	`PENANGGUNG_JAWAB_CETAK` tinyint DEFAULT 1,
-	`TANDA_TANGAN` LONGBLOB,
+	`PASSWORD` char(32) NOT NULL,
+	`HAK_AKSES` varchar(20) NOT NULL,
+	`NIP` varchar(30),
+	`NAMA` varchar(200),
+	`JABATAN` varchar(200),
+	`PENANGGUNG_JAWAB_CETAK` tinyint(1),
+	`TANDA_TANGAN` longblob,
 	`USER_ID` varchar(36),
-	CONSTRAINT `login_ID` PRIMARY KEY(`ID`),
-	CONSTRAINT `uk_username` UNIQUE(`USERNAME`)
+	CONSTRAINT `login_ID` PRIMARY KEY(`ID`)
 );
 --> statement-breakpoint
 CREATE TABLE `lookup_group` (
@@ -365,18 +345,18 @@ CREATE TABLE `konfigurasi` (
 --> statement-breakpoint
 CREATE TABLE `fasilitas` (
 	`KD_FASILITAS` char(2) NOT NULL,
-	`NM_FASILITAS` varchar(63) NOT NULL,
-	`SATUAN_FASILITAS` varchar(10) NOT NULL,
+	`NM_FASILITAS` varchar(50),
+	`SATUAN_FASILITAS` varchar(10),
 	`NILAI_FASILITAS` decimal(15,2) NOT NULL DEFAULT '0',
-	`STATUS_FASILITAS` char(1) NOT NULL DEFAULT '1',
-	`KETERGANTUNGAN` char(1) NOT NULL DEFAULT '0',
+	`STATUS_FASILITAS` char(1),
+	`KETERGANTUNGAN` char(1),
 	CONSTRAINT `fasilitas_KD_FASILITAS` PRIMARY KEY(`KD_FASILITAS`)
 );
 --> statement-breakpoint
 CREATE TABLE `jenis_sppt` (
 	`ID` int AUTO_INCREMENT NOT NULL,
-	`NAME` varchar(100) NOT NULL,
-	`TARIF_KHUSUS` decimal(8,4),
+	`NAME` varchar(255),
+	`TARIF_KHUSUS` decimal(3,3),
 	`NJKP_KHUSUS` int,
 	CONSTRAINT `jenis_sppt_ID` PRIMARY KEY(`ID`)
 );
@@ -397,24 +377,16 @@ CREATE TABLE `kelas_bumi` (
 	CONSTRAINT `kelas_bumi_KELAS_BUMI` PRIMARY KEY(`KELAS_BUMI`)
 );
 --> statement-breakpoint
-CREATE TABLE `kelas_tanah` (
-	`KD_KLS_TANAH` char(3) NOT NULL,
-	`THN_AWAL_KLS_TANAH` char(4) NOT NULL,
-	`THN_AKHIR_KLS_TANAH` char(4) NOT NULL,
-	`NILAI_MIN_TANAH` decimal(15,2),
-	`NILAI_MAX_TANAH` decimal(15,2),
-	`NILAI_PER_M2_TANAH` decimal(15,2),
-	CONSTRAINT `pk_kelas_tanah` PRIMARY KEY(`KD_KLS_TANAH`,`THN_AWAL_KLS_TANAH`,`THN_AKHIR_KLS_TANAH`)
-);
---> statement-breakpoint
-CREATE TABLE `tarif` (
-	`ID` int AUTO_INCREMENT NOT NULL,
-	`THN_AWAL` year NOT NULL,
-	`THN_AKHIR` year,
-	`NJOP_MIN` decimal(15,2) NOT NULL,
-	`NJOP_MAX` decimal(15,2) NOT NULL,
-	`NILAI_TARIF` decimal(8,4) NOT NULL,
-	CONSTRAINT `tarif_ID` PRIMARY KEY(`ID`)
+CREATE TABLE `dat_legalitas_bumi` (
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`KD_KELURAHAN` varchar(3) NOT NULL,
+	`KD_BLOK` varchar(3) NOT NULL,
+	`NO_URUT` varchar(4) NOT NULL,
+	`KD_JNS_OP` varchar(1) NOT NULL,
+	`NO_LEGALITAS_TANAH` varchar(15),
+	CONSTRAINT `pk_dat_legalitas_bumi` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_subjek_pajak` (
@@ -429,8 +401,8 @@ CREATE TABLE `dat_subjek_pajak` (
 	`KD_POS_WP` varchar(5),
 	`TELP_WP` varchar(20),
 	`NPWP` varchar(16),
+	`STATUS_PEKERJAAN_WP` varchar(1) NOT NULL,
 	`EMAIL_WP` varchar(50),
-	`STATUS_PEKERJAAN_WP` char(1) NOT NULL,
 	CONSTRAINT `dat_subjek_pajak_SUBJEK_PAJAK_ID` PRIMARY KEY(`SUBJEK_PAJAK_ID`)
 );
 --> statement-breakpoint
@@ -462,9 +434,9 @@ CREATE TABLE `spop` (
 	`NO_SPPT_LAMA` varchar(4),
 	`JALAN_OP` varchar(30) NOT NULL,
 	`BLOK_KAV_NO_OP` varchar(15),
-	`RT_OP` varchar(3),
-	`RW_OP` varchar(2),
 	`KELURAHAN_OP` varchar(30),
+	`RW_OP` varchar(2),
+	`RT_OP` varchar(3),
 	`KD_STATUS_WP` varchar(1) NOT NULL,
 	`LUAS_BUMI` bigint NOT NULL,
 	`KD_ZNT` varchar(2),
@@ -480,18 +452,53 @@ CREATE TABLE `spop` (
 	CONSTRAINT `pk_spop` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`)
 );
 --> statement-breakpoint
+CREATE TABLE `dat_op_anggota` (
+	`KD_PROPINSI_INDUK` varchar(2) NOT NULL,
+	`KD_DATI2_INDUK` varchar(2) NOT NULL,
+	`KD_KECAMATAN_INDUK` varchar(3) NOT NULL,
+	`KD_KELURAHAN_INDUK` varchar(3) NOT NULL,
+	`KD_BLOK_INDUK` varchar(3) NOT NULL,
+	`NO_URUT_INDUK` varchar(4) NOT NULL,
+	`KD_JNS_OP_INDUK` varchar(1) NOT NULL,
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`KD_KELURAHAN` varchar(3) NOT NULL,
+	`KD_BLOK` varchar(3) NOT NULL,
+	`NO_URUT` varchar(4) NOT NULL,
+	`KD_JNS_OP` varchar(1) NOT NULL,
+	`LUAS_BUMI_BEBAN` bigint,
+	`LUAS_BNG_BEBAN` bigint,
+	`NILAI_SISTEM_BUMI_BEBAN` bigint,
+	`NILAI_SISTEM_BNG_BEBAN` bigint,
+	`NJOP_BUMI_BEBAN` bigint,
+	`NJOP_BNG_BEBAN` bigint,
+	CONSTRAINT `pk_dat_op_anggota` PRIMARY KEY(`KD_PROPINSI_INDUK`,`KD_DATI2_INDUK`,`KD_KECAMATAN_INDUK`,`KD_KELURAHAN_INDUK`,`KD_BLOK_INDUK`,`NO_URUT_INDUK`,`KD_JNS_OP_INDUK`,`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`)
+);
+--> statement-breakpoint
+CREATE TABLE `dat_op_induk` (
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`KD_KELURAHAN` varchar(3) NOT NULL,
+	`KD_BLOK` varchar(3) NOT NULL,
+	`NO_URUT` varchar(4) NOT NULL,
+	`KD_JNS_OP` varchar(1) NOT NULL,
+	CONSTRAINT `pk_dat_op_induk` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`)
+);
+--> statement-breakpoint
 CREATE TABLE `dat_fasilitas_bangunan` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
-	`NO_BNG` int NOT NULL,
-	`KD_FASILITAS` char(2) NOT NULL,
-	`JML_SATUAN` bigint NOT NULL DEFAULT 0,
-	CONSTRAINT `pk_fasilitas_bangunan` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`,`KD_FASILITAS`)
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`KD_KELURAHAN` varchar(3) NOT NULL,
+	`KD_BLOK` varchar(3) NOT NULL,
+	`NO_URUT` varchar(4) NOT NULL,
+	`KD_JNS_OP` varchar(1) NOT NULL,
+	`NO_BNG` smallint NOT NULL,
+	`KD_FASILITAS` varchar(2) NOT NULL,
+	`JML_SATUAN` bigint NOT NULL,
+	CONSTRAINT `pk_dat_fasilitas_bangunan` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`,`KD_FASILITAS`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb12` (
@@ -503,8 +510,8 @@ CREATE TABLE `dat_jpb12` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`TYPE_KONSTRUKSI_JPB12` char(1) NOT NULL DEFAULT '1',
-	CONSTRAINT `pk_jpb12` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`TYPE_JPB12` char(1) NOT NULL,
+	CONSTRAINT `pk_dat_jpb12` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb13` (
@@ -516,11 +523,11 @@ CREATE TABLE `dat_jpb13` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`KLS_JPB13` char(1) NOT NULL DEFAULT '1',
-	`JML_JPB13` decimal(4,0),
-	`LUAS_JPB13_DGN_AC_SENT` decimal(12,0),
-	`LUAS_JPB13_LAIN_DGN_AC_SENT` decimal(12,0),
-	CONSTRAINT `pk_jpb13` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`KLS_JPB13` char(1) NOT NULL,
+	`JML_JPB13` decimal(4,0) NOT NULL,
+	`LUAS_JPB13_DGN_AC_SENT` decimal(12,0) NOT NULL,
+	`LUAS_JPB13_LAIN_DGN_AC_SENT` decimal(12,0) NOT NULL,
+	CONSTRAINT `pk_dat_jpb13` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb14` (
@@ -532,8 +539,8 @@ CREATE TABLE `dat_jpb14` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`LUAS_KANOPI_JPB14` decimal(12,0),
-	CONSTRAINT `pk_jpb14` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`LUAS_KANOPI_JPB14` decimal(12,0) NOT NULL,
+	CONSTRAINT `pk_dat_jpb14` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb15` (
@@ -545,9 +552,9 @@ CREATE TABLE `dat_jpb15` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`LETAK_TANGKI_JPB15` char(1) NOT NULL DEFAULT '1',
-	`KAPASITAS_TANGKI_JPB15` decimal(6,0),
-	CONSTRAINT `pk_jpb15` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`LETAK_TANGKI_JPB15` char(1) NOT NULL,
+	`KAPASITAS_TANGKI_JPB15` decimal(6,0) NOT NULL,
+	CONSTRAINT `pk_dat_jpb15` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb16` (
@@ -559,8 +566,8 @@ CREATE TABLE `dat_jpb16` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`KLS_JPB16` char(1) NOT NULL DEFAULT '1',
-	CONSTRAINT `pk_jpb16` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`KLS_JPB16` char(1) NOT NULL,
+	CONSTRAINT `pk_dat_jpb16` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb2` (
@@ -572,8 +579,8 @@ CREATE TABLE `dat_jpb2` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`KLS_JPB2` char(1) NOT NULL DEFAULT '1',
-	CONSTRAINT `pk_jpb2` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`KLS_JPB2` char(1) NOT NULL,
+	CONSTRAINT `pk_dat_jpb2` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb3` (
@@ -585,13 +592,13 @@ CREATE TABLE `dat_jpb3` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`TYPE_KONSTRUKSI` char(1) NOT NULL DEFAULT '1',
+	`TYPE_KONSTRUKSI` char(1) NOT NULL,
 	`TING_KOLOM_JPB3` decimal(4,0) NOT NULL,
 	`LBR_BENT_JPB3` decimal(4,0) NOT NULL,
 	`LUAS_MEZZANINE_JPB3` decimal(4,0) NOT NULL,
 	`KELILING_DINDING_JPB3` decimal(4,0) NOT NULL,
 	`DAYA_DUKUNG_LANTAI_JPB3` decimal(8,0) NOT NULL,
-	CONSTRAINT `pk_jpb3` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	CONSTRAINT `pk_dat_jpb3` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb4` (
@@ -603,8 +610,8 @@ CREATE TABLE `dat_jpb4` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`KLS_JPB4` char(1) NOT NULL DEFAULT '1',
-	CONSTRAINT `pk_jpb4` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`KLS_JPB4` char(1) NOT NULL,
+	CONSTRAINT `pk_dat_jpb4` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb5` (
@@ -616,10 +623,10 @@ CREATE TABLE `dat_jpb5` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`KLS_JPB5` char(1) NOT NULL DEFAULT '1',
-	`LUAS_JPB5_DGN_AC_SENT` decimal(12,0),
-	`LUAS_JPB5_LAIN_DGN_AC_SENT` decimal(12,0),
-	CONSTRAINT `pk_jpb5` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`KLS_JPB5` char(1) NOT NULL,
+	`LUAS_KMR_JPB5_DGN_AC_SENT` decimal(12,0) NOT NULL,
+	`LUAS_RNG_LAIN_JPB5_DGN_AC_SENT` decimal(12,0) NOT NULL,
+	CONSTRAINT `pk_dat_jpb5` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb6` (
@@ -631,8 +638,8 @@ CREATE TABLE `dat_jpb6` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`KLS_JPB6` char(1) NOT NULL DEFAULT '1',
-	CONSTRAINT `pk_jpb6` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`KLS_JPB6` char(1) NOT NULL,
+	CONSTRAINT `pk_dat_jpb6` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb7` (
@@ -646,10 +653,10 @@ CREATE TABLE `dat_jpb7` (
 	`NO_BNG` int NOT NULL,
 	`JNS_JPB7` char(1) NOT NULL,
 	`BINTANG_JPB7` char(1) NOT NULL,
-	`JML_KMR_JPB7` int NOT NULL,
+	`JML_KMR_JPB7` decimal(4,0) NOT NULL,
 	`LUAS_KMR_JPB7_DGN_AC_SENT` decimal(12,0) NOT NULL,
 	`LUAS_KMR_LAIN_JPB7_DGN_AC_SENT` decimal(12,0) NOT NULL,
-	CONSTRAINT `pk_jpb7` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	CONSTRAINT `pk_dat_jpb7` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb8` (
@@ -661,13 +668,13 @@ CREATE TABLE `dat_jpb8` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`TYPE_KONSTRUKSI` char(1) NOT NULL DEFAULT '1',
+	`TYPE_KONSTRUKSI` char(1) NOT NULL,
 	`TING_KOLOM_JPB8` decimal(4,0) NOT NULL,
 	`LBR_BENT_JPB8` decimal(4,0) NOT NULL,
 	`LUAS_MEZZANINE_JPB8` decimal(4,0) NOT NULL,
 	`KELILING_DINDING_JPB8` decimal(4,0) NOT NULL,
 	`DAYA_DUKUNG_LANTAI_JPB8` decimal(8,0),
-	CONSTRAINT `pk_jpb8` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	CONSTRAINT `pk_dat_jpb8` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_jpb9` (
@@ -679,8 +686,8 @@ CREATE TABLE `dat_jpb9` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`KLS_JPB9` char(1) NOT NULL DEFAULT '1',
-	CONSTRAINT `pk_jpb9` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
+	`KLS_JPB9` char(1) NOT NULL,
+	CONSTRAINT `pk_dat_jpb9` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `dat_op_bangunan` (
@@ -692,115 +699,42 @@ CREATE TABLE `dat_op_bangunan` (
 	`NO_URUT` char(4) NOT NULL,
 	`KD_JNS_OP` char(1) NOT NULL,
 	`NO_BNG` int NOT NULL,
-	`NO_FORMULIR_LSPOP` varchar(11),
-	`JNS_TRANSAKSI_BNG` char(1),
 	`KD_JPB` char(2),
-	`LUAS_BNG` bigint NOT NULL DEFAULT 0,
-	`JML_LANTAI_BNG` int NOT NULL DEFAULT 1,
-	`THN_DIBANGUN_BNG` char(4),
+	`NO_FORMULIR_LSPOP` char(11),
+	`THN_DIBANGUN_BNG` char(4) NOT NULL,
 	`THN_RENOVASI_BNG` char(4),
+	`LUAS_BNG` bigint NOT NULL,
+	`JML_LANTAI_BNG` int NOT NULL,
 	`KONDISI_BNG` char(1),
 	`JNS_KONSTRUKSI_BNG` char(1),
 	`JNS_ATAP_BNG` char(1),
 	`KD_DINDING` char(1),
 	`KD_LANTAI` char(1),
 	`KD_LANGIT_LANGIT` char(1),
-	`NILAI_SISTEM_BNG` bigint NOT NULL DEFAULT 0,
-	`NILAI_INDIVIDU` bigint NOT NULL DEFAULT 0,
+	`NILAI_SISTEM_BNG` bigint NOT NULL,
+	`JNS_TRANSAKSI_BNG` char(1),
 	`TGL_PENDATAAN_BNG` datetime,
 	`NIP_PENDATA_BNG` char(30),
 	`TGL_PEMERIKSAAN_BNG` datetime,
 	`NIP_PEMERIKSA_BNG` char(30),
 	`TGL_PEREKAMAN_BNG` datetime,
 	`NIP_PEREKAM_BNG` char(30),
-	`TGL_KUNJUNGAN_KEMBALI` datetime,
-	`AKTIF` tinyint NOT NULL DEFAULT 1,
-	CONSTRAINT `pk_op_bangunan` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
-);
---> statement-breakpoint
-CREATE TABLE `dat_legalitas_bumi` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
-	`NO_LEGALITAS_TANAH` varchar(100),
-	`JNS_LEGALITAS` varchar(50),
-	CONSTRAINT `pk_dat_legalitas_bumi` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`)
-);
---> statement-breakpoint
-CREATE TABLE `dat_op_anggota` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
-	`KD_PROPINSI_INDUK` char(2) NOT NULL,
-	`KD_DATI2_INDUK` char(2) NOT NULL,
-	`KD_KECAMATAN_INDUK` char(3) NOT NULL,
-	`KD_KELURAHAN_INDUK` char(3) NOT NULL,
-	`KD_BLOK_INDUK` char(3) NOT NULL,
-	`NO_URUT_INDUK` char(4) NOT NULL,
-	`KD_JNS_OP_INDUK` char(1) NOT NULL,
-	`LUAS_BUMI_BEBAN` bigint,
-	`LUAS_BNG_BEBAN` bigint,
-	`NILAI_SISTEM_BUMI_BEBAN` bigint,
-	`NILAI_SISTEM_BNG_BEBAN` bigint,
-	`NJOP_BUMI_BEBAN` bigint,
-	`NJOP_BNG_BEBAN` bigint,
-	CONSTRAINT `pk_dat_op_anggota` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`)
-);
---> statement-breakpoint
-CREATE TABLE `dat_op_induk` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
-	CONSTRAINT `pk_dat_op_induk` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`)
-);
---> statement-breakpoint
-CREATE TABLE `histori_sppt` (
-	`ID` int AUTO_INCREMENT NOT NULL,
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
-	`THN_PAJAK_SPPT` varchar(4) NOT NULL,
-	`SIKLUS_SPPT` tinyint NOT NULL,
-	`NJOP_BUMI` decimal(15,2),
-	`NJOP_BNG` decimal(15,2),
-	`NJOP_SPPT` decimal(15,2),
-	`NJOPTKP_SPPT` decimal(15,2),
-	`NJKP_SPPT` decimal(15,2),
-	`PBB_TERHUTANG_SPPT` decimal(15,2),
-	`FAKTOR_PENGURANG_SPPT` decimal(15,2),
-	`PBB_YG_HARUS_DIBAYAR_SPPT` decimal(15,2),
-	`TGL_PERUBAHAN` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`NIP_PETUGAS` varchar(40),
-	`KETERANGAN` text,
-	CONSTRAINT `histori_sppt_ID` PRIMARY KEY(`ID`)
+	`TGL_KUNJUNGAN_KEMBALI` date,
+	`NILAI_INDIVIDU` bigint NOT NULL,
+	`AKTIF` tinyint(1) NOT NULL,
+	CONSTRAINT `pk_dat_op_bangunan` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`)
 );
 --> statement-breakpoint
 CREATE TABLE `sppt` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`KD_KELURAHAN` varchar(3) NOT NULL,
+	`KD_BLOK` varchar(3) NOT NULL,
+	`NO_URUT` varchar(4) NOT NULL,
+	`KD_JNS_OP` varchar(1) NOT NULL,
 	`THN_PAJAK_SPPT` varchar(4) NOT NULL,
-	`SIKLUS_SPPT` tinyint DEFAULT 1,
+	`SIKLUS_SPPT` tinyint(1),
 	`KD_KANWIL_BANK` varchar(2),
 	`KD_KPPBB_BANK` varchar(2),
 	`KD_BANK_TUNGGAL` varchar(2),
@@ -817,71 +751,39 @@ CREATE TABLE `sppt` (
 	`NPWP_SPPT` varchar(15),
 	`NO_PERSIL_SPPT` varchar(5),
 	`KD_KLS_TANAH` varchar(3),
-	`THN_AWAL_KLS_TANAH` year DEFAULT 2000,
+	`THN_AWAL_KLS_TANAH` year(4),
 	`KD_KLS_BNG` varchar(3),
-	`THN_AWAL_KLS_BNG` year DEFAULT 2000,
+	`THN_AWAL_KLS_BNG` year(4),
 	`TGL_JATUH_TEMPO_SPPT` date,
+	`LUAS_BUMI_SPPT` bigint NOT NULL,
+	`LUAS_BNG_SPPT` bigint NOT NULL,
+	`NJOP_BUMI_SPPT` bigint NOT NULL,
+	`NJOP_BNG_SPPT` bigint NOT NULL,
+	`NJOP_SPPT` bigint NOT NULL,
+	`NJOPTKP_SPPT` int NOT NULL,
+	`NJKP_SPPT` bigint NOT NULL,
+	`PBB_TERHUTANG_SPPT` bigint NOT NULL,
+	`FAKTOR_PENGURANG_SPPT` bigint NOT NULL,
+	`PBB_YG_HARUS_DIBAYAR_SPPT` bigint NOT NULL,
+	`STATUS_PEMBAYARAN_SPPT` tinyint(1),
+	`STATUS_TAGIHAN_SPPT` tinyint(1),
+	`STATUS_CETAK_SPPT` tinyint(1),
+	`STATUS_PEMBATALAN` char(1) NOT NULL DEFAULT '0',
 	`TGL_TERBIT_SPPT` datetime,
 	`TGL_CETAK_SPPT` datetime,
-	`LUAS_BUMI_SPPT` bigint NOT NULL DEFAULT 0,
-	`LUAS_BNG_SPPT` bigint NOT NULL DEFAULT 0,
-	`NJOP_BUMI_SPPT` bigint NOT NULL DEFAULT 0,
-	`NJOP_BNG_SPPT` bigint NOT NULL DEFAULT 0,
-	`NJOP_SPPT` bigint NOT NULL DEFAULT 0,
-	`NJOPTKP_SPPT` int NOT NULL DEFAULT 0,
-	`NJKP_SPPT` bigint NOT NULL DEFAULT 0,
-	`PBB_TERHUTANG_SPPT` bigint NOT NULL DEFAULT 0,
-	`FAKTOR_PENGURANG_SPPT` bigint NOT NULL DEFAULT 0,
-	`PBB_YG_HARUS_DIBAYAR_SPPT` bigint NOT NULL DEFAULT 0,
-	`STATUS_PEMBAYARAN_SPPT` tinyint DEFAULT 0,
-	`STATUS_TAGIHAN_SPPT` tinyint DEFAULT 0,
-	`STATUS_CETAK_SPPT` tinyint DEFAULT 0,
-	`STATUS_PEMBATALAN` char(1) NOT NULL DEFAULT '0',
 	`NIP_PENCETAK_SPPT` varchar(20),
 	CONSTRAINT `pk_sppt` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`THN_PAJAK_SPPT`)
 );
 --> statement-breakpoint
-CREATE TABLE `sppt_khusus` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
-	`JENIS_SPPT` varchar(10),
-	`TAHAP` smallint,
-	CONSTRAINT `pk_sppt_khusus` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`)
-);
---> statement-breakpoint
-CREATE TABLE `status_pbb` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
-	`TAHUN_PBB` char(4) NOT NULL,
-	`TANGGAL_BAYAR` datetime,
-	`PERMOHONAN_PENGURANGAN` double,
-	`PENGURANGAN_DIBERI` double,
-	`ALASAN_PENGURANGAN` LONGTEXT,
-	`ALASAN_KEBERATAN` LONGTEXT,
-	`NO_SK_PENGURANGAN` varchar(100),
-	`TGL_SK` date,
-	CONSTRAINT `pk_status_pbb` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`TAHUN_PBB`)
-);
---> statement-breakpoint
 CREATE TABLE `sppt_e` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
-	`THN_PAJAK_SPPT` year NOT NULL,
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`KD_KELURAHAN` varchar(3) NOT NULL,
+	`KD_BLOK` varchar(3) NOT NULL,
+	`NO_URUT` varchar(4) NOT NULL,
+	`KD_JNS_OP` varchar(1) NOT NULL,
+	`THN_PAJAK_SPPT` year(4) NOT NULL,
 	`CETAK_KE` int NOT NULL,
 	`EMAIL` varchar(500),
 	`NM_WP_SPPT` varchar(255),
@@ -889,7 +791,7 @@ CREATE TABLE `sppt_e` (
 	`TGL_PEMBAYARAN_TERAKHIR` date,
 	`TGL_DIBUAT` datetime,
 	`TGL_EMAIL` datetime,
-	`TGL_RECORD` datetime DEFAULT CURRENT_TIMESTAMP,
+	`TGL_RECORD` timestamp NULL,
 	`NIP_VERIFIKASI_1` varchar(100),
 	`NIP_VERIFIKASI_2` varchar(100),
 	`NIP_VERIFIKASI_3` varchar(100),
@@ -903,13 +805,13 @@ CREATE TABLE `sppt_e` (
 );
 --> statement-breakpoint
 CREATE TABLE `sppt_op_bersama` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`KD_KELURAHAN` varchar(3) NOT NULL,
+	`KD_BLOK` varchar(3) NOT NULL,
+	`NO_URUT` varchar(4) NOT NULL,
+	`KD_JNS_OP` varchar(1) NOT NULL,
 	`THN_PAJAK_SPPT` varchar(4) NOT NULL,
 	`KD_KLS_TANAH` varchar(3) NOT NULL,
 	`THN_AWAL_KLS_TANAH` varchar(4) NOT NULL,
@@ -923,134 +825,150 @@ CREATE TABLE `sppt_op_bersama` (
 );
 --> statement-breakpoint
 CREATE TABLE `pembayaran_sppt` (
-	`KD_PROPINSI` char(2) NOT NULL,
-	`KD_DATI2` char(2) NOT NULL,
-	`KD_KECAMATAN` char(3) NOT NULL,
-	`KD_KELURAHAN` char(3) NOT NULL,
-	`KD_BLOK` char(3) NOT NULL,
-	`NO_URUT` char(4) NOT NULL,
-	`KD_JNS_OP` char(1) NOT NULL,
+	`KD_PROPINSI` varchar(2) NOT NULL,
+	`KD_DATI2` varchar(2) NOT NULL,
+	`KD_KECAMATAN` varchar(3) NOT NULL,
+	`KD_KELURAHAN` varchar(3) NOT NULL,
+	`KD_BLOK` varchar(3) NOT NULL,
+	`NO_URUT` varchar(4) NOT NULL,
+	`KD_JNS_OP` varchar(1) NOT NULL,
 	`THN_PAJAK_SPPT` varchar(4) NOT NULL,
-	`PEMBAYARAN_KE` tinyint NOT NULL,
-	`TGL_PEMBAYARAN_SPPT` date NOT NULL,
-	`JML_SPPT_YG_DIBAYAR` decimal(15,2) NOT NULL DEFAULT '0',
-	`DENDA_SPPT` decimal(15,2) NOT NULL DEFAULT '0',
-	`JML_BAYAR` decimal(15,2) NOT NULL DEFAULT '0',
-	`NAMA_BAYAR` varchar(100),
-	`CHANNEL_PEMBAYARAN` varchar(50),
-	`NO_REFERENSI` varchar(100),
-	`NIP_PETUGAS` varchar(40),
-	`DIBATALKAN` tinyint NOT NULL DEFAULT 0,
-	`TGL_BATAL` datetime,
-	`ALASAN_BATAL` text,
-	CONSTRAINT `pk_pembayaran_sppt` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`THN_PAJAK_SPPT`,`PEMBAYARAN_KE`)
+	`PEMBAYARAN_SPPT_KE` tinyint NOT NULL,
+	`KD_KANWIL_BANK` varchar(2) NOT NULL,
+	`KD_KPPBB_BANK` varchar(2) NOT NULL,
+	`KD_BANK_TUNGGAL` varchar(2) NOT NULL,
+	`KD_BANK_PERSEPSI` varchar(2) NOT NULL,
+	`KD_TP` varchar(2) NOT NULL,
+	`DENDA_SPPT` bigint,
+	`JML_SPPT_YG_DIBAYAR` bigint NOT NULL,
+	`TGL_PEMBAYARAN_SPPT` date,
+	`TGL_REKAM_BYR_SPPT` datetime NOT NULL,
+	`NIP_REKAM_BYR_SPPT` varchar(15) NOT NULL,
+	`NO_BUKTI` varchar(50),
+	`DIBATALKAN` tinyint(1) DEFAULT 0,
+	CONSTRAINT `pk_pembayaran_sppt` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`THN_PAJAK_SPPT`,`PEMBAYARAN_SPPT_KE`)
 );
 --> statement-breakpoint
 CREATE TABLE `histori_mutasi` (
-	`ID` int AUTO_INCREMENT NOT NULL,
-	`NO_PELAYANAN` varchar(30) NOT NULL,
-	`NOP_SEBELUM` varchar(18),
-	`NAMA_SEBELUM` varchar(100),
-	`LT_SEBELUM` decimal(12,2),
-	`LB_SEBELUM` decimal(12,2),
-	`PBB_SEBELUM` decimal(15,2),
-	`NOP_SESUDAH` varchar(18),
-	`NAMA_SESUDAH` varchar(100),
-	`LT_SESUDAH` decimal(12,2),
-	`LB_SESUDAH` decimal(12,2),
-	`PBB_SESUDAH` decimal(15,2),
-	`TGL_MUTASI` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`NIP_PETUGAS` varchar(40),
-	CONSTRAINT `histori_mutasi_ID` PRIMARY KEY(`ID`)
+	`no_pelayanan` varchar(50) NOT NULL,
+	`nop_sebelum` varchar(20),
+	`nama_sebelum` varchar(200),
+	`lt_sebelum` int,
+	`lb_sebelum` int,
+	`pbb_sebelum` bigint,
+	`nop_sesudah` varchar(18),
+	`nama_sesudah` varchar(200),
+	`lt_sesudah` int,
+	`lb_sesudah` int,
+	`pbb_sesudah` bigint,
+	`id` bigint AUTO_INCREMENT NOT NULL,
+	`keterangan` text,
+	CONSTRAINT `histori_mutasi_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `pelayanan` (
-	`NO_PELAYANAN` varchar(30) NOT NULL,
-	`KD_PROPINSI` char(2),
-	`KD_DATI2` char(2),
-	`KD_KECAMATAN` char(3),
-	`KD_KELURAHAN` char(3),
-	`KD_BLOK` char(3),
-	`NO_URUT` char(4),
-	`KD_JNS_OP` char(1),
-	`KD_JNS_PELAYANAN` char(2) NOT NULL,
-	`TANGGAL_PELAYANAN` date NOT NULL,
+	`ID` bigint AUTO_INCREMENT NOT NULL,
+	`NAMA_PEMOHON` varchar(300),
+	`ALAMAT_PEMOHON` varchar(500),
+	`LETAK_OP` varchar(250),
+	`KECAMATAN` varchar(250),
+	`KELURAHAN` varchar(250),
+	`NO_PELAYANAN` varchar(13) NOT NULL,
+	`TANGGAL_PELAYANAN` date,
+	`KD_PROPINSI` varchar(2),
+	`KD_DATI2` varchar(2),
+	`KD_KECAMATAN` varchar(3),
+	`KD_KELURAHAN` varchar(3),
+	`KD_BLOK` varchar(3),
+	`NO_URUT` varchar(4),
+	`KD_JNS_OP` varchar(1),
+	`KD_JNS_PELAYANAN` char(2),
 	`TANGGAL_PERKIRAAN_SELESAI` date,
-	`NAMA_PEMOHON` varchar(100),
-	`ALAMAT_PEMOHON` text,
-	`LETAK_OP` varchar(200),
-	`KECAMATAN` varchar(50),
-	`KELURAHAN` varchar(50),
-	`STATUS_PELAYANAN` smallint NOT NULL DEFAULT 1,
-	`NIP_PETUGAS_PENERIMA` varchar(40),
-	`NAMA_PETUGAS_PENERIMA` varchar(100),
-	`NIP_AR` varchar(40),
-	`NAMA_AR` varchar(100),
+	`STATUS_PELAYANAN` smallint,
+	`NIP_PETUGAS_PENERIMA` varchar(300),
+	`NAMA_PETUGAS_PENERIMA` varchar(300),
+	`NIP_AR` varchar(300),
+	`NAMA_AR` varchar(300),
 	`CATATAN` text,
 	`KETERANGAN` text,
-	`TGL_MASUK_PENILAI` date,
-	`NIP_MASUK_PENILAI` varchar(40),
-	`TGL_MASUK_PENETAPAN` date,
-	`NIP_MASUK_PENETAPAN` varchar(40),
-	`TGL_SELESAI` date,
-	`NIP_SELESAI` varchar(40),
-	`TGL_TERKONFIRMASI_WP` date,
-	`NIP_TERKONFIRMASI_WP` varchar(40),
-	`TGL_BERKAS_DITUNDA` date,
-	`ALASAN_DITUNDA` text,
-	`IS_KOLEKTIF` tinyint NOT NULL DEFAULT 0,
-	`TTD_KIRI_JABATAN` varchar(100),
-	`TTD_KIRI_NAMA` varchar(100),
-	`TTD_KIRI_NIP` varchar(40),
-	`TTD_KANAN_JABATAN` varchar(100),
-	`TTD_KANAN_NAMA` varchar(100),
-	`TTD_KANAN_NIP` varchar(40),
-	CONSTRAINT `pelayanan_NO_PELAYANAN` PRIMARY KEY(`NO_PELAYANAN`)
+	`TGL_MASUK_PENILAI` datetime,
+	`NIP_MASUK_PENILAI` varchar(300),
+	`TGL_SELESAI` datetime,
+	`NIP_SELESAI` varchar(300),
+	`TGL_TERKONFIRMASI_WP` datetime,
+	`NIP_TERKONFIRMASI_WP` varchar(300),
+	`TGL_PENETAPAN` datetime,
+	`NIP_PENETAPAN` varchar(300),
+	`TGL_BERKAS_DITUNDA` datetime,
+	`NIP_BERKAS_DITUNDA` varchar(300),
+	`TTD_JABATAN_KIRI` varchar(500),
+	`TTD_NAMA_KIRI` varchar(500),
+	`TTD_NIP_KIRI` varchar(500),
+	`TTD_JABATAN_KANAN` varchar(500),
+	`TTD_NAMA_KANAN` varchar(500),
+	`TTD_NIP_KANAN` varchar(500),
+	`KETERANGAN_BERKAS` text,
+	`EKSTRA` text,
+	CONSTRAINT `pelayanan_ID` PRIMARY KEY(`ID`)
 );
 --> statement-breakpoint
 CREATE TABLE `pelayanan_dokumen` (
-	`NO_PELAYANAN` varchar(30) NOT NULL,
-	`DOKUMEN_ID` tinyint NOT NULL,
-	CONSTRAINT `pelayanan_dokumen_NO_PELAYANAN_DOKUMEN_ID_pk` PRIMARY KEY(`NO_PELAYANAN`,`DOKUMEN_ID`)
+	`pelayanan_id` bigint NOT NULL,
+	`dokumen_id` smallint NOT NULL,
+	CONSTRAINT `pelayanan_dokumen_pelayanan_id_dokumen_id_pk` PRIMARY KEY(`pelayanan_id`,`dokumen_id`)
 );
 --> statement-breakpoint
 CREATE TABLE `pelayanan_lampiran_kolektif` (
-	`ID` int AUTO_INCREMENT NOT NULL,
+	`ID` bigint AUTO_INCREMENT NOT NULL,
 	`NO_PELAYANAN` varchar(30) NOT NULL,
-	`NOP` varchar(18),
+	`NOP` varchar(40),
 	`NAMA` varchar(100),
 	`ALAMAT` text,
-	`LT` decimal(12,2),
-	`LB` decimal(12,2),
+	`LT` double,
+	`LB` double,
 	`KETERANGAN` text,
 	CONSTRAINT `pelayanan_lampiran_kolektif_ID` PRIMARY KEY(`ID`)
 );
 --> statement-breakpoint
 CREATE TABLE `pemekaran` (
 	`ID` int AUTO_INCREMENT NOT NULL,
-	`NAMA_PEMEKARAN` varchar(100) NOT NULL,
-	`TGL_BERLAKU` date NOT NULL,
-	`KETERANGAN` text,
+	`JENIS_PEMEKARAN` int,
+	`KD_PROPINSI_LAMA` varchar(2),
+	`KD_DATI2_LAMA` varchar(2),
+	`KD_KECAMATAN_LAMA` varchar(3),
+	`KD_KELURAHAN_LAMA` varchar(3),
+	`KD_BLOK_AWAL` varchar(3),
+	`NO_URUT_AWAL` varchar(4),
+	`NO_URUT_AKHIR` varchar(4),
+	`KD_BLOK_AKHIR` varchar(3),
+	`KD_PROPINSI_BARU` varchar(2),
+	`KD_DATI2_BARU` varchar(2),
+	`KD_KECAMATAN_BARU` varchar(3),
+	`KD_KELURAHAN_BARU` varchar(3),
+	`KD_BLOK_BARU` varchar(3),
+	`TGL_ENTRY` datetime,
+	`USER_ENTRY` varchar(200),
+	`IS_CANCEL` tinyint(1),
 	CONSTRAINT `pemekaran_ID` PRIMARY KEY(`ID`)
 );
 --> statement-breakpoint
 CREATE TABLE `pemekaran_detail` (
 	`ID` int AUTO_INCREMENT NOT NULL,
-	`PEMEKARAN_ID` int NOT NULL,
-	`KD_PROPINSI_LAMA` char(2) NOT NULL,
-	`KD_DATI2_LAMA` char(2) NOT NULL,
-	`KD_KECAMATAN_LAMA` char(3) NOT NULL,
-	`KD_KELURAHAN_LAMA` char(3) NOT NULL,
-	`KD_BLOK_LAMA` char(3) NOT NULL,
-	`NO_URUT_LAMA` char(4) NOT NULL,
-	`KD_JNS_OP_LAMA` char(1) NOT NULL,
-	`KD_PROPINSI_BARU` char(2) NOT NULL,
-	`KD_DATI2_BARU` char(2) NOT NULL,
-	`KD_KECAMATAN_BARU` char(3) NOT NULL,
-	`KD_KELURAHAN_BARU` char(3) NOT NULL,
-	`KD_BLOK_BARU` char(3) NOT NULL,
-	`NO_URUT_BARU` char(4) NOT NULL,
-	`KD_JNS_OP_BARU` char(1) NOT NULL,
+	`PEMEKARAN_ID` int,
+	`KD_PROPINSI_LAMA` varchar(2) NOT NULL,
+	`KD_DATI2_LAMA` varchar(2) NOT NULL,
+	`KD_KECAMATAN_LAMA` varchar(3) NOT NULL,
+	`KD_KELURAHAN_LAMA` varchar(3) NOT NULL,
+	`KD_BLOK_LAMA` varchar(3) NOT NULL,
+	`NO_URUT_LAMA` varchar(4) NOT NULL,
+	`KD_JNS_OP_LAMA` varchar(1) NOT NULL,
+	`KD_PROPINSI_BARU` varchar(2) NOT NULL,
+	`KD_DATI2_BARU` varchar(2) NOT NULL,
+	`KD_KECAMATAN_BARU` varchar(3) NOT NULL,
+	`KD_KELURAHAN_BARU` varchar(3) NOT NULL,
+	`KD_BLOK_BARU` varchar(3) NOT NULL,
+	`NO_URUT_BARU` varchar(4) NOT NULL,
+	`KD_JNS_OP_BARU` varchar(1) NOT NULL,
 	CONSTRAINT `pemekaran_detail_ID` PRIMARY KEY(`ID`)
 );
 --> statement-breakpoint
@@ -1066,12 +984,42 @@ CREATE TABLE `log_aktivitas` (
 );
 --> statement-breakpoint
 CREATE TABLE `log_delete_pelayanan` (
-	`ID` int AUTO_INCREMENT NOT NULL,
-	`NO_PELAYANAN` varchar(30) NOT NULL,
-	`DATA_SNAPSHOT` json,
-	`DIHAPUS_OLEH` varchar(20),
-	`TGL_HAPUS` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`ALASAN` text,
+	`ID` bigint AUTO_INCREMENT NOT NULL,
+	`TGL_DELETE` datetime,
+	`USER_DELETE` varchar(200),
+	`NAMA_DELETE` varchar(200),
+	`NAMA_PEMOHON` varchar(300),
+	`ALAMAT_PEMOHON` varchar(500),
+	`NO_PELAYANAN` varchar(13) NOT NULL,
+	`TANGGAL_PELAYANAN` date,
+	`KD_PROPINSI` varchar(2),
+	`KD_DATI2` varchar(2),
+	`KD_KECAMATAN` varchar(3),
+	`KD_KELURAHAN` varchar(3),
+	`KD_BLOK` varchar(3),
+	`NO_URUT` varchar(4),
+	`KD_JNS_OP` varchar(1),
+	`KD_JNS_PELAYANAN` char(2),
+	`TANGGAL_PERKIRAAN_SELESAI` date,
+	`STATUS_PELAYANAN` smallint,
+	`NIP_PETUGAS_PENERIMA` varchar(300),
+	`NAMA_PETUGAS_PENERIMA` varchar(300),
+	`NIP_AR` varchar(300),
+	`NAMA_AR` varchar(300),
+	`CATATAN` text,
+	`KETERANGAN` text,
+	`TGL_MASUK_PENILAI` datetime,
+	`NIP_MASUK_PENILAI` varchar(300),
+	`TGL_SELESAI` datetime,
+	`NIP_SELESAI` varchar(300),
+	`TGL_TERKONFIRMASI_WP` datetime,
+	`NIP_TERKONFIRMASI_WP` varchar(300),
+	`TTD_JABATAN_KIRI` varchar(500),
+	`TTD_NAMA_KIRI` varchar(500),
+	`TTD_NIP_KIRI` varchar(500),
+	`TTD_JABATAN_KANAN` varchar(500),
+	`TTD_NAMA_KANAN` varchar(500),
+	`TTD_NIP_KANAN` varchar(500),
 	CONSTRAINT `log_delete_pelayanan_ID` PRIMARY KEY(`ID`)
 );
 --> statement-breakpoint
@@ -1079,8 +1027,8 @@ CREATE TABLE `bangunan_lantai` (
 	`KD_JPB` char(2) NOT NULL,
 	`TIPE_BNG` char(5) NOT NULL,
 	`KD_BNG_LANTAI` char(8) NOT NULL,
-	`LANTAI_MIN_BNG_LANTAI` int,
-	`LANTAI_MAX_BNG_LANTAI` int,
+	`LANTAI_MIN_BNG_LANTAI` smallint,
+	`LANTAI_MAX_BNG_LANTAI` smallint,
 	CONSTRAINT `pk_bangunan_lantai` PRIMARY KEY(`KD_JPB`,`TIPE_BNG`,`KD_BNG_LANTAI`)
 );
 --> statement-breakpoint
@@ -1158,10 +1106,10 @@ CREATE TABLE `dbkb_jpb3` (
 	`KD_PROPINSI` char(2) NOT NULL,
 	`KD_DATI2` char(2) NOT NULL,
 	`THN_DBKB_JPB3` char(4) NOT NULL,
-	`LBR_BENT_MIN_DBKB_JPB3` int NOT NULL,
-	`LBR_BENT_MAX_DBKB_JPB3` int NOT NULL,
-	`TING_KOLOM_MIN_DBKB_JPB3` int NOT NULL,
-	`TING_KOLOM_MAX_DBKB_JPB3` int NOT NULL,
+	`LBR_BENT_MIN_DBKB_JPB3` smallint NOT NULL,
+	`LBR_BENT_MAX_DBKB_JPB3` smallint NOT NULL,
+	`TING_KOLOM_MIN_DBKB_JPB3` smallint NOT NULL,
+	`TING_KOLOM_MAX_DBKB_JPB3` smallint NOT NULL,
 	`NILAI_DBKB_JPB3` decimal(12,2),
 	CONSTRAINT `pk_dbkb_jpb3` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB3`,`LBR_BENT_MIN_DBKB_JPB3`,`LBR_BENT_MAX_DBKB_JPB3`,`TING_KOLOM_MIN_DBKB_JPB3`,`TING_KOLOM_MAX_DBKB_JPB3`)
 );
@@ -1213,10 +1161,10 @@ CREATE TABLE `dbkb_jpb8` (
 	`KD_PROPINSI` char(2) NOT NULL,
 	`KD_DATI2` char(2) NOT NULL,
 	`THN_DBKB_JPB8` char(4) NOT NULL,
-	`LBR_BENT_MIN_DBKB_JPB8` int NOT NULL,
-	`LBR_BENT_MAX_DBKB_JPB8` int NOT NULL,
-	`TING_KOLOM_MIN_DBKB_JPB8` int NOT NULL,
-	`TING_KOLOM_MAX_DBKB_JPB8` int NOT NULL,
+	`LBR_BENT_MIN_DBKB_JPB8` smallint NOT NULL,
+	`LBR_BENT_MAX_DBKB_JPB8` smallint NOT NULL,
+	`TING_KOLOM_MIN_DBKB_JPB8` smallint NOT NULL,
+	`TING_KOLOM_MAX_DBKB_JPB8` smallint NOT NULL,
 	`NILAI_DBKB_JPB8` decimal(12,2),
 	CONSTRAINT `pk_dbkb_jpb8` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB8`,`LBR_BENT_MIN_DBKB_JPB8`,`LBR_BENT_MAX_DBKB_JPB8`,`TING_KOLOM_MIN_DBKB_JPB8`,`TING_KOLOM_MAX_DBKB_JPB8`)
 );
@@ -1285,7 +1233,7 @@ CREATE TABLE `kayu_ulin` (
 	`KD_PROPINSI` char(2) NOT NULL,
 	`KD_DATI2` char(2) NOT NULL,
 	`THN_STATUS_KAYU_ULIN` char(4) NOT NULL,
-	`STATUS_KAYU_ULIN` tinyint,
+	`STATUS_KAYU_ULIN` tinyint(1),
 	CONSTRAINT `pk_kayu_ulin` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_STATUS_KAYU_ULIN`)
 );
 --> statement-breakpoint
@@ -1293,7 +1241,7 @@ CREATE TABLE `penyusutan` (
 	`UMUR_EFEKTIF` tinyint NOT NULL,
 	`KD_RANGE_PENYUSUTAN` char(1) NOT NULL,
 	`KONDISI_BNG_SUSUT` char(1) NOT NULL,
-	`NILAI_PENYUSUTAN` int,
+	`NILAI_PENYUSUTAN` smallint,
 	CONSTRAINT `pk_penyusutan` PRIMARY KEY(`UMUR_EFEKTIF`,`KD_RANGE_PENYUSUTAN`,`KONDISI_BNG_SUSUT`)
 );
 --> statement-breakpoint
@@ -1301,7 +1249,19 @@ CREATE TABLE `range_penyusutan` (
 	`KD_RANGE_PENYUSUTAN` char(1) NOT NULL,
 	`NILAI_MIN_PENYUSUTAN` bigint,
 	`NILAI_MAX_PENYUSUTAN` bigint,
-	CONSTRAINT `pk_range_penyusutan` PRIMARY KEY(`KD_RANGE_PENYUSUTAN`)
+	CONSTRAINT `range_penyusutan_KD_RANGE_PENYUSUTAN` PRIMARY KEY(`KD_RANGE_PENYUSUTAN`)
+);
+--> statement-breakpoint
+CREATE TABLE `tarif` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_AWAL` char(4) NOT NULL,
+	`THN_AKHIR` char(4) NOT NULL,
+	`NJOP_MIN` decimal(15,0) NOT NULL,
+	`NJOP_MAX` decimal(15,0),
+	`NILAI_TARIF` decimal(3,3),
+	`NJKP` int NOT NULL,
+	CONSTRAINT `pk_tarif` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_AWAL`,`THN_AKHIR`,`NJOP_MIN`)
 );
 --> statement-breakpoint
 CREATE TABLE `tipe_bangunan` (
@@ -1310,7 +1270,7 @@ CREATE TABLE `tipe_bangunan` (
 	`LUAS_MIN_TIPE_BNG` mediumint,
 	`LUAS_MAX_TIPE_BNG` mediumint,
 	`FAKTOR_PEMBAGI_TIPE_BNG` decimal(8,4),
-	CONSTRAINT `pk_tipe_bangunan` PRIMARY KEY(`TIPE_BNG`)
+	CONSTRAINT `tipe_bangunan_TIPE_BNG` PRIMARY KEY(`TIPE_BNG`)
 );
 --> statement-breakpoint
 ALTER TABLE `account` ADD CONSTRAINT `account_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -1330,31 +1290,13 @@ ALTER TABLE `team_member` ADD CONSTRAINT `team_member_user_id_user_id_fk` FOREIG
 ALTER TABLE `two_factor` ADD CONSTRAINT `two_factor_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `member_roles` ADD CONSTRAINT `member_roles_member_id_member_id_fk` FOREIGN KEY (`member_id`) REFERENCES `member`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `member_roles` ADD CONSTRAINT `member_roles_created_by_user_id_fk` FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `notifications` ADD CONSTRAINT `notifications_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `notification_preferences` ADD CONSTRAINT `notification_preferences_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `org_roles` ADD CONSTRAINT `org_roles_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `org_roles` ADD CONSTRAINT `org_roles_created_by_user_id_fk` FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `books` ADD CONSTRAINT `books_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `resource_ownership` ADD CONSTRAINT `resource_ownership_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `ref_dati2` ADD CONSTRAINT `fk_dati2_propinsi` FOREIGN KEY (`KD_PROPINSI`) REFERENCES `ref_propinsi`(`KD_PROPINSI`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `ref_kecamatan` ADD CONSTRAINT `fk_kecamatan_dati2` FOREIGN KEY (`KD_PROPINSI`,`KD_DATI2`) REFERENCES `ref_dati2`(`KD_PROPINSI`,`KD_DATI2`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `ref_kelurahan` ADD CONSTRAINT `fk_kelurahan_kecamatan` FOREIGN KEY (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`) REFERENCES `ref_kecamatan`(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `group_akses` ADD CONSTRAINT `fk_group_akses_akses` FOREIGN KEY (`AKSES`) REFERENCES `akses`(`AKSES`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `login` ADD CONSTRAINT `login_USER_ID_user_id_fk` FOREIGN KEY (`USER_ID`) REFERENCES `user`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `notifications` ADD CONSTRAINT `notifications_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `notification_preferences` ADD CONSTRAINT `notification_preferences_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `books` ADD CONSTRAINT `books_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `lookup_item` ADD CONSTRAINT `fk_lookup_item_group` FOREIGN KEY (`KD_LOOKUP_GROUP`) REFERENCES `lookup_group`(`KD_LOOKUP_GROUP`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `spop` ADD CONSTRAINT `fk_spop_subjek` FOREIGN KEY (`SUBJEK_PAJAK_ID`) REFERENCES `dat_subjek_pajak`(`SUBJEK_PAJAK_ID`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `dat_fasilitas_bangunan` ADD CONSTRAINT `fk_fas_bangunan` FOREIGN KEY (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`) REFERENCES `dat_op_bangunan`(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`NO_BNG`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `dat_fasilitas_bangunan` ADD CONSTRAINT `fk_fas_master` FOREIGN KEY (`KD_FASILITAS`) REFERENCES `fasilitas`(`KD_FASILITAS`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `dat_op_bangunan` ADD CONSTRAINT `fk_bangunan_spop` FOREIGN KEY (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) REFERENCES `spop`(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `dat_legalitas_bumi` ADD CONSTRAINT `fk_legalitas_spop` FOREIGN KEY (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) REFERENCES `spop`(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `dat_op_anggota` ADD CONSTRAINT `fk_anggota_spop` FOREIGN KEY (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) REFERENCES `spop`(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `dat_op_induk` ADD CONSTRAINT `fk_op_induk_spop` FOREIGN KEY (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) REFERENCES `spop`(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `status_pbb` ADD CONSTRAINT `fk_status_pbb_spop` FOREIGN KEY (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) REFERENCES `spop`(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `pembayaran_sppt` ADD CONSTRAINT `fk_pembayaran_sppt` FOREIGN KEY (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`THN_PAJAK_SPPT`) REFERENCES `sppt`(`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`THN_PAJAK_SPPT`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `pelayanan` ADD CONSTRAINT `fk_pelayanan_jns` FOREIGN KEY (`KD_JNS_PELAYANAN`) REFERENCES `ref_jns_pelayanan`(`KD_JNS_PELAYANAN`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `pelayanan_dokumen` ADD CONSTRAINT `fk_dok_pelayanan` FOREIGN KEY (`NO_PELAYANAN`) REFERENCES `pelayanan`(`NO_PELAYANAN`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `pelayanan_lampiran_kolektif` ADD CONSTRAINT `fk_lamp_kol_pelayanan` FOREIGN KEY (`NO_PELAYANAN`) REFERENCES `pelayanan`(`NO_PELAYANAN`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `pemekaran_detail` ADD CONSTRAINT `fk_pemekaran_detail_induk` FOREIGN KEY (`PEMEKARAN_ID`) REFERENCES `pemekaran`(`ID`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX `account_userId_idx` ON `account` (`user_id`);--> statement-breakpoint
 CREATE INDEX `invitation_organizationId_idx` ON `invitation` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `invitation_email_idx` ON `invitation` (`email`);--> statement-breakpoint
@@ -1375,25 +1317,15 @@ CREATE INDEX `twoFactor_userId_idx` ON `two_factor` (`user_id`);--> statement-br
 CREATE INDEX `verification_identifier_idx` ON `verification` (`identifier`);--> statement-breakpoint
 CREATE INDEX `member_roles_member_id_idx` ON `member_roles` (`member_id`);--> statement-breakpoint
 CREATE INDEX `member_roles_role_id_idx` ON `member_roles` (`role_id`);--> statement-breakpoint
-CREATE INDEX `notifications_userId_idx` ON `notifications` (`user_id`);--> statement-breakpoint
-CREATE INDEX `notifications_createdAt_idx` ON `notifications` (`created_at`);--> statement-breakpoint
-CREATE INDEX `notification_preferences_userId_idx` ON `notification_preferences` (`user_id`);--> statement-breakpoint
 CREATE INDEX `org_roles_org_idx` ON `org_roles` (`organization_id`);--> statement-breakpoint
 CREATE INDEX `org_roles_created_by_idx` ON `org_roles` (`created_by`);--> statement-breakpoint
-CREATE INDEX `books_organization_id_idx` ON `books` (`organization_id`);--> statement-breakpoint
-CREATE INDEX `books_created_by_id_idx` ON `books` (`created_by_id`);--> statement-breakpoint
 CREATE INDEX `resource_ownership_resource_idx` ON `resource_ownership` (`resource_type`,`resource_id`);--> statement-breakpoint
 CREATE INDEX `resource_ownership_owner_idx` ON `resource_ownership` (`owner_id`);--> statement-breakpoint
 CREATE INDEX `resource_ownership_org_idx` ON `resource_ownership` (`organization_id`);--> statement-breakpoint
-CREATE INDEX `idx_jalan_wilayah` ON `jalan` (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`);--> statement-breakpoint
-CREATE INDEX `idx_histori_nop` ON `histori_sppt` (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`,`THN_PAJAK_SPPT`);--> statement-breakpoint
-CREATE INDEX `idx_sppt_thn` ON `sppt` (`THN_PAJAK_SPPT`);--> statement-breakpoint
-CREATE INDEX `idx_sppt_status_bayar` ON `sppt` (`STATUS_PEMBAYARAN_SPPT`);--> statement-breakpoint
-CREATE INDEX `idx_histori_mutasi_pelayanan` ON `histori_mutasi` (`NO_PELAYANAN`);--> statement-breakpoint
-CREATE INDEX `idx_pelayanan_nop` ON `pelayanan` (`KD_PROPINSI`,`KD_DATI2`,`KD_KECAMATAN`,`KD_KELURAHAN`,`KD_BLOK`,`NO_URUT`,`KD_JNS_OP`);--> statement-breakpoint
-CREATE INDEX `idx_pelayanan_status` ON `pelayanan` (`STATUS_PELAYANAN`);--> statement-breakpoint
-CREATE INDEX `idx_pelayanan_tgl` ON `pelayanan` (`TANGGAL_PELAYANAN`);--> statement-breakpoint
-CREATE INDEX `idx_lamp_kol_pelayanan` ON `pelayanan_lampiran_kolektif` (`NO_PELAYANAN`);--> statement-breakpoint
-CREATE INDEX `idx_pemekaran_nop_lama` ON `pemekaran_detail` (`KD_PROPINSI_LAMA`,`KD_DATI2_LAMA`,`KD_KECAMATAN_LAMA`,`KD_KELURAHAN_LAMA`,`KD_BLOK_LAMA`,`NO_URUT_LAMA`,`KD_JNS_OP_LAMA`);--> statement-breakpoint
+CREATE INDEX `notifications_userId_idx` ON `notifications` (`user_id`);--> statement-breakpoint
+CREATE INDEX `notifications_createdAt_idx` ON `notifications` (`created_at`);--> statement-breakpoint
+CREATE INDEX `notification_preferences_userId_idx` ON `notification_preferences` (`user_id`);--> statement-breakpoint
+CREATE INDEX `books_organization_id_idx` ON `books` (`organization_id`);--> statement-breakpoint
+CREATE INDEX `books_created_by_id_idx` ON `books` (`created_by_id`);--> statement-breakpoint
 CREATE INDEX `idx_log_user` ON `log_aktivitas` (`USERNAME`);--> statement-breakpoint
 CREATE INDEX `idx_log_tgl` ON `log_aktivitas` (`CREATED_AT`);

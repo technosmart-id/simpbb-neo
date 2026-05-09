@@ -75,8 +75,7 @@ export function getBaseWilayahData() {
           kdPropinsi: p.kdPropinsi,
           kdDati2: d.kdDati2,
           kdKecamatan: k.kdKecamatan,
-          nmKecamatan: `${d.nmDati2} ${k.nmKecamatan}`,
-          nmKecamatanOnly: k.nmKecamatan,
+          nmKecamatan: k.nmKecamatan,
         });
 
         for (const kel of k.kelurahan) {
@@ -85,8 +84,7 @@ export function getBaseWilayahData() {
             kdDati2: d.kdDati2,
             kdKecamatan: k.kdKecamatan,
             kdKelurahan: kel.kdKelurahan,
-            nmKelurahan: `${k.nmKecamatan} ${kel.nmKelurahan}`,
-            nmKelurahanOnly: kel.nmKelurahan,
+            nmKelurahan: kel.nmKelurahan,
             noKelurahan: parseInt(kel.kdKelurahan),
             kdSektor: "01",
           });

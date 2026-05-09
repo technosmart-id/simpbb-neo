@@ -5,18 +5,15 @@ export * from "./notification-preferences";
 export * from "./books";
 
 // SIM-PBB Domain Schema
-export * from "./_columns";
-export * from "./wilayah";
 export * from "./referensi";
 export * from "./pengguna";
 export * from "./lookup";
 export * from "./konfigurasi";
 export * from "./klasifikasi";
 export * from "./objek-pajak";
-export * from "./lspop";
 export * from "./op-bersama";
+export * from "./lspop";
 export * from "./sppt";
-export * from "./sppt-e";
 export * from "./pembayaran";
 export * from "./pelayanan";
 export * from "./pemekaran";
