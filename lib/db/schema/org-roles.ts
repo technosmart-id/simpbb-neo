@@ -10,7 +10,8 @@
  * System roles (owner, user) are NOT stored here - they're hardcoded.
  */
 
-import { mysqlTable, varchar, text, timestamp, boolean, index, uniqueIndex } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, text, datetime, boolean, index, uniqueIndex } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 import { organization } from "./auth";
 import { user } from "./auth";
 
@@ -26,8 +27,8 @@ export const orgRoles = mysqlTable("org_roles", {
 	description: text("description"),
 	isDefaultRole: boolean("is_default_role").notNull().default(false),
 	// Permissions are now stored in Casbin, not here!
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at").defaultNow().notNull(),
+	createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: datetime("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 	createdBy: varchar("created_by", { length: 36 })
 		.notNull()
 		.references(() => user.id, { onDelete: "restrict" }),

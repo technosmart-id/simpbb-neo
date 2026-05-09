@@ -6,12 +6,12 @@ CREATE TABLE `account` (
 	`access_token` text,
 	`refresh_token` text,
 	`id_token` text,
-	`access_token_expires_at` timestamp(3),
-	`refresh_token_expires_at` timestamp(3),
+	`access_token_expires_at` datetime,
+	`refresh_token_expires_at` datetime,
 	`scope` text,
 	`password` text,
-	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
-	`updated_at` timestamp(3) NOT NULL,
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` datetime NOT NULL,
 	CONSTRAINT `account_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -22,8 +22,8 @@ CREATE TABLE `invitation` (
 	`role` varchar(255),
 	`team_id` varchar(255),
 	`status` varchar(255) NOT NULL DEFAULT 'pending',
-	`expires_at` timestamp(3) NOT NULL,
-	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
+	`expires_at` datetime NOT NULL,
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`inviter_id` varchar(36) NOT NULL,
 	CONSTRAINT `invitation_id` PRIMARY KEY(`id`)
 );
@@ -34,21 +34,21 @@ CREATE TABLE `member` (
 	`user_id` varchar(36) NOT NULL,
 	`role` varchar(255) NOT NULL DEFAULT 'member',
 	`custom_role_id` varchar(36),
-	`created_at` timestamp(3) NOT NULL,
+	`created_at` datetime NOT NULL,
 	CONSTRAINT `member_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `oauth_access_token` (
 	`id` varchar(36) NOT NULL,
-	`access_token` varchar(255),
-	`refresh_token` varchar(255),
-	`access_token_expires_at` timestamp(3),
-	`refresh_token_expires_at` timestamp(3),
+	`access_token` varchar(191),
+	`refresh_token` varchar(191),
+	`access_token_expires_at` datetime,
+	`refresh_token_expires_at` datetime,
 	`client_id` varchar(36),
 	`user_id` varchar(36),
 	`scopes` text,
-	`created_at` timestamp(3),
-	`updated_at` timestamp(3),
+	`created_at` datetime,
+	`updated_at` datetime,
 	CONSTRAINT `oauth_access_token_id` PRIMARY KEY(`id`),
 	CONSTRAINT `oauth_access_token_access_token_unique` UNIQUE(`access_token`),
 	CONSTRAINT `oauth_access_token_refresh_token_unique` UNIQUE(`refresh_token`)
@@ -59,14 +59,14 @@ CREATE TABLE `oauth_application` (
 	`name` text,
 	`icon` text,
 	`metadata` text,
-	`client_id` varchar(255),
+	`client_id` varchar(191),
 	`client_secret` text,
 	`redirect_urls` text,
 	`type` text,
 	`disabled` boolean DEFAULT false,
 	`user_id` varchar(36),
-	`created_at` timestamp(3),
-	`updated_at` timestamp(3),
+	`created_at` datetime,
+	`updated_at` datetime,
 	CONSTRAINT `oauth_application_id` PRIMARY KEY(`id`),
 	CONSTRAINT `oauth_application_client_id_unique` UNIQUE(`client_id`)
 );
@@ -76,8 +76,8 @@ CREATE TABLE `oauth_consent` (
 	`client_id` varchar(36),
 	`user_id` varchar(36),
 	`scopes` text,
-	`created_at` timestamp(3),
-	`updated_at` timestamp(3),
+	`created_at` datetime,
+	`updated_at` datetime,
 	`consent_given` boolean,
 	CONSTRAINT `oauth_consent_id` PRIMARY KEY(`id`)
 );
@@ -85,9 +85,9 @@ CREATE TABLE `oauth_consent` (
 CREATE TABLE `organization` (
 	`id` varchar(36) NOT NULL,
 	`name` varchar(255) NOT NULL,
-	`slug` varchar(255) NOT NULL,
+	`slug` varchar(191) NOT NULL,
 	`logo` text,
-	`created_at` timestamp(3) NOT NULL,
+	`created_at` datetime NOT NULL,
 	`metadata` text,
 	`auto_join` boolean NOT NULL DEFAULT true,
 	CONSTRAINT `organization_id` PRIMARY KEY(`id`),
@@ -97,10 +97,10 @@ CREATE TABLE `organization` (
 --> statement-breakpoint
 CREATE TABLE `session` (
 	`id` varchar(36) NOT NULL,
-	`expires_at` timestamp(3) NOT NULL,
-	`token` varchar(255) NOT NULL,
-	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
-	`updated_at` timestamp(3) NOT NULL,
+	`expires_at` datetime NOT NULL,
+	`token` varchar(191) NOT NULL,
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` datetime NOT NULL,
 	`ip_address` text,
 	`user_agent` text,
 	`user_id` varchar(36) NOT NULL,
@@ -115,8 +115,8 @@ CREATE TABLE `team` (
 	`id` varchar(36) NOT NULL,
 	`name` text NOT NULL,
 	`organization_id` varchar(36) NOT NULL,
-	`created_at` timestamp(3) NOT NULL,
-	`updated_at` timestamp(3),
+	`created_at` datetime NOT NULL,
+	`updated_at` datetime,
 	CONSTRAINT `team_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -124,7 +124,7 @@ CREATE TABLE `team_member` (
 	`id` varchar(36) NOT NULL,
 	`team_id` varchar(36) NOT NULL,
 	`user_id` varchar(36) NOT NULL,
-	`created_at` timestamp(3),
+	`created_at` datetime,
 	CONSTRAINT `team_member_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -139,20 +139,20 @@ CREATE TABLE `two_factor` (
 CREATE TABLE `user` (
 	`id` varchar(36) NOT NULL,
 	`name` varchar(255) NOT NULL,
-	`email` varchar(255) NOT NULL,
+	`email` varchar(191) NOT NULL,
 	`email_verified` boolean NOT NULL DEFAULT false,
 	`image` text,
-	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
-	`updated_at` timestamp(3) NOT NULL DEFAULT (now()),
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`two_factor_enabled` boolean DEFAULT false,
-	`username` varchar(255),
+	`username` varchar(191),
 	`display_username` text,
-	`phone_number` varchar(255),
+	`phone_number` varchar(191),
 	`phone_number_verified` boolean,
 	`role` text,
 	`banned` boolean DEFAULT false,
 	`ban_reason` text,
-	`ban_expires` timestamp(3),
+	`ban_expires` datetime,
 	`is_anonymous` boolean DEFAULT false,
 	CONSTRAINT `user_id` PRIMARY KEY(`id`),
 	CONSTRAINT `user_email_unique` UNIQUE(`email`),
@@ -164,9 +164,9 @@ CREATE TABLE `verification` (
 	`id` varchar(36) NOT NULL,
 	`identifier` varchar(255) NOT NULL,
 	`value` text NOT NULL,
-	`expires_at` timestamp(3) NOT NULL,
-	`created_at` timestamp(3) NOT NULL DEFAULT (now()),
-	`updated_at` timestamp(3) NOT NULL DEFAULT (now()),
+	`expires_at` datetime NOT NULL,
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT `verification_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -187,7 +187,7 @@ CREATE TABLE `member_roles` (
 	`member_id` varchar(36) NOT NULL,
 	`role_id` varchar(36) NOT NULL,
 	`role_type` varchar(20) NOT NULL,
-	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`created_by` varchar(36) NOT NULL,
 	CONSTRAINT `member_roles_id` PRIMARY KEY(`id`),
 	CONSTRAINT `unique_member_role` UNIQUE(`member_id`,`role_id`,`role_type`)
@@ -201,7 +201,7 @@ CREATE TABLE `notifications` (
 	`type` varchar(50) NOT NULL DEFAULT 'info',
 	`link` text,
 	`is_read` boolean NOT NULL DEFAULT false,
-	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT `notifications_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -214,7 +214,7 @@ CREATE TABLE `notification_preferences` (
 	`warning_enabled` boolean NOT NULL DEFAULT true,
 	`error_enabled` boolean NOT NULL DEFAULT true,
 	`info_enabled` boolean NOT NULL DEFAULT true,
-	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT `notification_preferences_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -225,8 +225,8 @@ CREATE TABLE `org_roles` (
 	`slug` varchar(100) NOT NULL,
 	`description` text,
 	`is_default_role` boolean NOT NULL DEFAULT false,
-	`created_at` timestamp NOT NULL DEFAULT (now()),
-	`updated_at` timestamp NOT NULL DEFAULT (now()),
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`created_by` varchar(36) NOT NULL,
 	CONSTRAINT `org_roles_id` PRIMARY KEY(`id`),
 	CONSTRAINT `org_roles_org_slug_idx` UNIQUE(`organization_id`,`slug`)
@@ -236,15 +236,15 @@ CREATE TABLE `books` (
 	`id` serial AUTO_INCREMENT NOT NULL,
 	`title` varchar(255) NOT NULL,
 	`author` varchar(255) NOT NULL,
-	`published_at` timestamp,
+	`published_at` datetime,
 	`organization_id` varchar(36),
 	`created_by_id` varchar(36),
 	`cover_image` varchar(512),
 	`attachment_file` varchar(512),
 	`gallery_images` json,
 	`additional_documents` json,
-	`created_at` timestamp NOT NULL DEFAULT (now()),
-	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT `books_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -254,7 +254,7 @@ CREATE TABLE `resource_ownership` (
 	`resource_id` varchar(36) NOT NULL,
 	`owner_id` varchar(36) NOT NULL,
 	`organization_id` varchar(36) NOT NULL,
-	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT `resource_ownership_id` PRIMARY KEY(`id`),
 	CONSTRAINT `resource_ownership_unique_idx` UNIQUE(`resource_type`,`resource_id`,`owner_id`)
 );
@@ -324,7 +324,7 @@ CREATE TABLE `akses` (
 );
 --> statement-breakpoint
 CREATE TABLE `group_akses` (
-	`HAK_AKSES` varchar(20) NOT NULL,
+	`HAK_AKSES` varchar(30) NOT NULL,
 	`AKSES` varchar(50) NOT NULL,
 	CONSTRAINT `group_akses_HAK_AKSES_AKSES_pk` PRIMARY KEY(`HAK_AKSES`,`AKSES`)
 );
@@ -332,12 +332,12 @@ CREATE TABLE `group_akses` (
 CREATE TABLE `login` (
 	`ID` int AUTO_INCREMENT NOT NULL,
 	`USERNAME` varchar(20) NOT NULL,
-	`PASSWORD` varchar(255) NOT NULL,
-	`HAK_AKSES` varchar(20) NOT NULL,
-	`NIP` varchar(30),
-	`NAMA` varchar(200),
-	`JABATAN` varchar(200),
-	`PENANGGUNG_JAWAB_CETAK` tinyint NOT NULL DEFAULT 1,
+	`PASSWORD` varchar(255) NOT NULL DEFAULT 'd41d8cd98f00b204e9800998ecf8427e',
+	`HAK_AKSES` varchar(30) NOT NULL,
+	`NIP` varchar(30) DEFAULT '-',
+	`NAMA` varchar(200) DEFAULT '-',
+	`JABATAN` varchar(200) DEFAULT '-',
+	`PENANGGUNG_JAWAB_CETAK` tinyint DEFAULT 1,
 	`TANDA_TANGAN` LONGBLOB,
 	`USER_ID` varchar(36),
 	CONSTRAINT `login_ID` PRIMARY KEY(`ID`),
@@ -889,7 +889,7 @@ CREATE TABLE `sppt_e` (
 	`TGL_PEMBAYARAN_TERAKHIR` date,
 	`TGL_DIBUAT` datetime,
 	`TGL_EMAIL` datetime,
-	`TGL_RECORD` timestamp DEFAULT CURRENT_TIMESTAMP,
+	`TGL_RECORD` datetime DEFAULT CURRENT_TIMESTAMP,
 	`NIP_VERIFIKASI_1` varchar(100),
 	`NIP_VERIFIKASI_2` varchar(100),
 	`NIP_VERIFIKASI_3` varchar(100),

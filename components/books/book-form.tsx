@@ -17,10 +17,10 @@ import { FileUpload } from '@/components/examples/file-upload'
 const bookSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   author: z.string().min(1, 'Author is required'),
-  publishedAt: z.string().optional().nullable(),
-  coverImage: z.string().optional().nullable(),
+  publishedAt: z.string().optional(),
+  coverImage: z.string().optional(),
   galleryImages: z.array(z.string()),
-  attachmentFile: z.string().optional().nullable(),
+  attachmentFile: z.string().optional(),
   additionalDocuments: z.array(z.string()),
 })
 
@@ -51,10 +51,10 @@ export function BookForm({ book, onSuccess }: BookFormProps) {
     defaultValues: {
       title: book?.title ?? '',
       author: book?.author ?? '',
-      publishedAt: book?.publishedAt ? new Date(book.publishedAt).toISOString().split('T')[0] : '',
-      coverImage: book?.coverImage ?? null,
+      publishedAt: book?.publishedAt ? new Date(book.publishedAt).toISOString().split('T')[0] : undefined,
+      coverImage: book?.coverImage ?? undefined,
       galleryImages: Array.isArray(book?.galleryImages) ? book.galleryImages : [],
-      attachmentFile: book?.attachmentFile ?? null,
+      attachmentFile: book?.attachmentFile ?? undefined,
       additionalDocuments: Array.isArray(book?.additionalDocuments) ? book.additionalDocuments : [],
     }
   })

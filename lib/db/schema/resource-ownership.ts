@@ -9,7 +9,8 @@
  * ownership tracking or for additional ownership relationships.
  */
 
-import { mysqlTable, varchar, text, timestamp, index, uniqueIndex } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, text, datetime, index, uniqueIndex } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 import { organization } from "./auth";
 
 export const resourceOwnership = mysqlTable("resource_ownership", {
@@ -22,7 +23,7 @@ export const resourceOwnership = mysqlTable("resource_ownership", {
   organizationId: varchar("organization_id", { length: 36 })
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
   index("resource_ownership_resource_idx").on(table.resourceType, table.resourceId),
   index("resource_ownership_owner_idx").on(table.ownerId),

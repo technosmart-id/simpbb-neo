@@ -6,7 +6,6 @@ import {
   year,
   date,
   datetime,
-  timestamp,
   text,
   primaryKey,
 } from "drizzle-orm/mysql-core";
@@ -60,7 +59,7 @@ export const spptE = mysqlTable(
     tglPembayaranTerakhir: date("TGL_PEMBAYARAN_TERAKHIR"),
     tglDibuat: datetime("TGL_DIBUAT"),
     tglEmail: datetime("TGL_EMAIL"),
-    tglRecord: timestamp("TGL_RECORD").default(sql`CURRENT_TIMESTAMP`),
+    tglRecord: datetime("TGL_RECORD").default(sql`CURRENT_TIMESTAMP`),
     nipVerifikasi1: varchar("NIP_VERIFIKASI_1", { length: 100 }),
     nipVerifikasi2: varchar("NIP_VERIFIKASI_2", { length: 100 }),
     nipVerifikasi3: varchar("NIP_VERIFIKASI_3", { length: 100 }),

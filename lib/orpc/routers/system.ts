@@ -49,13 +49,13 @@ export const systemRouter = os.router({
         await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
         await connection.end();
 
-        // 2. APPLY SCHEMA VIA DRIZZLE PUSH
-        console.log("[SYSTEM] Recreating tables via drizzle-kit push...");
+        // 2. APPLY SCHEMA VIA DRIZZLE MIGRATE
+        console.log("[SYSTEM] Recreating tables via drizzle-kit migrate...");
         const { execSync } = await import('child_process');
         
         try {
           // Use direct path to binary to avoid npx update checks/noise
-          const output = execSync('./node_modules/.bin/drizzle-kit push --force --verbose', {
+          const output = execSync('./node_modules/.bin/drizzle-kit migrate', {
             env: { 
               ...process.env, 
               NODE_ENV: 'development',
@@ -63,7 +63,7 @@ export const systemRouter = os.router({
             stdio: 'pipe', 
             encoding: 'utf-8'
           });
-          console.log("[SYSTEM] Drizzle push output:", output);
+          console.log("[SYSTEM] Drizzle migrate output:", output);
           console.log("[SYSTEM] Tables recreated successfully.");
 
           // Apply Custom SQL (Views & Procedures)

@@ -8,11 +8,11 @@
  * Custom roles: references org_roles.id (role_type = 'custom')
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
 	mysqlTable,
 	varchar,
-	timestamp,
+	datetime,
 	index,
 	unique,
 } from "drizzle-orm/mysql-core";
@@ -38,7 +38,7 @@ export const memberRoles = mysqlTable("member_roles", {
 	roleType: varchar("role_type", { length: 20 })
 		.notNull()
 		.$type<"system" | "custom">(),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
+	createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 	createdBy: varchar("created_by", { length: 36 })
 		.notNull()
 		.references(() => user.id, { onDelete: "restrict" }),
