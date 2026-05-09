@@ -4,6 +4,8 @@ import {
   char,
   smallint,
   primaryKey,
+  int,
+  text,
 } from "drizzle-orm/mysql-core";
 
 // ─── ref_propinsi ─────────────────────────────────────────────────
@@ -51,4 +53,25 @@ export const refJnsPelayanan = mysqlTable("ref_jns_pelayanan", {
   kdJnsPelayanan: char("KD_JNS_PELAYANAN", { length: 2 }).notNull().primaryKey(),
   nmJenisPelayanan: varchar("NM_JENIS_PELAYANAN", { length: 50 }).notNull(),
 }, (table) => [
+]);
+
+// ─── ref_jalan ─────────────────────────────────────────────────
+export const jalan = mysqlTable("ref_jalan", {
+  id: int("ID").notNull().primaryKey().autoincrement(),
+  kdPropinsi: varchar("KD_PROPINSI", { length: 2 }).notNull(),
+  kdDati2: varchar("KD_DATI2", { length: 2 }).notNull(),
+  kdKecamatan: varchar("KD_KECAMATAN", { length: 3 }).notNull(),
+  kdKelurahan: varchar("KD_KELURAHAN", { length: 3 }).notNull(),
+  nmJalan: varchar("NM_JALAN", { length: 100 }).notNull(),
+}, (table) => [
+]);
+
+// ─── ref_kategori ─────────────────────────────────────────────────
+export const refKategori = mysqlTable("ref_kategori", {
+  kategori: varchar("KATEGORI", { length: 100 }).notNull(),
+  kode: varchar("KODE", { length: 2 }).notNull(),
+  nama: varchar("NAMA", { length: 100 }).notNull(),
+  nilai: text("NILAI"),
+}, (table) => [
+  primaryKey({ columns: [table.kategori, table.kode] }),
 ]);
