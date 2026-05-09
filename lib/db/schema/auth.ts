@@ -8,7 +8,7 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/mysql-core";
-import { memberRoles } from "./member-roles";
+import { memberRoles } from "./authorization";
 
 export const user = mysqlTable("user", {
   id: varchar("id", { length: 36 }).primaryKey(),
@@ -377,6 +377,13 @@ export const memberRelations = relations(member, ({ one, many }) => ({
     references: [user.id],
   }),
   roleAssignments: many(memberRoles),
+}));
+
+export const memberRolesRelations = relations(memberRoles, ({ one }) => ({
+  member: one(member, {
+    fields: [memberRoles.memberId],
+    references: [member.id],
+  }),
 }));
 
 export const invitationRelations = relations(invitation, ({ one }) => ({

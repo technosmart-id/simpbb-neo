@@ -15,7 +15,7 @@ import {
 	getCasbinSyncService,
 	type PermissionMap,
 } from "@/lib/services/casbin-sync";
-import type { RoleAssignment, EnrichedMemberRole } from "@/lib/db/schema/member-roles";
+import type { RoleAssignment, EnrichedMemberRole } from "@/lib/db/schema";
 
 /**
  * Role assignment result

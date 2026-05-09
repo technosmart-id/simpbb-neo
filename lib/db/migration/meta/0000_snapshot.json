@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "9ffff859-69af-4164-b8ad-faee2c6e59c3",
+  "id": "1dba5b16-9af7-40bc-b4a9-55b100bdc7e8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "account": {
@@ -8016,6 +8016,1497 @@
           "name": "log_delete_pelayanan_ID",
           "columns": [
             "ID"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "bangunan_lantai": {
+      "name": "bangunan_lantai",
+      "columns": {
+        "KD_JPB": {
+          "name": "KD_JPB",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "TIPE_BNG": {
+          "name": "TIPE_BNG",
+          "type": "char(5)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_BNG_LANTAI": {
+          "name": "KD_BNG_LANTAI",
+          "type": "char(8)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MIN_BNG_LANTAI": {
+          "name": "LANTAI_MIN_BNG_LANTAI",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "LANTAI_MAX_BNG_LANTAI": {
+          "name": "LANTAI_MAX_BNG_LANTAI",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_bangunan_lantai": {
+          "name": "pk_bangunan_lantai",
+          "columns": [
+            "KD_JPB",
+            "TIPE_BNG",
+            "KD_BNG_LANTAI"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_daya_dukung": {
+      "name": "dbkb_daya_dukung",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_DAYA_DUKUNG": {
+          "name": "THN_DBKB_DAYA_DUKUNG",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "TYPE_KONSTRUKSI": {
+          "name": "TYPE_KONSTRUKSI",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_DAYA_DUKUNG": {
+          "name": "NILAI_DBKB_DAYA_DUKUNG",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_daya_dukung": {
+          "name": "pk_dbkb_daya_dukung",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_DAYA_DUKUNG",
+            "TYPE_KONSTRUKSI"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb12": {
+      "name": "dbkb_jpb12",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB12": {
+          "name": "THN_DBKB_JPB12",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "TYPE_DBKB_JPB12": {
+          "name": "TYPE_DBKB_JPB12",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB12": {
+          "name": "NILAI_DBKB_JPB12",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb12": {
+          "name": "pk_dbkb_jpb12",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB12",
+            "TYPE_DBKB_JPB12"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb13": {
+      "name": "dbkb_jpb13",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB13": {
+          "name": "THN_DBKB_JPB13",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KLS_DBKB_JPB13": {
+          "name": "KLS_DBKB_JPB13",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MIN_JPB13": {
+          "name": "LANTAI_MIN_JPB13",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MAX_JPB13": {
+          "name": "LANTAI_MAX_JPB13",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB13": {
+          "name": "NILAI_DBKB_JPB13",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb13": {
+          "name": "pk_dbkb_jpb13",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB13",
+            "KLS_DBKB_JPB13",
+            "LANTAI_MIN_JPB13",
+            "LANTAI_MAX_JPB13"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb14": {
+      "name": "dbkb_jpb14",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB14": {
+          "name": "THN_DBKB_JPB14",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB14": {
+          "name": "NILAI_DBKB_JPB14",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb14": {
+          "name": "pk_dbkb_jpb14",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB14"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb15": {
+      "name": "dbkb_jpb15",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB15": {
+          "name": "THN_DBKB_JPB15",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "JNS_TANGKI_DBKB_JPB15": {
+          "name": "JNS_TANGKI_DBKB_JPB15",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KAPASITAS_MIN_DBKB_JPB15": {
+          "name": "KAPASITAS_MIN_DBKB_JPB15",
+          "type": "decimal(9,4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KAPASITAS_MAX_DBKB_JPB15": {
+          "name": "KAPASITAS_MAX_DBKB_JPB15",
+          "type": "decimal(9,4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB15": {
+          "name": "NILAI_DBKB_JPB15",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb15": {
+          "name": "pk_dbkb_jpb15",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB15",
+            "JNS_TANGKI_DBKB_JPB15",
+            "KAPASITAS_MIN_DBKB_JPB15",
+            "KAPASITAS_MAX_DBKB_JPB15"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb16": {
+      "name": "dbkb_jpb16",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB16": {
+          "name": "THN_DBKB_JPB16",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KLS_DBKB_JPB16": {
+          "name": "KLS_DBKB_JPB16",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MIN_JPB16": {
+          "name": "LANTAI_MIN_JPB16",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MAX_JPB16": {
+          "name": "LANTAI_MAX_JPB16",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB16": {
+          "name": "NILAI_DBKB_JPB16",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb16": {
+          "name": "pk_dbkb_jpb16",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB16",
+            "KLS_DBKB_JPB16",
+            "LANTAI_MIN_JPB16",
+            "LANTAI_MAX_JPB16"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb2": {
+      "name": "dbkb_jpb2",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB2": {
+          "name": "THN_DBKB_JPB2",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KLS_DBKB_JPB2": {
+          "name": "KLS_DBKB_JPB2",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MIN_JPB2": {
+          "name": "LANTAI_MIN_JPB2",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MAX_JPB2": {
+          "name": "LANTAI_MAX_JPB2",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB2": {
+          "name": "NILAI_DBKB_JPB2",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb2": {
+          "name": "pk_dbkb_jpb2",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB2",
+            "KLS_DBKB_JPB2",
+            "LANTAI_MIN_JPB2",
+            "LANTAI_MAX_JPB2"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb3": {
+      "name": "dbkb_jpb3",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB3": {
+          "name": "THN_DBKB_JPB3",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LBR_BENT_MIN_DBKB_JPB3": {
+          "name": "LBR_BENT_MIN_DBKB_JPB3",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LBR_BENT_MAX_DBKB_JPB3": {
+          "name": "LBR_BENT_MAX_DBKB_JPB3",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "TING_KOLOM_MIN_DBKB_JPB3": {
+          "name": "TING_KOLOM_MIN_DBKB_JPB3",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "TING_KOLOM_MAX_DBKB_JPB3": {
+          "name": "TING_KOLOM_MAX_DBKB_JPB3",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB3": {
+          "name": "NILAI_DBKB_JPB3",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb3": {
+          "name": "pk_dbkb_jpb3",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB3",
+            "LBR_BENT_MIN_DBKB_JPB3",
+            "LBR_BENT_MAX_DBKB_JPB3",
+            "TING_KOLOM_MIN_DBKB_JPB3",
+            "TING_KOLOM_MAX_DBKB_JPB3"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb4": {
+      "name": "dbkb_jpb4",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB4": {
+          "name": "THN_DBKB_JPB4",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KLS_DBKB_JPB4": {
+          "name": "KLS_DBKB_JPB4",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MIN_JPB4": {
+          "name": "LANTAI_MIN_JPB4",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MAX_JPB4": {
+          "name": "LANTAI_MAX_JPB4",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB4": {
+          "name": "NILAI_DBKB_JPB4",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb4": {
+          "name": "pk_dbkb_jpb4",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB4",
+            "KLS_DBKB_JPB4",
+            "LANTAI_MIN_JPB4",
+            "LANTAI_MAX_JPB4"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb5": {
+      "name": "dbkb_jpb5",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB5": {
+          "name": "THN_DBKB_JPB5",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KLS_DBKB_JPB5": {
+          "name": "KLS_DBKB_JPB5",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MIN_JPB5": {
+          "name": "LANTAI_MIN_JPB5",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MAX_JPB5": {
+          "name": "LANTAI_MAX_JPB5",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB5": {
+          "name": "NILAI_DBKB_JPB5",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb5": {
+          "name": "pk_dbkb_jpb5",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB5",
+            "KLS_DBKB_JPB5",
+            "LANTAI_MIN_JPB5",
+            "LANTAI_MAX_JPB5"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb6": {
+      "name": "dbkb_jpb6",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB6": {
+          "name": "THN_DBKB_JPB6",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KLS_DBKB_JPB6": {
+          "name": "KLS_DBKB_JPB6",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB6": {
+          "name": "NILAI_DBKB_JPB6",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb6": {
+          "name": "pk_dbkb_jpb6",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB6",
+            "KLS_DBKB_JPB6"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb7": {
+      "name": "dbkb_jpb7",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB7": {
+          "name": "THN_DBKB_JPB7",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "JNS_DBKB_JPB7": {
+          "name": "JNS_DBKB_JPB7",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "BINTANG_DBKB_JPB7": {
+          "name": "BINTANG_DBKB_JPB7",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MIN_JPB7": {
+          "name": "LANTAI_MIN_JPB7",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MAX_JPB7": {
+          "name": "LANTAI_MAX_JPB7",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB7": {
+          "name": "NILAI_DBKB_JPB7",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb7": {
+          "name": "pk_dbkb_jpb7",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB7",
+            "JNS_DBKB_JPB7",
+            "BINTANG_DBKB_JPB7",
+            "LANTAI_MIN_JPB7",
+            "LANTAI_MAX_JPB7"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb8": {
+      "name": "dbkb_jpb8",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB8": {
+          "name": "THN_DBKB_JPB8",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LBR_BENT_MIN_DBKB_JPB8": {
+          "name": "LBR_BENT_MIN_DBKB_JPB8",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LBR_BENT_MAX_DBKB_JPB8": {
+          "name": "LBR_BENT_MAX_DBKB_JPB8",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "TING_KOLOM_MIN_DBKB_JPB8": {
+          "name": "TING_KOLOM_MIN_DBKB_JPB8",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "TING_KOLOM_MAX_DBKB_JPB8": {
+          "name": "TING_KOLOM_MAX_DBKB_JPB8",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB8": {
+          "name": "NILAI_DBKB_JPB8",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb8": {
+          "name": "pk_dbkb_jpb8",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB8",
+            "LBR_BENT_MIN_DBKB_JPB8",
+            "LBR_BENT_MAX_DBKB_JPB8",
+            "TING_KOLOM_MIN_DBKB_JPB8",
+            "TING_KOLOM_MAX_DBKB_JPB8"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_jpb9": {
+      "name": "dbkb_jpb9",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_JPB9": {
+          "name": "THN_DBKB_JPB9",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KLS_DBKB_JPB9": {
+          "name": "KLS_DBKB_JPB9",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MIN_JPB9": {
+          "name": "LANTAI_MIN_JPB9",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "LANTAI_MAX_JPB9": {
+          "name": "LANTAI_MAX_JPB9",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_JPB9": {
+          "name": "NILAI_DBKB_JPB9",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_jpb9": {
+          "name": "pk_dbkb_jpb9",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_JPB9",
+            "KLS_DBKB_JPB9",
+            "LANTAI_MIN_JPB9",
+            "LANTAI_MAX_JPB9"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_material": {
+      "name": "dbkb_material",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_MATERIAL": {
+          "name": "THN_DBKB_MATERIAL",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_PEKERJAAN": {
+          "name": "KD_PEKERJAAN",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_KEGIATAN": {
+          "name": "KD_KEGIATAN",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_MATERIAL": {
+          "name": "NILAI_DBKB_MATERIAL",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_material": {
+          "name": "pk_dbkb_material",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_MATERIAL",
+            "KD_PEKERJAAN",
+            "KD_KEGIATAN"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_mezanin": {
+      "name": "dbkb_mezanin",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_MEZANIN": {
+          "name": "THN_DBKB_MEZANIN",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_MEZANIN": {
+          "name": "NILAI_DBKB_MEZANIN",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_mezanin": {
+          "name": "pk_dbkb_mezanin",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_MEZANIN"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "dbkb_standard": {
+      "name": "dbkb_standard",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DBKB_STANDARD": {
+          "name": "THN_DBKB_STANDARD",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_JPB": {
+          "name": "KD_JPB",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "TIPE_BNG": {
+          "name": "TIPE_BNG",
+          "type": "char(5)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_BNG_LANTAI": {
+          "name": "KD_BNG_LANTAI",
+          "type": "char(8)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DBKB_STANDARD": {
+          "name": "NILAI_DBKB_STANDARD",
+          "type": "decimal(11,4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_dbkb_standard": {
+          "name": "pk_dbkb_standard",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DBKB_STANDARD",
+            "KD_JPB",
+            "TIPE_BNG",
+            "KD_BNG_LANTAI"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "fas_dep_min_max": {
+      "name": "fas_dep_min_max",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_DEP_MIN_MAX": {
+          "name": "THN_DEP_MIN_MAX",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_FASILITAS": {
+          "name": "KD_FASILITAS",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KLS_DEP_MIN": {
+          "name": "KLS_DEP_MIN",
+          "type": "mediumint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KLS_DEP_MAX": {
+          "name": "KLS_DEP_MAX",
+          "type": "mediumint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_DEP_MIN_MAX": {
+          "name": "NILAI_DEP_MIN_MAX",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_fas_dep_min_max": {
+          "name": "pk_fas_dep_min_max",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_DEP_MIN_MAX",
+            "KD_FASILITAS",
+            "KLS_DEP_MIN",
+            "KLS_DEP_MAX"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "fas_non_dep": {
+      "name": "fas_non_dep",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_NON_DEP": {
+          "name": "THN_NON_DEP",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_FASILITAS": {
+          "name": "KD_FASILITAS",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_NON_DEP": {
+          "name": "NILAI_NON_DEP",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_fas_non_dep": {
+          "name": "pk_fas_non_dep",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_NON_DEP",
+            "KD_FASILITAS"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "kayu_ulin": {
+      "name": "kayu_ulin",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_STATUS_KAYU_ULIN": {
+          "name": "THN_STATUS_KAYU_ULIN",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "STATUS_KAYU_ULIN": {
+          "name": "STATUS_KAYU_ULIN",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_kayu_ulin": {
+          "name": "pk_kayu_ulin",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "THN_STATUS_KAYU_ULIN"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "penyusutan": {
+      "name": "penyusutan",
+      "columns": {
+        "UMUR_EFEKTIF": {
+          "name": "UMUR_EFEKTIF",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_RANGE_PENYUSUTAN": {
+          "name": "KD_RANGE_PENYUSUTAN",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KONDISI_BNG_SUSUT": {
+          "name": "KONDISI_BNG_SUSUT",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_PENYUSUTAN": {
+          "name": "NILAI_PENYUSUTAN",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_penyusutan": {
+          "name": "pk_penyusutan",
+          "columns": [
+            "UMUR_EFEKTIF",
+            "KD_RANGE_PENYUSUTAN",
+            "KONDISI_BNG_SUSUT"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "range_penyusutan": {
+      "name": "range_penyusutan",
+      "columns": {
+        "KD_RANGE_PENYUSUTAN": {
+          "name": "KD_RANGE_PENYUSUTAN",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI_MIN_PENYUSUTAN": {
+          "name": "NILAI_MIN_PENYUSUTAN",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NILAI_MAX_PENYUSUTAN": {
+          "name": "NILAI_MAX_PENYUSUTAN",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_range_penyusutan": {
+          "name": "pk_range_penyusutan",
+          "columns": [
+            "KD_RANGE_PENYUSUTAN"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "tipe_bangunan": {
+      "name": "tipe_bangunan",
+      "columns": {
+        "TIPE_BNG": {
+          "name": "TIPE_BNG",
+          "type": "char(5)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NM_TIPE_BNG": {
+          "name": "NM_TIPE_BNG",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "LUAS_MIN_TIPE_BNG": {
+          "name": "LUAS_MIN_TIPE_BNG",
+          "type": "mediumint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "LUAS_MAX_TIPE_BNG": {
+          "name": "LUAS_MAX_TIPE_BNG",
+          "type": "mediumint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "FAKTOR_PEMBAGI_TIPE_BNG": {
+          "name": "FAKTOR_PEMBAGI_TIPE_BNG",
+          "type": "decimal(8,4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_tipe_bangunan": {
+          "name": "pk_tipe_bangunan",
+          "columns": [
+            "TIPE_BNG"
           ]
         }
       },

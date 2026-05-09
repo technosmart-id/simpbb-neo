@@ -1075,6 +1075,244 @@ CREATE TABLE `log_delete_pelayanan` (
 	CONSTRAINT `log_delete_pelayanan_ID` PRIMARY KEY(`ID`)
 );
 --> statement-breakpoint
+CREATE TABLE `bangunan_lantai` (
+	`KD_JPB` char(2) NOT NULL,
+	`TIPE_BNG` char(5) NOT NULL,
+	`KD_BNG_LANTAI` char(8) NOT NULL,
+	`LANTAI_MIN_BNG_LANTAI` int,
+	`LANTAI_MAX_BNG_LANTAI` int,
+	CONSTRAINT `pk_bangunan_lantai` PRIMARY KEY(`KD_JPB`,`TIPE_BNG`,`KD_BNG_LANTAI`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_daya_dukung` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_DAYA_DUKUNG` char(4) NOT NULL,
+	`TYPE_KONSTRUKSI` char(1) NOT NULL,
+	`NILAI_DBKB_DAYA_DUKUNG` int,
+	CONSTRAINT `pk_dbkb_daya_dukung` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_DAYA_DUKUNG`,`TYPE_KONSTRUKSI`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb12` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB12` char(4) NOT NULL,
+	`TYPE_DBKB_JPB12` char(1) NOT NULL,
+	`NILAI_DBKB_JPB12` int,
+	CONSTRAINT `pk_dbkb_jpb12` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB12`,`TYPE_DBKB_JPB12`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb13` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB13` char(4) NOT NULL,
+	`KLS_DBKB_JPB13` char(1) NOT NULL,
+	`LANTAI_MIN_JPB13` tinyint NOT NULL,
+	`LANTAI_MAX_JPB13` tinyint NOT NULL,
+	`NILAI_DBKB_JPB13` int,
+	CONSTRAINT `pk_dbkb_jpb13` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB13`,`KLS_DBKB_JPB13`,`LANTAI_MIN_JPB13`,`LANTAI_MAX_JPB13`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb14` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB14` char(4) NOT NULL,
+	`NILAI_DBKB_JPB14` int,
+	CONSTRAINT `pk_dbkb_jpb14` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB14`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb15` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB15` char(4) NOT NULL,
+	`JNS_TANGKI_DBKB_JPB15` char(1) NOT NULL,
+	`KAPASITAS_MIN_DBKB_JPB15` decimal(9,4) NOT NULL,
+	`KAPASITAS_MAX_DBKB_JPB15` decimal(9,4) NOT NULL,
+	`NILAI_DBKB_JPB15` int,
+	CONSTRAINT `pk_dbkb_jpb15` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB15`,`JNS_TANGKI_DBKB_JPB15`,`KAPASITAS_MIN_DBKB_JPB15`,`KAPASITAS_MAX_DBKB_JPB15`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb16` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB16` char(4) NOT NULL,
+	`KLS_DBKB_JPB16` char(1) NOT NULL,
+	`LANTAI_MIN_JPB16` tinyint NOT NULL,
+	`LANTAI_MAX_JPB16` tinyint NOT NULL,
+	`NILAI_DBKB_JPB16` int,
+	CONSTRAINT `pk_dbkb_jpb16` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB16`,`KLS_DBKB_JPB16`,`LANTAI_MIN_JPB16`,`LANTAI_MAX_JPB16`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb2` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB2` char(4) NOT NULL,
+	`KLS_DBKB_JPB2` char(1) NOT NULL,
+	`LANTAI_MIN_JPB2` tinyint NOT NULL,
+	`LANTAI_MAX_JPB2` tinyint NOT NULL,
+	`NILAI_DBKB_JPB2` int,
+	CONSTRAINT `pk_dbkb_jpb2` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB2`,`KLS_DBKB_JPB2`,`LANTAI_MIN_JPB2`,`LANTAI_MAX_JPB2`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb3` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB3` char(4) NOT NULL,
+	`LBR_BENT_MIN_DBKB_JPB3` int NOT NULL,
+	`LBR_BENT_MAX_DBKB_JPB3` int NOT NULL,
+	`TING_KOLOM_MIN_DBKB_JPB3` int NOT NULL,
+	`TING_KOLOM_MAX_DBKB_JPB3` int NOT NULL,
+	`NILAI_DBKB_JPB3` decimal(12,2),
+	CONSTRAINT `pk_dbkb_jpb3` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB3`,`LBR_BENT_MIN_DBKB_JPB3`,`LBR_BENT_MAX_DBKB_JPB3`,`TING_KOLOM_MIN_DBKB_JPB3`,`TING_KOLOM_MAX_DBKB_JPB3`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb4` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB4` char(4) NOT NULL,
+	`KLS_DBKB_JPB4` char(1) NOT NULL,
+	`LANTAI_MIN_JPB4` tinyint NOT NULL,
+	`LANTAI_MAX_JPB4` tinyint NOT NULL,
+	`NILAI_DBKB_JPB4` int,
+	CONSTRAINT `pk_dbkb_jpb4` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB4`,`KLS_DBKB_JPB4`,`LANTAI_MIN_JPB4`,`LANTAI_MAX_JPB4`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb5` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB5` char(4) NOT NULL,
+	`KLS_DBKB_JPB5` char(1) NOT NULL,
+	`LANTAI_MIN_JPB5` tinyint NOT NULL,
+	`LANTAI_MAX_JPB5` tinyint NOT NULL,
+	`NILAI_DBKB_JPB5` int,
+	CONSTRAINT `pk_dbkb_jpb5` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB5`,`KLS_DBKB_JPB5`,`LANTAI_MIN_JPB5`,`LANTAI_MAX_JPB5`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb6` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB6` char(4) NOT NULL,
+	`KLS_DBKB_JPB6` char(1) NOT NULL,
+	`NILAI_DBKB_JPB6` int,
+	CONSTRAINT `pk_dbkb_jpb6` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB6`,`KLS_DBKB_JPB6`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb7` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB7` char(4) NOT NULL,
+	`JNS_DBKB_JPB7` char(1) NOT NULL,
+	`BINTANG_DBKB_JPB7` char(1) NOT NULL,
+	`LANTAI_MIN_JPB7` tinyint NOT NULL,
+	`LANTAI_MAX_JPB7` tinyint NOT NULL,
+	`NILAI_DBKB_JPB7` int,
+	CONSTRAINT `pk_dbkb_jpb7` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB7`,`JNS_DBKB_JPB7`,`BINTANG_DBKB_JPB7`,`LANTAI_MIN_JPB7`,`LANTAI_MAX_JPB7`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb8` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB8` char(4) NOT NULL,
+	`LBR_BENT_MIN_DBKB_JPB8` int NOT NULL,
+	`LBR_BENT_MAX_DBKB_JPB8` int NOT NULL,
+	`TING_KOLOM_MIN_DBKB_JPB8` int NOT NULL,
+	`TING_KOLOM_MAX_DBKB_JPB8` int NOT NULL,
+	`NILAI_DBKB_JPB8` decimal(12,2),
+	CONSTRAINT `pk_dbkb_jpb8` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB8`,`LBR_BENT_MIN_DBKB_JPB8`,`LBR_BENT_MAX_DBKB_JPB8`,`TING_KOLOM_MIN_DBKB_JPB8`,`TING_KOLOM_MAX_DBKB_JPB8`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_jpb9` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_JPB9` char(4) NOT NULL,
+	`KLS_DBKB_JPB9` char(1) NOT NULL,
+	`LANTAI_MIN_JPB9` tinyint NOT NULL,
+	`LANTAI_MAX_JPB9` tinyint NOT NULL,
+	`NILAI_DBKB_JPB9` int,
+	CONSTRAINT `pk_dbkb_jpb9` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_JPB9`,`KLS_DBKB_JPB9`,`LANTAI_MIN_JPB9`,`LANTAI_MAX_JPB9`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_material` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_MATERIAL` char(4) NOT NULL,
+	`KD_PEKERJAAN` char(2) NOT NULL,
+	`KD_KEGIATAN` char(2) NOT NULL,
+	`NILAI_DBKB_MATERIAL` decimal(12,2),
+	CONSTRAINT `pk_dbkb_material` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_MATERIAL`,`KD_PEKERJAAN`,`KD_KEGIATAN`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_mezanin` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_MEZANIN` char(4) NOT NULL,
+	`NILAI_DBKB_MEZANIN` int,
+	CONSTRAINT `pk_dbkb_mezanin` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_MEZANIN`)
+);
+--> statement-breakpoint
+CREATE TABLE `dbkb_standard` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DBKB_STANDARD` char(4) NOT NULL,
+	`KD_JPB` char(2) NOT NULL,
+	`TIPE_BNG` char(5) NOT NULL,
+	`KD_BNG_LANTAI` char(8) NOT NULL,
+	`NILAI_DBKB_STANDARD` decimal(11,4),
+	CONSTRAINT `pk_dbkb_standard` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DBKB_STANDARD`,`KD_JPB`,`TIPE_BNG`,`KD_BNG_LANTAI`)
+);
+--> statement-breakpoint
+CREATE TABLE `fas_dep_min_max` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_DEP_MIN_MAX` char(4) NOT NULL,
+	`KD_FASILITAS` char(2) NOT NULL,
+	`KLS_DEP_MIN` mediumint NOT NULL,
+	`KLS_DEP_MAX` mediumint NOT NULL,
+	`NILAI_DEP_MIN_MAX` decimal(10,2),
+	CONSTRAINT `pk_fas_dep_min_max` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_DEP_MIN_MAX`,`KD_FASILITAS`,`KLS_DEP_MIN`,`KLS_DEP_MAX`)
+);
+--> statement-breakpoint
+CREATE TABLE `fas_non_dep` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_NON_DEP` char(4) NOT NULL,
+	`KD_FASILITAS` char(2) NOT NULL,
+	`NILAI_NON_DEP` decimal(10,2),
+	CONSTRAINT `pk_fas_non_dep` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_NON_DEP`,`KD_FASILITAS`)
+);
+--> statement-breakpoint
+CREATE TABLE `kayu_ulin` (
+	`KD_PROPINSI` char(2) NOT NULL,
+	`KD_DATI2` char(2) NOT NULL,
+	`THN_STATUS_KAYU_ULIN` char(4) NOT NULL,
+	`STATUS_KAYU_ULIN` tinyint,
+	CONSTRAINT `pk_kayu_ulin` PRIMARY KEY(`KD_PROPINSI`,`KD_DATI2`,`THN_STATUS_KAYU_ULIN`)
+);
+--> statement-breakpoint
+CREATE TABLE `penyusutan` (
+	`UMUR_EFEKTIF` tinyint NOT NULL,
+	`KD_RANGE_PENYUSUTAN` char(1) NOT NULL,
+	`KONDISI_BNG_SUSUT` char(1) NOT NULL,
+	`NILAI_PENYUSUTAN` int,
+	CONSTRAINT `pk_penyusutan` PRIMARY KEY(`UMUR_EFEKTIF`,`KD_RANGE_PENYUSUTAN`,`KONDISI_BNG_SUSUT`)
+);
+--> statement-breakpoint
+CREATE TABLE `range_penyusutan` (
+	`KD_RANGE_PENYUSUTAN` char(1) NOT NULL,
+	`NILAI_MIN_PENYUSUTAN` bigint,
+	`NILAI_MAX_PENYUSUTAN` bigint,
+	CONSTRAINT `pk_range_penyusutan` PRIMARY KEY(`KD_RANGE_PENYUSUTAN`)
+);
+--> statement-breakpoint
+CREATE TABLE `tipe_bangunan` (
+	`TIPE_BNG` char(5) NOT NULL,
+	`NM_TIPE_BNG` varchar(30),
+	`LUAS_MIN_TIPE_BNG` mediumint,
+	`LUAS_MAX_TIPE_BNG` mediumint,
+	`FAKTOR_PEMBAGI_TIPE_BNG` decimal(8,4),
+	CONSTRAINT `pk_tipe_bangunan` PRIMARY KEY(`TIPE_BNG`)
+);
+--> statement-breakpoint
 ALTER TABLE `account` ADD CONSTRAINT `account_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `invitation` ADD CONSTRAINT `invitation_organization_id_organization_id_fk` FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `invitation` ADD CONSTRAINT `invitation_inviter_id_user_id_fk` FOREIGN KEY (`inviter_id`) REFERENCES `user`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
