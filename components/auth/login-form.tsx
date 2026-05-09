@@ -450,30 +450,28 @@ function LoginFormContent({ className, ...props }: React.ComponentProps<"div">) 
 							)}
 
 							{/* Demo & Reset Buttons - Only show in development */}
-							{process.env.NODE_ENV !== "production" && (
-								<div className="grid grid-cols-2 gap-2">
-									<Button
-										type="button"
-										variant="outline"
-										className="w-full"
-										onClick={fillDemoAdmin}
-										disabled={loading}
-									>
-										<Sparkles className="h-4 w-4 mr-2 text-yellow-500" />
-										Demo Akun
-									</Button>
-									<Button
-										type="button"
-										variant="outline"
-										className="w-full text-destructive hover:bg-destructive/10"
-										onClick={handleResetDb}
-										disabled={loading}
-									>
-										<Loader2Icon className={cn("h-4 w-4 mr-2", resetDb.isPending && "animate-spin")} />
-										Reset DB
-									</Button>
-								</div>
-							)}
+							<div className="grid grid-cols-2 gap-2">
+								<Button
+									type="button"
+									variant="outline"
+									className="w-full"
+									onClick={fillDemoAdmin}
+									disabled={loading}
+								>
+									<Sparkles className="h-4 w-4 mr-2 text-yellow-500" />
+									Demo Akun
+								</Button>
+								<Button
+									type="button"
+									variant="outline"
+									className="w-full text-destructive hover:bg-destructive/10"
+									onClick={handleResetDb}
+									disabled={loading}
+								>
+									<Loader2Icon className={cn("h-4 w-4 mr-2", resetDb.isPending && "animate-spin")} />
+									Reset DB
+								</Button>
+							</div>
 
 							{/* Sign In Button */}
 							<Field>
