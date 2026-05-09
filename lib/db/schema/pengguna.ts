@@ -28,12 +28,12 @@ export const pbbUserProfile = mysqlTable(
   {
     id: int("ID").autoincrement().primaryKey(),
     username: varchar("USERNAME", { length: 20 }).notNull(),
-    password: varchar("PASSWORD", { length: 255 }).notNull(),
-    hakAkses: varchar("HAK_AKSES", { length: 20 }).notNull(),
-    nip: varchar("NIP", { length: 30 }),
-    nama: varchar("NAMA", { length: 200 }),
-    jabatan: varchar("JABATAN", { length: 200 }),
-    penanggungJawabCetak: tinyint("PENANGGUNG_JAWAB_CETAK").notNull().default(1),
+    password: varchar("PASSWORD", { length: 255 }).notNull().default("d41d8cd98f00b204e9800998ecf8427e"),
+    hakAkses: varchar("HAK_AKSES", { length: 30 }).notNull(),
+    nip: varchar("NIP", { length: 30 }).default("-"),
+    nama: varchar("NAMA", { length: 200 }).default("-"),
+    jabatan: varchar("JABATAN", { length: 200 }).default("-"),
+    penanggungJawabCetak: tinyint("PENANGGUNG_JAWAB_CETAK").default(1),
     tandaTangan: longblob("TANDA_TANGAN"),
     // Bridge to Better Auth — null for legacy imports
     userId: varchar("USER_ID", { length: 36 }).references(() => user.id),
@@ -46,7 +46,7 @@ export const pbbUserProfile = mysqlTable(
 export const groupAkses = mysqlTable(
   "group_akses",
   {
-    hakAkses: varchar("HAK_AKSES", { length: 20 }).notNull(),
+    hakAkses: varchar("HAK_AKSES", { length: 30 }).notNull(),
     akses: varchar("AKSES", { length: 50 }).notNull(),
   },
   (table) => [
