@@ -110,7 +110,7 @@ async function extractSpptMerged() {
     const headers = Object.keys(transformed[0]);
     const csv = [
       headers.join(','),
-      ...transformed.map(row => headers.map(h => {
+      ...transformed.map((row: any) => headers.map(h => {
         const val = row[h];
         if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
           return `"${String(val).replace(/"/g, '""')}"`;
