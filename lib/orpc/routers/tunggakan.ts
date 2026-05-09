@@ -27,7 +27,7 @@ export const tunggakanRouter = os.router({
       if (input.kdKecamatan) conditions.push(eq(sppt.kdKecamatan, input.kdKecamatan))
       if (input.kdKelurahan) conditions.push(eq(sppt.kdKelurahan, input.kdKelurahan))
       if (input.search) {
-        conditions.push(sql`(${sppt.nmWp} LIKE ${`%${input.search}%`} OR ${sppt.noUrut} LIKE ${`%${input.search}%`})`)
+        conditions.push(sql`(${sppt.nmWpSppt} LIKE ${`%${input.search}%`} OR ${sppt.noUrut} LIKE ${`%${input.search}%`})`)
       }
 
       const where = and(...conditions)

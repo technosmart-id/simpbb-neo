@@ -36,7 +36,7 @@ interface SpptTabProps {
 
 export function SpptTab({ initialData }: SpptTabProps) {
   const orpc = useORPC()
-  const [selectedYear, setSelectedYear] = React.useState<number | undefined>()
+  const [selectedYear, setSelectedYear] = React.useState<string | undefined>()
 
   const { data: history, isLoading } = useQuery({
     ...orpc.objekPajak.getSpptHistory.queryOptions({
@@ -76,7 +76,7 @@ export function SpptTab({ initialData }: SpptTabProps) {
     )
   }
 
-  const years = history.map(h => h.thnPajakSppt).sort((a, b) => b - a)
+  const years = history.map(h => h.thnPajakSppt).sort((a, b) => parseInt(b) - parseInt(a))
   const currentSppt = history.find(h => h.thnPajakSppt === selectedYear) || history[0]
   const currentIndex = years.indexOf(currentSppt.thnPajakSppt)
 
@@ -120,9 +120,9 @@ export function SpptTab({ initialData }: SpptTabProps) {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             
-            <Select 
-              value={selectedYear?.toString()} 
-              onValueChange={(v) => setSelectedYear(Number(v))}
+            <Select
+              value={selectedYear?.toString()}
+              onValueChange={(v) => setSelectedYear(v)}
             >
               <SelectTrigger className="h-7 w-[100px] font-bold text-xs border-none shadow-none focus:ring-0 focus:ring-offset-0">
                 <SelectValue placeholder="Pilih Tahun" />
@@ -158,7 +158,7 @@ export function SpptTab({ initialData }: SpptTabProps) {
               </div>
               <div className="space-y-1">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Nama Wajib Pajak</span>
-                <p className="text-xl font-black text-foreground uppercase tracking-tight">{currentSppt.nmWp}</p>
+                <p className="text-xl font-black text-foreground uppercase tracking-tight">{currentSppt.nmWpSppt}</p>
               </div>
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="space-y-1">
@@ -167,7 +167,7 @@ export function SpptTab({ initialData }: SpptTabProps) {
                 </div>
                 <div className="space-y-1">
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Tgl. Jatuh Tempo</span>
-                  <p className="text-sm font-semibold text-destructive">{currentSppt.tglJatuhTempo ? format(new Date(currentSppt.tglJatuhTempo), 'dd MMM yyyy') : '—'}</p>
+                  <p className="text-sm font-semibold text-destructive">{currentSppt.tglJatuhTempoSppt ? format(new Date(currentSppt.tglJatuhTempoSppt), 'dd MMM yyyy') : '—'}</p>
                 </div>
               </div>
             </div>

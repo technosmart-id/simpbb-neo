@@ -71,19 +71,19 @@ async function validateSchema() {
 
       // Check for missing or mismatching columns
       for (const [colName, cloneCol] of cloneMap.entries()) {
-        const localCol = localMap.get(colName);
+        const localCol = localMap.get(colName) as any;
 
         if (!localCol) {
           diffs.push(chalk.red(`  ❌ Missing column: ${colName}`));
         } else {
-          const typeMatch = localCol.COLUMN_TYPE.toLowerCase() === cloneCol.COLUMN_TYPE.toLowerCase();
-          const nullMatch = localCol.IS_NULLABLE === cloneCol.IS_NULLABLE;
+          const typeMatch = localCol.COLUMN_TYPE.toLowerCase() === (cloneCol as any).COLUMN_TYPE.toLowerCase();
+          const nullMatch = localCol.IS_NULLABLE === (cloneCol as any).IS_NULLABLE;
 
           if (!typeMatch) {
-            diffs.push(chalk.yellow(`  ⚠️  Type mismatch for ${colName}: Local [${localCol.COLUMN_TYPE}] vs Clone [${cloneCol.COLUMN_TYPE}]`));
+            diffs.push(chalk.yellow(`  ⚠️  Type mismatch for ${colName}: Local [${localCol.COLUMN_TYPE}] vs Clone [${(cloneCol as any).COLUMN_TYPE}]`));
           }
           if (!nullMatch) {
-            diffs.push(chalk.yellow(`  ⚠️  Nullability mismatch for ${colName}: Local [${localCol.IS_NULLABLE}] vs Clone [${cloneCol.IS_NULLABLE}]`));
+            diffs.push(chalk.yellow(`  ⚠️  Nullability mismatch for ${colName}: Local [${localCol.IS_NULLABLE}] vs Clone [${(cloneCol as any).IS_NULLABLE}]`));
           }
         }
       }

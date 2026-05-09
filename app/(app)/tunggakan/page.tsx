@@ -21,11 +21,11 @@ type TunggakanRow = {
   kdBlok: string
   noUrut: string
   kdJnsOp: string
-  thnPajakSppt: number
-  nmWp: string | null
-  pbbYgHarusDibayarSppt: string | number
-  statusPembayaranSppt: string | number
-  tglJatuhTempo: Date | string | null
+  thnPajakSppt: string
+  nmWpSppt: string | null
+  pbbYgHarusDibayarSppt: bigint | number
+  statusPembayaranSppt: number | null
+  tglJatuhTempoSppt: Date | string | null
 }
 
 const columns: ColumnDef<TunggakanRow>[] = [
@@ -35,21 +35,21 @@ const columns: ColumnDef<TunggakanRow>[] = [
     cell: ({ row }) => <NopDisplay parts={row.original} copyable={false} />,
   },
   { accessorKey: 'thnPajakSppt', header: 'Tahun' },
-  { accessorKey: 'nmWp', header: 'Nama WP', cell: ({ row }) => row.original.nmWp ?? '-' },
+  { accessorKey: 'nmWpSppt', header: 'Nama WP', cell: ({ row }) => row.original.nmWpSppt ?? '-' },
   {
     accessorKey: 'pbbYgHarusDibayarSppt',
     header: 'PBB Terhutang',
-    cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(row.original.pbbYgHarusDibayarSppt)}</span>,
+    cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(Number(row.original.pbbYgHarusDibayarSppt))}</span>,
   },
   {
     accessorKey: 'statusPembayaranSppt',
     header: 'Status',
-    cell: ({ row }) => <PembayaranBadge status={row.original.statusPembayaranSppt} />,
+    cell: ({ row }) => <PembayaranBadge status={row.original.statusPembayaranSppt ?? 0} />,
   },
   {
-    accessorKey: 'tglJatuhTempo',
+    accessorKey: 'tglJatuhTempoSppt',
     header: 'Jatuh Tempo',
-    cell: ({ row }) => formatTanggal(row.original.tglJatuhTempo),
+    cell: ({ row }) => formatTanggal(row.original.tglJatuhTempoSppt),
   },
 ]
 

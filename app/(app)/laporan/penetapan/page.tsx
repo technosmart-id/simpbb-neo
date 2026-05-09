@@ -20,17 +20,17 @@ import { FileText } from 'lucide-react'
 type Row = {
   kdPropinsi: string; kdDati2: string; kdKecamatan: string; kdKelurahan: string
   kdBlok: string; noUrut: string; kdJnsOp: string
-  thnPajakSppt: number; nmWp: string | null
-  njopSppt: string | number; pbbYgHarusDibayarSppt: string | number; statusPembayaranSppt: string | number
+  thnPajakSppt: string; nmWpSppt: string | null
+  njopSppt: bigint | number; pbbYgHarusDibayarSppt: bigint | number; statusPembayaranSppt: number | null
 }
 
 const columns: ColumnDef<Row>[] = [
   { id: 'nop', header: 'NOP', cell: ({ row }) => <NopDisplay parts={row.original} copyable={false} /> },
   { accessorKey: 'thnPajakSppt', header: 'Tahun' },
-  { accessorKey: 'nmWp', header: 'Nama WP', cell: ({ row }) => row.original.nmWp ?? '-' },
-  { accessorKey: 'njopSppt', header: 'NJOP', cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(row.original.njopSppt)}</span> },
-  { accessorKey: 'pbbYgHarusDibayarSppt', header: 'PBB', cell: ({ row }) => <span className="font-mono text-sm font-medium">{formatRupiah(row.original.pbbYgHarusDibayarSppt)}</span> },
-  { accessorKey: 'statusPembayaranSppt', header: 'Status', cell: ({ row }) => <PembayaranBadge status={row.original.statusPembayaranSppt} /> },
+  { accessorKey: 'nmWpSppt', header: 'Nama WP', cell: ({ row }) => row.original.nmWpSppt ?? '-' },
+  { accessorKey: 'njopSppt', header: 'NJOP', cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(Number(row.original.njopSppt ?? 0))}</span> },
+  { accessorKey: 'pbbYgHarusDibayarSppt', header: 'PBB', cell: ({ row }) => <span className="font-mono text-sm font-medium">{formatRupiah(Number(row.original.pbbYgHarusDibayarSppt ?? 0))}</span> },
+  { accessorKey: 'statusPembayaranSppt', header: 'Status', cell: ({ row }) => <PembayaranBadge status={row.original.statusPembayaranSppt ?? 0} /> },
 ]
 
 const PAGE_SIZE = 50

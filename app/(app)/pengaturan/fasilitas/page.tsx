@@ -11,20 +11,16 @@ import {
 } from "@/components/data-table/column-helpers"
 import { Badge } from "@/components/ui/badge"
 
-// ─── Types ───────────────────────────────────────────────────────
-
-type Fasilitas = {
-  kdFasilitas: string
-  nmFasilitas: string
-  satuanFasilitas: string
-  nilaiFasilitas: string
-  statusFasilitas: string
-  ketergantungan: string
-}
-
 // ─── Columns ─────────────────────────────────────────────────────
 
-const columns: ColumnDef<Fasilitas>[] = [
+const columns: ColumnDef<{
+  kdFasilitas: string
+  nmFasilitas: string | null
+  satuanFasilitas: string | null
+  nilaiFasilitas: string
+  statusFasilitas: string | null
+  ketergantungan: string | null
+}>[] = [
   {
     accessorKey: "kdFasilitas",
     header: ({ column }) => <SortableHeader column={column} label="Kode" />,
@@ -32,10 +28,12 @@ const columns: ColumnDef<Fasilitas>[] = [
   {
     accessorKey: "nmFasilitas",
     header: ({ column }) => <SortableHeader column={column} label="Nama" />,
+    cell: ({ row }) => row.original.nmFasilitas ?? "-",
   },
   {
     accessorKey: "satuanFasilitas",
     header: "Satuan",
+    cell: ({ row }) => row.original.satuanFasilitas ?? "-",
   },
   {
     accessorKey: "nilaiFasilitas",

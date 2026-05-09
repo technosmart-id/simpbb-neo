@@ -9,23 +9,24 @@ export const dashboardRouter = os.router({
   summary: os
     .input(z.object({ thnPajak: z.number() }))
     .handler(async ({ input }) => {
+      const thnPajakStr = String(input.thnPajak)
       const [totalOp] = await db.select({ count: sql<number>`count(*)` }).from(spop)
 
       const [totalSppt] = await db
         .select({ count: sql<number>`count(*)` })
         .from(sppt)
-        .where(eq(sppt.thnPajakSppt, input.thnPajak))
+        .where(eq(sppt.thnPajakSppt, thnPajakStr))
 
       const [ketetapan] = await db
         .select({ total: sql<string>`COALESCE(SUM(PBB_YG_HARUS_DIBAYAR_SPPT), 0)` })
         .from(sppt)
-        .where(eq(sppt.thnPajakSppt, input.thnPajak))
+        .where(eq(sppt.thnPajakSppt, thnPajakStr))
 
       const [realisasi] = await db
         .select({ total: sql<string>`COALESCE(SUM(JML_SPPT_YG_DIBAYAR), 0)` })
         .from(pembayaranSppt)
         .where(and(
-          eq(pembayaranSppt.thnPajakSppt, input.thnPajak),
+          eq(pembayaranSppt.thnPajakSppt, thnPajakStr),
           eq(pembayaranSppt.dibatalkan, 0),
         ))
 
@@ -33,7 +34,7 @@ export const dashboardRouter = os.router({
         .select({ count: sql<number>`count(*)` })
         .from(sppt)
         .where(and(
-          eq(sppt.thnPajakSppt, input.thnPajak),
+          eq(sppt.thnPajakSppt, thnPajakStr),
           eq(sppt.statusPembayaranSppt, 1),
         ))
 
@@ -41,7 +42,7 @@ export const dashboardRouter = os.router({
         .select({ count: sql<number>`count(*)` })
         .from(sppt)
         .where(and(
-          eq(sppt.thnPajakSppt, input.thnPajak),
+          eq(sppt.thnPajakSppt, thnPajakStr),
           eq(sppt.statusPembayaranSppt, 0),
         ))
 
@@ -65,6 +66,7 @@ export const dashboardRouter = os.router({
   realisasiPerKecamatan: os
     .input(z.object({ thnPajak: z.number() }))
     .handler(async ({ input }) => {
+      const thnPajakStr = String(input.thnPajak)
       return db
         .select({
           kdKecamatan: sppt.kdKecamatan,
@@ -72,7 +74,7 @@ export const dashboardRouter = os.router({
           totalSppt: sql<number>`count(*)`,
         })
         .from(sppt)
-        .where(eq(sppt.thnPajakSppt, input.thnPajak))
+        .where(eq(sppt.thnPajakSppt, thnPajakStr))
         .groupBy(sppt.kdKecamatan)
         .orderBy(sppt.kdKecamatan)
     }),
@@ -81,6 +83,7 @@ export const dashboardRouter = os.router({
   paymentDistribution: os
     .input(z.object({ thnPajak: z.number() }))
     .handler(async ({ input }) => {
+      const thnPajakStr = String(input.thnPajak)
       return db
         .select({
           status: sppt.statusPembayaranSppt,
@@ -88,7 +91,7 @@ export const dashboardRouter = os.router({
           total: sql<string>`COALESCE(SUM(PBB_YG_HARUS_DIBAYAR_SPPT), 0)`,
         })
         .from(sppt)
-        .where(eq(sppt.thnPajakSppt, input.thnPajak))
+        .where(eq(sppt.thnPajakSppt, thnPajakStr))
         .groupBy(sppt.statusPembayaranSppt)
     }),
 })

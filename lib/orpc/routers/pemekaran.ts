@@ -35,15 +35,16 @@ export const pemekaranRouter = os.router({
       const rows = await db
         .select({
           id: pemekaran.id,
-          namaPemekaran: pemekaran.namaPemekaran,
-          tglBerlaku: pemekaran.tglBerlaku,
-          keterangan: pemekaran.keterangan,
+          jenisPemekaran: pemekaran.jenisPemekaran,
+          tglEntry: pemekaran.tglEntry,
+          userEntry: pemekaran.userEntry,
+          isCancel: pemekaran.isCancel,
           jumlahDetail: sql<number>`(
             SELECT COUNT(*) FROM pemekaran_detail pd WHERE pd.PEMEKARAN_ID = ${pemekaran.id}
           )`,
         })
         .from(pemekaran)
-        .orderBy(desc(pemekaran.tglBerlaku))
+        .orderBy(desc(pemekaran.tglEntry))
         .limit(input.limit)
         .offset(input.offset)
 
@@ -70,17 +71,42 @@ export const pemekaranRouter = os.router({
   // Create a pemekaran event
   create: os
     .input(z.object({
-      namaPemekaran: z.string().min(1).max(100),
-      tglBerlaku: z.string(), // YYYY-MM-DD
-      keterangan: z.string().optional(),
+      jenisPemekaran: z.number().int(),
+      kdPropinsiLama: z.string().length(2),
+      kdDati2Lama: z.string().length(2),
+      kdKecamatanLama: z.string().length(3),
+      kdKelurahanLama: z.string().length(3),
+      kdBlokAwal: z.string().length(3),
+      noUrutAwal: z.string().length(4),
+      noUrutAkhir: z.string().length(4),
+      kdBlokAkhir: z.string().length(3),
+      kdPropinsiBaru: z.string().length(2),
+      kdDati2Baru: z.string().length(2),
+      kdKecamatanBaru: z.string().length(3),
+      kdKelurahanBaru: z.string().length(3),
+      kdBlokBaru: z.string().length(3),
     }))
     .handler(async ({ input }) => {
-      const [result] = await db.insert(pemekaran).values({
-        namaPemekaran: input.namaPemekaran,
-        tglBerlaku: new Date(input.tglBerlaku),
-        keterangan: input.keterangan ?? null,
-      })
-      return { id: (result as { insertId: number }).insertId }
+      await db.insert(pemekaran).values({
+        jenisPemekaran: input.jenisPemekaran,
+        kdPropinsiLama: input.kdPropinsiLama,
+        kdDati2Lama: input.kdDati2Lama,
+        kdKecamatanLama: input.kdKecamatanLama,
+        kdKelurahanLama: input.kdKelurahanLama,
+        kdBlokAwal: input.kdBlokAwal,
+        noUrutAwal: input.noUrutAwal,
+        noUrutAkhir: input.noUrutAkhir,
+        kdBlokAkhir: input.kdBlokAkhir,
+        kdPropinsiBaru: input.kdPropinsiBaru,
+        kdDati2Baru: input.kdDati2Baru,
+        kdKecamatanBaru: input.kdKecamatanBaru,
+        kdKelurahanBaru: input.kdKelurahanBaru,
+        kdBlokBaru: input.kdBlokBaru,
+        tglEntry: new Date(),
+        userEntry: 'system',
+        isCancel: 0,
+      } as any)
+      return { ok: true }
     }),
 
   // Add a detail record (NOP lama → NOP baru)

@@ -21,18 +21,25 @@ import { formatNop } from '@/lib/utils/nop'
 type Row = {
   kdPropinsi: string; kdDati2: string; kdKecamatan: string; kdKelurahan: string
   kdBlok: string; noUrut: string; kdJnsOp: string
-  thnPajakSppt: number; tglPembayaranSppt: Date | string
-  jmlSpptYgDibayar: string; dendaSppt: string; jmlBayar: string; namaBayar: string | null
+  thnPajakSppt: string; tglPembayaranSppt: Date | string | null
+  jmlSpptYgDibayar: bigint | number; dendaSppt: bigint | number | null
+  pembayaranSpptKe: number
 }
 
 const columns: ColumnDef<Row>[] = [
   { id: 'nop', header: 'NOP', cell: ({ row }) => <NopDisplay parts={row.original} copyable={false} /> },
   { accessorKey: 'thnPajakSppt', header: 'Tahun' },
   { accessorKey: 'tglPembayaranSppt', header: 'Tanggal', cell: ({ row }) => formatTanggal(row.original.tglPembayaranSppt) },
-  { accessorKey: 'jmlSpptYgDibayar', header: 'Pokok', cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(row.original.jmlSpptYgDibayar)}</span> },
-  { accessorKey: 'dendaSppt', header: 'Denda', cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(row.original.dendaSppt)}</span> },
-  { accessorKey: 'jmlBayar', header: 'Total', cell: ({ row }) => <span className="font-mono text-sm font-medium">{formatRupiah(row.original.jmlBayar)}</span> },
-  { accessorKey: 'namaBayar', header: 'Pembayar', cell: ({ row }) => row.original.namaBayar ?? '-' },
+  { accessorKey: 'jmlSpptYgDibayar', header: 'Pokok', cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(Number(row.original.jmlSpptYgDibayar))}</span> },
+  { accessorKey: 'dendaSppt', header: 'Denda', cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(Number(row.original.dendaSppt ?? 0))}</span> },
+  {
+    accessorKey: 'total',
+    header: 'Total',
+    cell: ({ row }) => {
+      const total = Number(row.original.jmlSpptYgDibayar) + Number(row.original.dendaSppt ?? 0)
+      return <span className="font-mono text-sm font-medium">{formatRupiah(total)}</span>
+    },
+  },
 ]
 
 const EXCEL_COLUMNS = [
@@ -41,8 +48,7 @@ const EXCEL_COLUMNS = [
   { header: 'Tanggal Bayar', key: 'tglPembayaranSppt', width: 16, style: 'date' as const },
   { header: 'PBB Pokok (Rp)', key: 'jmlSpptYgDibayar', width: 18, style: 'currency' as const },
   { header: 'Denda (Rp)', key: 'dendaSppt', width: 16, style: 'currency' as const },
-  { header: 'Total Bayar (Rp)', key: 'jmlBayar', width: 18, style: 'currency' as const },
-  { header: 'Nama Pembayar', key: 'namaBayar', width: 24 },
+  { header: 'Total Bayar (Rp)', key: 'total', width: 18, style: 'currency' as const },
 ]
 
 const PAGE_SIZE = 50
@@ -64,15 +70,18 @@ export default function LaporanPembayaranPage() {
     const result = await qc.fetchQuery(
       orpc.pembayaran.list.queryOptions({ input: { limit: 9999, offset: 0, thnPajak } }),
     )
-    return (result.rows as Row[]).map((r) => ({
-      nop: formatNop(r),
-      thnPajakSppt: r.thnPajakSppt,
-      tglPembayaranSppt: r.tglPembayaranSppt ? new Date(r.tglPembayaranSppt as string) : null,
-      jmlSpptYgDibayar: Number(r.jmlSpptYgDibayar),
-      dendaSppt: Number(r.dendaSppt),
-      jmlBayar: Number(r.jmlBayar),
-      namaBayar: r.namaBayar ?? '',
-    }))
+    return (result.rows as Row[]).map((r) => {
+      const jmlBayar = Number(r.jmlSpptYgDibayar) + Number(r.dendaSppt ?? 0)
+      return {
+        nop: formatNop(r),
+        thnPajakSppt: r.thnPajakSppt,
+        tglPembayaranSppt: r.tglPembayaranSppt ? new Date(r.tglPembayaranSppt as string) : null,
+        jmlSpptYgDibayar: Number(r.jmlSpptYgDibayar),
+        dendaSppt: Number(r.dendaSppt ?? 0),
+        jmlBayar,
+        total: jmlBayar,
+      }
+    })
   }
 
   return (

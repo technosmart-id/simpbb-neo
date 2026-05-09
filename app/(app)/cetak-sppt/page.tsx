@@ -31,22 +31,22 @@ type SpptRow = {
   kdBlok: string
   noUrut: string
   kdJnsOp: string
-  thnPajakSppt: number
-  nmWp: string | null
-  jalanWp: string | null
-  luasBumi: string | number | null
-  njopBumi: string | number | null
-  luasBng: string | number | null
-  njopBng: string | number | null
-  njopSppt: string | number | null
-  njoptkpSppt: string | number | null
-  njkpSppt: string | number | null
-  pbbTerhutangSppt: string | number | null
-  faktorPengurangSppt: string | number | null
-  pbbYgHarusDibayarSppt: string | number
-  tglJatuhTempo: Date | string | null
-  statusPembayaranSppt: string | number
-  statusCetakSppt: string | number
+  thnPajakSppt: string
+  nmWpSppt: string | null
+  jlnWpSppt: string | null
+  luasBumiSppt: bigint | number
+  luasBngSppt: bigint | number
+  njopBumiSppt: bigint | number
+  njopBngSppt: bigint | number
+  njopSppt: bigint | number
+  njoptkpSppt: number
+  njkpSppt: bigint | number
+  pbbTerhutangSppt: bigint | number
+  faktorPengurangSppt: bigint | number
+  pbbYgHarusDibayarSppt: bigint | number
+  tglJatuhTempoSppt: Date | string | null
+  statusPembayaranSppt: number | null
+  statusCetakSppt: number | null
 }
 
 const PAGE_SIZE = 20
@@ -62,22 +62,22 @@ function buildSpptData(row: SpptRow): SpptData {
     noUrut: row.noUrut,
     kdJnsOp: row.kdJnsOp,
   }
-  const njopTotalBumi = Number(row.luasBumi ?? 0) * Number(row.njopBumi ?? 0)
-  const njopTotalBng = Number(row.luasBng ?? 0) * Number(row.njopBng ?? 0)
+  const njopTotalBumi = Number(row.luasBumiSppt ?? 0) * Number(row.njopBumiSppt ?? 0)
+  const njopTotalBng = Number(row.luasBngSppt ?? 0) * Number(row.njopBngSppt ?? 0)
   const njopTotal = Number(row.njopSppt ?? njopTotalBumi + njopTotalBng)
   const njoptkp = Number(row.njoptkpSppt ?? 0)
   const njkp = Number(row.njkpSppt ?? Math.max(0, njopTotal - njoptkp))
   const pbb = Number(row.pbbYgHarusDibayarSppt)
   const pengurangan = Number(row.faktorPengurangSppt ?? 0)
-  const tglJatuhTempo = row.tglJatuhTempo
-    ? (row.tglJatuhTempo instanceof Date ? row.tglJatuhTempo.toISOString().slice(0, 10) : String(row.tglJatuhTempo))
+  const tglJatuhTempo = row.tglJatuhTempoSppt
+    ? (row.tglJatuhTempoSppt instanceof Date ? row.tglJatuhTempoSppt.toISOString().slice(0, 10) : String(row.tglJatuhTempoSppt))
     : new Date().toISOString().slice(0, 10)
 
   return {
     nopParts,
-    thnPajakSppt: row.thnPajakSppt,
-    nmWp: row.nmWp ?? '-',
-    jlnWp: row.jalanWp ?? '',
+    thnPajakSppt: Number(row.thnPajakSppt),
+    nmWp: row.nmWpSppt ?? '-',
+    jlnWp: row.jlnWpSppt ?? '',
     blokKavNoWp: '',
     rtwWp: '',
     kelurahanWp: '',
@@ -87,11 +87,11 @@ function buildSpptData(row: SpptRow): SpptData {
     blokKavNoOp: '',
     kelurahanOp: '',
     kecamatanOp: '',
-    luasBumi: Number(row.luasBumi ?? 0),
-    njopBumi: Number(row.njopBumi ?? 0),
+    luasBumi: Number(row.luasBumiSppt ?? 0),
+    njopBumi: Number(row.njopBumiSppt ?? 0),
     njopTotalBumi,
-    luasBng: Number(row.luasBng ?? 0),
-    njopBng: Number(row.njopBng ?? 0),
+    luasBng: Number(row.luasBngSppt ?? 0),
+    njopBng: Number(row.njopBngSppt ?? 0),
     njopTotalBng,
     njopTotal,
     njoptkp,
@@ -215,22 +215,22 @@ export default function CetakSpptPage() {
       cell: ({ row }) => <NopDisplay parts={row.original} copyable={false} />,
     },
     { accessorKey: 'thnPajakSppt', header: 'Tahun' },
-    { accessorKey: 'nmWp', header: 'Nama WP', cell: ({ row }) => row.original.nmWp ?? '-' },
+    { accessorKey: 'nmWpSppt', header: 'Nama WP', cell: ({ row }) => row.original.nmWpSppt ?? '-' },
     {
       accessorKey: 'pbbYgHarusDibayarSppt',
       header: 'PBB',
-      cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(row.original.pbbYgHarusDibayarSppt)}</span>,
+      cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(Number(row.original.pbbYgHarusDibayarSppt ?? 0))}</span>,
     },
     {
       accessorKey: 'statusPembayaranSppt',
       header: 'Bayar',
-      cell: ({ row }) => <PembayaranBadge status={row.original.statusPembayaranSppt} />,
+      cell: ({ row }) => <PembayaranBadge status={row.original.statusPembayaranSppt ?? 0} />,
     },
     {
       accessorKey: 'statusCetakSppt',
       header: 'Cetak',
       cell: ({ row }) =>
-        row.original.statusCetakSppt === '1' ? (
+        row.original.statusCetakSppt === 1 ? (
           <Badge variant="outline" className="border-green-500/50 text-green-600 bg-green-500/10">Sudah Cetak</Badge>
         ) : (
           <Badge variant="outline">Belum Cetak</Badge>

@@ -3,23 +3,21 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.local' });
 
-const LOCAL_DB_URL = process.env.DATABASE_URL;
 const CLONE_DB_URL = "mysql://simpbb:af1u5nyk62vgugfm@203.130.255.4:33063/simpbb";
 
-async function getFullTruth() {
-  const localConn = await mysql.createConnection(LOCAL_DB_URL!);
+const tablesToFix = [
+  'ref_propinsi', 'ref_dati2', 'ref_kecamatan', 'ref_kelurahan',
+  'ref_kategori', 'ref_jns_pelayanan',
+  'tarif', 'sppt', 'penyusutan', 'pemekaran', 'pemekaran_detail',
+  'spop', 'dat_op_bangunan', 'dat_fasilitas_bangunan', 'dat_subjek_pajak',
+  'kelas_bumi', 'kelas_bangunan', 'fasilitas', 'login', 'group_akses', 'akses'
+];
+
+async function getTruth() {
   const cloneConn = await mysql.createConnection(CLONE_DB_URL);
   
   try {
-    const [localTables]: any = await localConn.query("SHOW TABLES");
-    const localTableNames = localTables.map((t: any) => Object.values(t)[0] as string);
-    
-    const [cloneTables]: any = await cloneConn.query("SHOW TABLES");
-    const cloneTableNames = new Set(cloneTables.map((t: any) => Object.values(t)[0] as string));
-
-    const sharedTables = localTableNames.filter((t: string) => cloneTableNames.has(t) && t !== 'user');
-
-    for (const tableName of sharedTables) {
+    for (const tableName of tablesToFix) {
       console.log(`\n// ─── ${tableName} ─────────────────────────────────────────────────`);
       const [cols]: any = await cloneConn.query(`
         SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA
@@ -40,19 +38,21 @@ async function getFullTruth() {
       
       for (const col of cols) {
         let drizzleType = "";
+        let config: any = { length: null, precision: null, scale: null };
+        
         const type = col.COLUMN_TYPE.toLowerCase();
         const colName = col.COLUMN_NAME;
         const drizzleName = toCamel(colName);
         
         if (type.includes('varchar')) {
-          const len = type.match(/\d+/)?.[0] || '255';
+          const len = type.match(/\d+/)?.[0];
           drizzleType = `varchar("${colName}", { length: ${len} })`;
         } else if (type.includes('char')) {
-          const len = type.match(/\d+/)?.[0] || '1';
+          const len = type.match(/\d+/)?.[0];
           drizzleType = `char("${colName}", { length: ${len} })`;
         } else if (type.includes('decimal')) {
           const precision = type.match(/(\d+),(\d+)/);
-          drizzleType = `decimal("${colName}", { precision: ${precision ? precision[1] : 15}, scale: ${precision ? precision[2] : 2} })`;
+          drizzleType = `decimal("${colName}", { precision: ${precision![1]}, scale: ${precision![2]} })`;
         } else if (type.includes('bigint')) {
           drizzleType = `bigint("${colName}", { mode: "number" })`;
         } else if (type.includes('int')) {
@@ -60,7 +60,7 @@ async function getFullTruth() {
         } else if (type.includes('smallint')) {
           drizzleType = `smallint("${colName}")`;
         } else if (type.includes('tinyint(1)')) {
-          drizzleType = `tinyint("${colName}")`; // Following clone specifically
+          drizzleType = `boolean("${colName}")`;
         } else if (type.includes('tinyint')) {
           drizzleType = `tinyint("${colName}")`;
         } else if (type.includes('timestamp')) {
@@ -73,10 +73,8 @@ async function getFullTruth() {
           drizzleType = `longtext("${colName}")`;
         } else if (type.includes('text')) {
           drizzleType = `text("${colName}")`;
-        } else if (type.includes('year')) {
-            drizzleType = `char("${colName}", { length: 4 }) /* year */`;
         } else {
-          drizzleType = `text("${colName}") /* unknown: ${type} */`;
+          drizzleType = `custom_type("${colName}") /* ${type} */`;
         }
 
         let line = `  ${drizzleName}: ${drizzleType}`;
@@ -94,7 +92,6 @@ async function getFullTruth() {
       console.log(`]);`);
     }
   } finally {
-    await localConn.end();
     await cloneConn.end();
   }
 }
@@ -103,4 +100,4 @@ function toCamel(str: string) {
   return str.toLowerCase().replace(/_([a-z0-9])/g, (_, c) => c.toUpperCase());
 }
 
-getFullTruth();
+getTruth();

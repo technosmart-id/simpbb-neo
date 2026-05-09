@@ -247,7 +247,7 @@ export default function NopListPage() {
                       <div className="flex flex-col max-w-[300px]">
                         <div className="flex items-center gap-1.5">
                           <User className="h-3 w-3 text-muted-foreground" />
-                          <span className="font-bold text-sm truncate uppercase">{row.nmWp || '—'}</span>
+                          <span className="font-bold text-sm truncate uppercase">{row.nmWpSppt || '—'}</span>
                         </div>
                         <div className="flex items-start gap-1.5 mt-1">
                           <MapPin className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />

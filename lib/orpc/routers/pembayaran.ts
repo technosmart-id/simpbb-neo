@@ -29,13 +29,14 @@ export const pembayaranRouter = os.router({
     }))
     .handler(async ({ input }) => {
       const conditions = []
-      if (input.thnPajak) conditions.push(eq(pembayaranSppt.thnPajakSppt, input.thnPajak))
+      if (input.thnPajak) conditions.push(eq(pembayaranSppt.thnPajakSppt, String(input.thnPajak)))
       if (input.kdPropinsi) conditions.push(eq(pembayaranSppt.kdPropinsi, input.kdPropinsi))
       if (input.kdDati2) conditions.push(eq(pembayaranSppt.kdDati2, input.kdDati2))
       if (input.kdKecamatan) conditions.push(eq(pembayaranSppt.kdKecamatan, input.kdKecamatan))
       if (input.kdKelurahan) conditions.push(eq(pembayaranSppt.kdKelurahan, input.kdKelurahan))
+      // Note: namaBayar doesn't exist in schema, search by NOP or noBukti instead
       if (input.search) {
-        conditions.push(sql`${pembayaranSppt.namaBayar} LIKE ${`%${input.search}%`}`)
+        conditions.push(sql`(${pembayaranSppt.noUrut} LIKE ${`%${input.search}%`} OR ${pembayaranSppt.noBukti} LIKE ${`%${input.search}%`})`)
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined
@@ -52,7 +53,7 @@ export const pembayaranRouter = os.router({
 
   // List payments for a specific SPPT
   listBySppt: os
-    .input(nopInput.extend({ thnPajakSppt: z.number() }))
+    .input(nopInput.extend({ thnPajakSppt: z.string() }))
     .handler(async ({ input }) => {
       return db.select().from(pembayaranSppt).where(and(
         eq(pembayaranSppt.kdPropinsi, input.kdPropinsi),
@@ -63,26 +64,26 @@ export const pembayaranRouter = os.router({
         eq(pembayaranSppt.noUrut, input.noUrut),
         eq(pembayaranSppt.kdJnsOp, input.kdJnsOp),
         eq(pembayaranSppt.thnPajakSppt, input.thnPajakSppt),
-      )).orderBy(pembayaranSppt.pembayaranKe)
+      )).orderBy(pembayaranSppt.pembayaranSpptKe)
     }),
 
   // Record payment
   create: os
     .input(nopInput.extend({
-      thnPajakSppt: z.number(),
+      thnPajakSppt: z.string(),
       tglPembayaranSppt: z.string(),
       jmlSpptYgDibayar: z.string(),
       dendaSppt: z.string(),
-      jmlBayar: z.string(),
-      namaBayar: z.string().optional(),
-      channelPembayaran: z.string().optional(),
-      noReferensi: z.string().optional(),
-      nipPetugas: z.string().optional(),
+      // Optional fields that will be stored in noBukti if needed
+      noBukti: z.string().optional(),
+      nipRekamByrSppt: z.string().optional(),
     }))
     .handler(async ({ input }) => {
-      // Get next pembayaran_ke
+      const thnPajak = input.thnPajakSppt
+
+      // Get next pembayaran_sppt_ke
       const [result] = await db
-        .select({ maxKe: sql<number>`COALESCE(MAX(PEMBAYARAN_KE), 0)` })
+        .select({ maxKe: sql<number>`COALESCE(MAX(PEMBAYARAN_SPPT_KE), 0)` })
         .from(pembayaranSppt)
         .where(and(
           eq(pembayaranSppt.kdPropinsi, input.kdPropinsi),
@@ -92,10 +93,10 @@ export const pembayaranRouter = os.router({
           eq(pembayaranSppt.kdBlok, input.kdBlok),
           eq(pembayaranSppt.noUrut, input.noUrut),
           eq(pembayaranSppt.kdJnsOp, input.kdJnsOp),
-          eq(pembayaranSppt.thnPajakSppt, input.thnPajakSppt),
+          eq(pembayaranSppt.thnPajakSppt, thnPajak),
         ))
 
-      const pembayaranKe = (result?.maxKe ?? 0) + 1
+      const pembayaranSpptKe = (result?.maxKe ?? 0) + 1
 
       await db.insert(pembayaranSppt).values({
         kdPropinsi: input.kdPropinsi,
@@ -105,21 +106,25 @@ export const pembayaranRouter = os.router({
         kdBlok: input.kdBlok,
         noUrut: input.noUrut,
         kdJnsOp: input.kdJnsOp,
-        thnPajakSppt: input.thnPajakSppt,
-        pembayaranKe,
+        thnPajakSppt: thnPajak,
+        pembayaranSpptKe,
+        // Bank codes - using defaults
+        kdKanwilBank: "01",
+        kdKppbbBank: "01",
+        kdBankTunggal: "01",
+        kdBankPersepsi: "01",
+        kdTp: "01",
+        // Payment details
+        dendaSppt: BigInt(parseInt(input.dendaSppt) || 0),
+        jmlSpptYgDibayar: BigInt(parseInt(input.jmlSpptYgDibayar) || 0),
         tglPembayaranSppt: new Date(input.tglPembayaranSppt),
-        jmlSpptYgDibayar: input.jmlSpptYgDibayar,
-        dendaSppt: input.dendaSppt,
-        jmlBayar: input.jmlBayar,
-        namaBayar: input.namaBayar ?? null,
-        channelPembayaran: input.channelPembayaran ?? null,
-        noReferensi: input.noReferensi ?? null,
-        nipPetugas: input.nipPetugas ?? null,
+        tglRekamByrSppt: new Date(),
+        nipRekamByrSppt: input.nipRekamByrSppt ?? "SYSTEM",
+        noBukti: input.noBukti ?? null,
         dibatalkan: 0,
-      })
+      } as any)
 
       // Update SPPT payment status
-      // Get total paid vs total due
       const [totalPaid] = await db
         .select({ total: sql<string>`COALESCE(SUM(JML_SPPT_YG_DIBAYAR), 0)` })
         .from(pembayaranSppt)
@@ -131,7 +136,7 @@ export const pembayaranRouter = os.router({
           eq(pembayaranSppt.kdBlok, input.kdBlok),
           eq(pembayaranSppt.noUrut, input.noUrut),
           eq(pembayaranSppt.kdJnsOp, input.kdJnsOp),
-          eq(pembayaranSppt.thnPajakSppt, input.thnPajakSppt),
+          eq(pembayaranSppt.thnPajakSppt, thnPajak),
           eq(pembayaranSppt.dibatalkan, 0),
         ))
 
@@ -146,12 +151,12 @@ export const pembayaranRouter = os.router({
           eq(sppt.kdBlok, input.kdBlok),
           eq(sppt.noUrut, input.noUrut),
           eq(sppt.kdJnsOp, input.kdJnsOp),
-          eq(sppt.thnPajakSppt, input.thnPajakSppt),
+          eq(sppt.thnPajakSppt, thnPajak),
         ))
 
       if (spptRow) {
         const paid = parseFloat(totalPaid?.total ?? "0")
-        const due = spptRow.pbb
+        const due = Number(spptRow.pbb)
         let status = 0 // belum
         if (paid >= due) status = 1 // lunas
         else if (paid > 0) status = 2 // kurang bayar
@@ -166,27 +171,22 @@ export const pembayaranRouter = os.router({
             eq(sppt.kdBlok, input.kdBlok),
             eq(sppt.noUrut, input.noUrut),
             eq(sppt.kdJnsOp, input.kdJnsOp),
-            eq(sppt.thnPajakSppt, input.thnPajakSppt),
+            eq(sppt.thnPajakSppt, thnPajak),
           ))
       }
 
-      return { success: true, pembayaranKe }
+      return { success: true, pembayaranKe: pembayaranSpptKe }
     }),
 
   // Void payment
   void: os
     .input(nopInput.extend({
-      thnPajakSppt: z.number(),
-      pembayaranKe: z.number(),
-      alasanBatal: z.string(),
+      thnPajakSppt: z.string(),
+      pembayaranSpptKe: z.number(),
     }))
     .handler(async ({ input }) => {
       await db.update(pembayaranSppt)
-        .set({
-          dibatalkan: 1,
-          tglBatal: new Date(),
-          alasanBatal: input.alasanBatal,
-        })
+        .set({ dibatalkan: 1 })
         .where(and(
           eq(pembayaranSppt.kdPropinsi, input.kdPropinsi),
           eq(pembayaranSppt.kdDati2, input.kdDati2),
@@ -196,7 +196,7 @@ export const pembayaranRouter = os.router({
           eq(pembayaranSppt.noUrut, input.noUrut),
           eq(pembayaranSppt.kdJnsOp, input.kdJnsOp),
           eq(pembayaranSppt.thnPajakSppt, input.thnPajakSppt),
-          eq(pembayaranSppt.pembayaranKe, input.pembayaranKe),
+          eq(pembayaranSppt.pembayaranSpptKe, input.pembayaranSpptKe),
         ))
       return { success: true }
     }),

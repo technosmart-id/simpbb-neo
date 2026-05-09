@@ -162,7 +162,7 @@ export default function JalanPage() {
               <SelectContent>
                 {(kecamatanQuery.data ?? []).map((k) => (
                   <SelectItem key={k.kdKecamatan} value={k.kdKecamatan}>
-                    {k.kdKecamatan} - {k.nmKecamatan ?? k.nmKecamatanOnly}
+                    {k.kdKecamatan} - {k.nmKecamatan}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -184,7 +184,7 @@ export default function JalanPage() {
               <SelectContent>
                 {(kelurahanQuery.data ?? []).map((k) => (
                   <SelectItem key={k.kdKelurahan} value={k.kdKelurahan}>
-                    {k.kdKelurahan} - {k.nmKelurahan ?? k.nmKelurahanOnly}
+                    {k.kdKelurahan} - {k.nmKelurahan}
                   </SelectItem>
                 ))}
               </SelectContent>

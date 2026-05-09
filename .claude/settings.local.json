@@ -41,7 +41,10 @@
       "Bash(npx next:*)",
       "Bash(head:*)",
       "Bash(timeout:*)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Bash(cmd /c \"rmdir /s /q lib\\\\db\\\\migration\")",
+      "Bash(git reset:*)",
+      "Bash(cut:*)"
     ]
   }
 }

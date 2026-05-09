@@ -23,8 +23,8 @@ export async function seedMasterData() {
       nilai: row.NILAI instanceof Buffer ? row.NILAI.toString() : row.NILAI,
     }));
 
-    kdPropinsi = configData.find(c => c.nama === 'KD_PROPINSI')?.nilai || '51';
-    kdDati2 = configData.find(c => c.nama === 'KD_DATI2')?.nilai || '72';
+    kdPropinsi = configData.find((c: any) => c.nama === 'KD_PROPINSI')?.nilai || '51';
+    kdDati2 = configData.find((c: any) => c.nama === 'KD_DATI2')?.nilai || '72';
     // Chunking insert for konfigurasi
     for (let i = 0; i < configData.length; i += 50) {
       await db.insert(konfigurasi).values(configData.slice(i, i + 50)).onDuplicateKeyUpdate({

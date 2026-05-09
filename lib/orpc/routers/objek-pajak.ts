@@ -43,7 +43,7 @@ export const objekPajakRouter = os.router({
           kdBlok: spop.kdBlok,
           noUrut: spop.noUrut,
           kdJnsOp: spop.kdJnsOp,
-          nmWp: datSubjekPajak.nmWp,
+          nmWpSppt: datSubjekPajak.nmWp,
           jalanOp: spop.jalanOp,
         })
         .from(spop)
@@ -133,7 +133,7 @@ export const objekPajakRouter = os.router({
           kdBlok: spop.kdBlok,
           noUrut: spop.noUrut,
           kdJnsOp: spop.kdJnsOp,
-          nmWp: datSubjekPajak.nmWp,
+          nmWpSppt: datSubjekPajak.nmWp,
           jalanOp: spop.jalanOp,
           luasBumi: spop.luasBumi,
           njopBumi: spop.nilaiSistemBumi,
@@ -558,28 +558,11 @@ export const objekPajakRouter = os.router({
           await tx.delete(datOpAnggota).where(nopWhere(datOpAnggota, spopData))
         }
 
-        // 4. Handle SPPT Khusus (Peruntukan)
-        const { spptKhusus } = await import('@/lib/db/schema')
-        if (spopData.jenisSpptKhusus) {
-          const [existingKhusus] = await tx
-            .select()
-            .from(spptKhusus)
-            .where(nopWhere(spptKhusus, spopData))
-          
-          const khususValues = {
-            ...spopData,
-            jenisSppt: spopData.jenisSpptKhusus,
-            tahap: 1, // Default tahap 1
-          }
-
-          if (existingKhusus) {
-            await tx.update(spptKhusus).set(khususValues).where(nopWhere(spptKhusus, spopData))
-          } else {
-            await tx.insert(spptKhusus).values(khususValues)
-          }
-        } else {
-          await tx.delete(spptKhusus).where(nopWhere(spptKhusus, spopData))
-        }
+        // 4. Handle SPPT Khusus (Peruntukan) - TODO: table not available in schema
+        // const { spptKhusus } = await import('@/lib/db/schema')
+        // if (spopData.jenisSpptKhusus) {
+        //   ...
+        // }
 
         return { success: true }
       })
@@ -592,18 +575,18 @@ export const objekPajakRouter = os.router({
       return db
         .select({
           thnPajakSppt: sppt.thnPajakSppt,
-          nmWp: sppt.nmWp,
-          luasBumi: sppt.luasBumi,
-          luasBng: sppt.luasBng,
-          njopBumi: sppt.njopBumi,
-          njopBng: sppt.njopBng,
+          nmWpSppt: sppt.nmWpSppt,
+          luasBumi: sppt.luasBumiSppt,
+          luasBng: sppt.luasBngSppt,
+          njopBumi: sppt.njopBumiSppt,
+          njopBng: sppt.njopBngSppt,
           njopSppt: sppt.njopSppt,
           njoptkpSppt: sppt.njoptkpSppt,
           njkpSppt: sppt.njkpSppt,
           pbbHarusDibayar: sppt.pbbYgHarusDibayarSppt,
           statusPembayaran: sppt.statusPembayaranSppt,
           tglTerbit: sppt.tglTerbitSppt,
-          tglJatuhTempo: sppt.tglJatuhTempo,
+          tglJatuhTempoSppt: sppt.tglJatuhTempoSppt,
         })
         .from(sppt)
         .where(nopWhere(sppt, input))
@@ -617,9 +600,9 @@ export const objekPajakRouter = os.router({
       return db
         .select({
           thnPajakSppt: sppt.thnPajakSppt,
-          nmWp: sppt.nmWp,
+          nmWpSppt: sppt.nmWpSppt,
           pbbHarusDibayar: sppt.pbbYgHarusDibayarSppt,
-          tglJatuhTempo: sppt.tglJatuhTempo,
+          tglJatuhTempoSppt: sppt.tglJatuhTempoSppt,
         })
         .from(sppt)
         .where(and(

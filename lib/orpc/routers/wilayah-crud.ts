@@ -77,7 +77,6 @@ export const wilayahCrudRouter = os.router({
     .handler(async ({ input }) => {
       await db.update(refKecamatan)
         .set({
-          nmKecamatanOnly: input.nmKecamatanOnly,
           nmKecamatan: `${input.kdKecamatan} - ${input.nmKecamatanOnly}`,
         })
         .where(and(
@@ -135,7 +134,6 @@ export const wilayahCrudRouter = os.router({
     .handler(async ({ input }) => {
       await db.update(refKelurahan)
         .set({
-          nmKelurahanOnly: input.nmKelurahanOnly,
           nmKelurahan: `${input.kdKelurahan} - ${input.nmKelurahanOnly}`,
           noKelurahan: input.noKelurahan ?? null,
           kdPosKelurahan: input.kdPosKelurahan ?? null,

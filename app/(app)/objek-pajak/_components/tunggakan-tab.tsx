@@ -103,10 +103,10 @@ export function TunggakanTab({ initialData }: TunggakanTabProps) {
             if (!tunggakan) return
             downloadTunggakanPdf({
               nopParts: initialData,
-              nmWp: tunggakan[0]?.nmWp || 'Unknown',
+              nmWp: tunggakan[0]?.nmWpSppt || 'Unknown',
               items: tunggakan.map(t => ({
                 thnPajakSppt: t.thnPajakSppt,
-                tglJatuhTempo: t.tglJatuhTempo,
+                tglJatuhTempoSppt: t.tglJatuhTempoSppt,
                 pbbHarusDibayar: t.pbbHarusDibayar || 0
               }))
             })
@@ -136,7 +136,7 @@ export function TunggakanTab({ initialData }: TunggakanTabProps) {
                 <TableRow key={item.thnPajakSppt} className="hover:bg-destructive/5 transition-colors group">
                   <TableCell className="font-bold">{item.thnPajakSppt}</TableCell>
                   <TableCell className="text-xs">
-                    {item.tglJatuhTempo ? format(new Date(item.tglJatuhTempo), 'dd MMM yyyy') : '—'}
+                    {item.tglJatuhTempoSppt ? format(new Date(item.tglJatuhTempoSppt), 'dd MMM yyyy') : '—'}
                   </TableCell>
                   <TableCell className="text-right font-mono text-xs">
                     {item.pbbHarusDibayar?.toLocaleString()}

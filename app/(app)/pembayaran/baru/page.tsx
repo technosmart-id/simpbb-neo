@@ -20,15 +20,6 @@ import { ArrowLeft, Save, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { PembayaranBadge } from '@/components/status/pembayaran-badge'
 
-const CHANNELS = [
-  'Tunai / Kasir',
-  'Bank Mitra',
-  'Pos Indonesia',
-  'Transfer Bank',
-  'Aplikasi Mobile',
-  'Minimarket',
-]
-
 function PembayaranBaruForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -43,10 +34,8 @@ function PembayaranBaruForm() {
   const [tglPembayaran, setTglPembayaran] = React.useState(
     new Date().toISOString().slice(0, 10),
   )
-  const [namaBayar, setNamaBayar] = React.useState('')
-  const [channel, setChannel] = React.useState('Tunai / Kasir')
-  const [noReferensi, setNoReferensi] = React.useState('')
-  const [nipPetugas, setNipPetugas] = React.useState('')
+  const [noBukti, setNoBukti] = React.useState('')
+  const [nipRekamByrSppt, setNipRekamByrSppt] = React.useState('')
 
   // Calculated amounts (can be overridden)
   const [dendaOverride, setDendaOverride] = React.useState<number | null>(null)
@@ -55,7 +44,7 @@ function PembayaranBaruForm() {
   // Load SPPT for the selected NOP + tahun
   const spptQuery = useQuery({
     ...orpc.sppt.get.queryOptions({
-      input: { ...nopParts!, thnPajakSppt: thnPajak },
+      input: { ...nopParts!, thnPajakSppt: String(thnPajak) },
     }),
     enabled: !!nopParts,
   })
@@ -64,8 +53,8 @@ function PembayaranBaruForm() {
 
   // Calculate denda based on SPPT jatuh tempo
   const dendaCalc = React.useMemo(() => {
-    if (!sppt?.tglJatuhTempo || !sppt?.pbbYgHarusDibayarSppt) return null
-    const jatuhTempo = new Date(sppt.tglJatuhTempo)
+    if (!sppt?.tglJatuhTempoSppt || !sppt?.pbbYgHarusDibayarSppt) return null
+    const jatuhTempo = new Date(sppt.tglJatuhTempoSppt)
     const bayarDate = new Date(tglPembayaran)
     if (bayarDate <= jatuhTempo) return 0
     return calculateDenda(Number(sppt.pbbYgHarusDibayarSppt), jatuhTempo, bayarDate).dendaAmount
@@ -90,15 +79,12 @@ function PembayaranBaruForm() {
     if (!nopParts || !sppt) return
     createMutation.mutate({
       ...nopParts,
-      thnPajakSppt: thnPajak,
+      thnPajakSppt: String(thnPajak),
       tglPembayaranSppt: tglPembayaran,
       jmlSpptYgDibayar: String(pbbPokok),
       dendaSppt: String(denda),
-      jmlBayar: String(totalBayar),
-      namaBayar: namaBayar || undefined,
-      channelPembayaran: channel,
-      noReferensi: noReferensi || undefined,
-      nipPetugas: nipPetugas || undefined,
+      noBukti: noBukti || undefined,
+      nipRekamByrSppt: nipRekamByrSppt || undefined,
     })
   }
 
@@ -176,8 +162,8 @@ function PembayaranBaruForm() {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Jatuh Tempo:</span>{' '}
-                  {sppt.tglJatuhTempo
-                    ? new Date(sppt.tglJatuhTempo).toLocaleDateString('id-ID', { dateStyle: 'long' })
+                  {sppt.tglJatuhTempoSppt
+                    ? new Date(sppt.tglJatuhTempoSppt).toLocaleDateString('id-ID', { dateStyle: 'long' })
                     : '-'}
                 </div>
                 {sppt.statusPembayaranSppt === 1 && (
@@ -258,41 +244,19 @@ function PembayaranBaruForm() {
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label>Nama Pembayar</Label>
+                <Label>No Bukti</Label>
                 <Input
-                  value={namaBayar}
-                  onChange={(e) => setNamaBayar(e.target.value)}
-                  placeholder="Nama penyetor"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label>Channel Pembayaran</Label>
-                <select
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
-                  value={channel}
-                  onChange={(e) => setChannel(e.target.value)}
-                >
-                  {CHANNELS.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label>No Referensi / NTPN</Label>
-                <Input
-                  value={noReferensi}
-                  onChange={(e) => setNoReferensi(e.target.value)}
-                  placeholder="Opsional"
+                  value={noBukti}
+                  onChange={(e) => setNoBukti(e.target.value)}
+                  placeholder="No Bukti / NTPN / Referensi"
                   className="font-mono"
                 />
               </div>
               <div className="space-y-1">
                 <Label>NIP Petugas</Label>
                 <Input
-                  value={nipPetugas}
-                  onChange={(e) => setNipPetugas(e.target.value)}
+                  value={nipRekamByrSppt}
+                  onChange={(e) => setNipRekamByrSppt(e.target.value)}
                   placeholder="Opsional"
                   className="font-mono"
                 />

@@ -27,10 +27,8 @@ export async function seedLegacyData() {
 
     console.log("  - Seeding login (pbbUserProfile)...");
     for (const item of legacyLogin) {
-        await db.insert(pbbUserProfile).values({
-            ...item,
-            tandaTangan: item.tandaTangan ? Buffer.from(item.tandaTangan) : null
-        }).onDuplicateKeyUpdate({ set: { username: item.username } });
+        const { tandaTangan, ...loginData } = item as any;
+        await db.insert(pbbUserProfile).values(loginData).onDuplicateKeyUpdate({ set: { username: item.username } });
     }
 
     console.log("  ✓ Legacy tables seeded");

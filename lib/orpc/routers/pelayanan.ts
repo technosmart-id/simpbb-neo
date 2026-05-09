@@ -58,9 +58,9 @@ export const pelayananRouter = os.router({
       const [row] = await db.select().from(pelayanan).where(eq(pelayanan.noPelayanan, input.noPelayanan))
       if (!row) return null
 
-      const dokumen = await db.select().from(pelayananDokumen).where(eq(pelayananDokumen.noPelayanan, input.noPelayanan))
+      const dokumen = await db.select().from(pelayananDokumen).where(eq(pelayananDokumen.pelayananId, row.id))
       const lampiran = await db.select().from(pelayananLampiranKolektif).where(eq(pelayananLampiranKolektif.noPelayanan, input.noPelayanan))
-      const mutasi = await db.select().from(historiMutasi).where(eq(historiMutasi.noPelayanan, input.noPelayanan)).orderBy(desc(historiMutasi.tglMutasi))
+      const mutasi = await db.select().from(historiMutasi).where(eq(historiMutasi.noPelayanan, input.noPelayanan)).orderBy(desc(historiMutasi.id))
 
       return { ...row, dokumen, lampiran, mutasi }
     }),
@@ -84,17 +84,16 @@ export const pelayananRouter = os.router({
       catatan: z.string().optional(),
       nipPetugasPenerima: z.string().optional(),
       namaPetugasPenerima: z.string().optional(),
-      isKolektif: z.number().min(0).max(1).default(0),
+      isKolektif: z.number().min(0).max(1).default(0).optional(),
       dokumenIds: z.array(z.number()).optional(),
     }))
     .handler(async ({ input }) => {
-      const { dokumenIds, ...data } = input
+      const { dokumenIds, isKolektif, ...data } = input
 
       await db.insert(pelayanan).values({
         noPelayanan: data.noPelayanan,
         kdJnsPelayanan: data.kdJnsPelayanan,
         tanggalPelayanan: new Date(data.tanggalPelayanan),
-        isKolektif: data.isKolektif,
         kdPropinsi: data.kdPropinsi ?? null,
         kdDati2: data.kdDati2 ?? null,
         kdKecamatan: data.kdKecamatan ?? null,
@@ -111,10 +110,16 @@ export const pelayananRouter = os.router({
         statusPelayanan: 1,
       })
 
+      // Get the inserted pelayanan ID
+      const [pelayananRow] = await db
+        .select()
+        .from(pelayanan)
+        .where(eq(pelayanan.noPelayanan, data.noPelayanan))
+
       // Insert dokumen checklist
-      if (dokumenIds && dokumenIds.length > 0) {
+      if (dokumenIds && dokumenIds.length > 0 && pelayananRow) {
         await db.insert(pelayananDokumen).values(
-          dokumenIds.map((id) => ({ noPelayanan: input.noPelayanan, dokumenId: id })),
+          dokumenIds.map((id) => ({ pelayananId: pelayananRow.id, dokumenId: id })),
         )
       }
 
@@ -141,8 +146,8 @@ export const pelayananRouter = os.router({
           updates.nipMasukPenilai = input.nipPetugas ?? null
           break
         case 3: // Masuk Penetapan
-          updates.tglMasukPenetapan = now
-          updates.nipMasukPenetapan = input.nipPetugas ?? null
+          updates.tglPenetapan = now
+          updates.nipPenetapan = input.nipPetugas ?? null
           break
         case 4: // Selesai
           updates.tglSelesai = now
@@ -154,7 +159,7 @@ export const pelayananRouter = os.router({
           break
         case 6: // Ditunda
           updates.tglBerkasDitunda = now
-          updates.alasanDitunda = input.catatan ?? null
+          updates.keteranganBerkas = input.catatan ?? null
           break
       }
 
@@ -180,10 +185,10 @@ export const pelayananRouter = os.router({
         nop: input.nop ?? null,
         nama: input.nama ?? null,
         alamat: input.alamat ?? null,
-        lt: input.lt ?? null,
-        lb: input.lb ?? null,
+        lt: input.lt ? Number(input.lt) : null,
+        lb: input.lb ? Number(input.lb) : null,
         keterangan: input.keterangan ?? null,
-      })
+      } as any)
       return { success: true }
     }),
 
