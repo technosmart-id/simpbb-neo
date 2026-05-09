@@ -50,14 +50,16 @@ export const systemRouter = os.router({
         const { execSync } = await import('child_process');
         
         try {
-          execSync('npx drizzle-kit push --force', {
+          // Use 'pipe' for stdio to capture both stdout and stderr
+          const output = execSync('npx drizzle-kit push --force', {
             env: { 
               ...process.env, 
               NODE_ENV: 'development',
             },
-            stdio: 'pipe', // Capture output
+            stdio: 'pipe', 
             encoding: 'utf-8'
           });
+          console.log("[SYSTEM] Drizzle push output:", output);
           console.log("[SYSTEM] Tables recreated successfully.");
 
           // Apply Custom SQL (Views & Procedures)
@@ -65,8 +67,9 @@ export const systemRouter = os.router({
           await applyCustomSql(console.log, console.error);
 
         } catch (pushError: any) {
-          console.error("[SYSTEM] Drizzle push or Custom SQL failed:", pushError.stdout || pushError.message);
-          throw new Error(`Failed to recreate tables/views: ${pushError.message}`);
+          const errorMessage = pushError.stderr || pushError.stdout || pushError.message;
+          console.error("[SYSTEM] Drizzle push or Custom SQL failed:", errorMessage);
+          throw new Error(`Failed to recreate tables/views: ${errorMessage}`);
         }
 
         // 3. SEED DATA
