@@ -13,7 +13,7 @@ import { memberRoles } from "./member-roles";
 export const user = mysqlTable("user", {
   id: varchar("id", { length: 36 }).primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 191 }).notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
   createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
@@ -22,9 +22,9 @@ export const user = mysqlTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   twoFactorEnabled: boolean("two_factor_enabled").default(false),
-  username: varchar("username", { length: 255 }).unique(),
+  username: varchar("username", { length: 191 }).unique(),
   displayUsername: text("display_username"),
-  phoneNumber: varchar("phone_number", { length: 255 }).unique(),
+  phoneNumber: varchar("phone_number", { length: 191 }).unique(),
   phoneNumberVerified: boolean("phone_number_verified"),
   role: text("role"),
   banned: boolean("banned").default(false),
@@ -38,7 +38,7 @@ export const session = mysqlTable(
   {
     id: varchar("id", { length: 36 }).primaryKey(),
     expiresAt: timestamp("expires_at", { fsp: 3 }).notNull(),
-    token: varchar("token", { length: 255 }).notNull().unique(),
+    token: varchar("token", { length: 191 }).notNull().unique(),
     createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { fsp: 3 })
       .$onUpdate(() => /* @__PURE__ */ new Date())
@@ -118,7 +118,7 @@ export const oauthApplication = mysqlTable(
     name: text("name"),
     icon: text("icon"),
     metadata: text("metadata"),
-    clientId: varchar("client_id", { length: 255 }).unique(),
+    clientId: varchar("client_id", { length: 191 }).unique(),
     clientSecret: text("client_secret"),
     redirectUrls: text("redirect_urls"),
     type: text("type"),
@@ -136,8 +136,8 @@ export const oauthAccessToken = mysqlTable(
   "oauth_access_token",
   {
     id: varchar("id", { length: 36 }).primaryKey(),
-    accessToken: varchar("access_token", { length: 255 }).unique(),
-    refreshToken: varchar("refresh_token", { length: 255 }).unique(),
+    accessToken: varchar("access_token", { length: 191 }).unique(),
+    refreshToken: varchar("refresh_token", { length: 191 }).unique(),
     accessTokenExpiresAt: timestamp("access_token_expires_at", { fsp: 3 }),
     refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { fsp: 3 }),
     clientId: varchar("client_id", { length: 36 }).references(
@@ -184,7 +184,7 @@ export const organization = mysqlTable(
   {
     id: varchar("id", { length: 36 }).primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
-    slug: varchar("slug", { length: 255 }).notNull().unique(),
+    slug: varchar("slug", { length: 191 }).notNull().unique(),
     logo: text("logo"),
     createdAt: timestamp("created_at", { fsp: 3 }).notNull(),
     metadata: text("metadata"),

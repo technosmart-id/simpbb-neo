@@ -50,8 +50,8 @@ export const systemRouter = os.router({
         const { execSync } = await import('child_process');
         
         try {
-          // Use 'pipe' for stdio to capture both stdout and stderr
-          const output = execSync('npx drizzle-kit push --force', {
+          // Use direct path to binary to avoid npx update checks/noise
+          const output = execSync('./node_modules/.bin/drizzle-kit push --force --verbose', {
             env: { 
               ...process.env, 
               NODE_ENV: 'development',
