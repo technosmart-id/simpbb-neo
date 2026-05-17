@@ -131,7 +131,7 @@ export function NopSearchDialog({ onSelect, trigger }: NopSearchDialogProps) {
         {trigger || (
           <Button variant="outline" size="sm" type="button">
             <Search className="h-4 w-4 mr-2" />
-            Cari NOP
+            Cari Objek Pajak
           </Button>
         )}
       </DialogTrigger>

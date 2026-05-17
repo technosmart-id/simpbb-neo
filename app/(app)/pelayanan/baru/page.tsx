@@ -22,6 +22,7 @@ import { Switch } from '@/components/ui/switch'
 import { ArrowLeft, Save, Search } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { isPelayananComplete } from '@/lib/utils/pelayanan-form'
 
 
 // 15 standard document types for PBB pelayanan
@@ -122,6 +123,10 @@ export default function PelayananBaruPage() {
       toast.error('Tanggal Pelayanan harus diisi')
       return
     }
+    if (!isKolektif && !nopParts) {
+      toast.error('Objek Pajak (NOP) harus dipilih untuk berkas non-kolektif')
+      return
+    }
 
     createMutation.mutate({
       noPelayanan,
@@ -147,7 +152,7 @@ export default function PelayananBaruPage() {
     })
   }
 
-  const isComplete = !!noPelayanan && !!kdJnsPelayanan && !!tanggalPelayanan
+  const isComplete = isPelayananComplete({ noPelayanan, kdJnsPelayanan, tanggalPelayanan, isKolektif, nopParts })
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-3xl">
@@ -220,13 +225,13 @@ export default function PelayananBaruPage() {
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">NOP Objek Pajak</CardTitle>
-              <NopSearchDialog 
-                onSelect={handleNopSelect} 
+              <CardTitle className="text-base">Objek Pajak</CardTitle>
+              <NopSearchDialog
+                onSelect={handleNopSelect}
                 trigger={
                   <Button type="button" variant="outline" size="sm" className="h-8">
                     <Search className="w-3.5 h-3.5 mr-2" />
-                    Cari NOP
+                    Cari Objek Pajak
                   </Button>
                 }
               />

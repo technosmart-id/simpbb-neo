@@ -5,6 +5,27 @@ import { pbbUserProfile, groupAkses, akses } from "@/lib/db/schema"
 import { eq, like, sql, and, desc } from "drizzle-orm"
 
 export const penggunaRouter = os.router({
+  // Returns the current Better-Auth-linked PBB profile, or null if not linked
+  me: os.handler(async ({ context }) => {
+    const userId = context.session?.user?.id
+    if (!userId) return null
+
+    const [row] = await db
+      .select({
+        id: pbbUserProfile.id,
+        username: pbbUserProfile.username,
+        hakAkses: pbbUserProfile.hakAkses,
+        nip: pbbUserProfile.nip,
+        nama: pbbUserProfile.nama,
+        jabatan: pbbUserProfile.jabatan,
+      })
+      .from(pbbUserProfile)
+      .where(eq(pbbUserProfile.userId, userId))
+      .limit(1)
+
+    return row ?? null
+  }),
+
   list: os
     .input(
       z.object({

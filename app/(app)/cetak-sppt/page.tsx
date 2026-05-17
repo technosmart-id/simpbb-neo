@@ -100,6 +100,7 @@ function buildSpptData(row: SpptRow): SpptData {
     pengurangan,
     pbbYgHarusDibayar: pbb,
     tglJatuhTempo,
+    verifikasiBaseUrl: typeof window !== 'undefined' ? window.location.origin : undefined,
   }
 }
 

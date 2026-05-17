@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { formatRupiah } from '@/components/data-table/column-helpers'
+import { QuickActionsBar } from '@/components/dashboard/quick-actions-bar'
 import {
   LayoutDashboard,
   FileText,
@@ -104,6 +105,8 @@ export default function DashboardPage() {
           </SelectContent>
         </Select>
       </div>
+
+      <QuickActionsBar />
 
       {summaryQuery.isLoading ? (
         <div className="flex items-center justify-center h-48 gap-2 text-muted-foreground">

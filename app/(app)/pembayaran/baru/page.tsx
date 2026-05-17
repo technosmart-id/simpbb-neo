@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useORPC } from '@/lib/orpc/react'
 import { NopInput } from '@/components/nop/nop-input'
 import { NopDisplay } from '@/components/nop/nop-display'
+import { NopSearchDialog } from '@/components/nop/nop-search-dialog'
 import { CurrencyInput } from '@/components/forms/currency-input'
 import { parseNop, formatNop } from '@/lib/utils/nop'
 import { calculateDenda } from '@/lib/utils/denda-calculator'
@@ -16,7 +17,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowLeft, Save, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Save, AlertCircle, Search } from 'lucide-react'
 import Link from 'next/link'
 import { PembayaranBadge } from '@/components/status/pembayaran-badge'
 
@@ -118,7 +119,18 @@ function PembayaranBaruForm() {
       {/* NOP & Tahun */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Objek Pajak</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">Objek Pajak</CardTitle>
+            <NopSearchDialog
+              onSelect={(parts) => setNopParts(parts)}
+              trigger={
+                <Button type="button" variant="outline" size="sm" className="h-8">
+                  <Search className="w-3.5 h-3.5 mr-2" />
+                  Cari Objek Pajak
+                </Button>
+              }
+            />
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-1">

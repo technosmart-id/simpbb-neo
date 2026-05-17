@@ -52,6 +52,28 @@ export interface SpptData {
   nmInstansi?: string
   nmDati2?: string
   tahunAnggaran?: number
+
+  // Verifikasi — base URL untuk QR Code verifikasi dokumen, mis. "https://pbb.example.go.id"
+  verifikasiBaseUrl?: string
+}
+
+// NOP cell geometry constants — exported for testing
+export const NOP_CELL_W = 8   // mm per digit cell
+export const NOP_CELL_COUNT = 18
+export const NOP_SEP_W = 3    // mm per dot separator
+export const NOP_SEP_COUNT = 6
+
+/** Builds the QR code payload for an SPPT document. */
+export function buildSpptQrContent(
+  nopStr: string,
+  thnPajakSppt: number,
+  pbbYgHarusDibayar: number,
+  verifikasiBaseUrl?: string,
+): string {
+  if (verifikasiBaseUrl) {
+    return `${verifikasiBaseUrl}/verifikasi-sppt?nop=${encodeURIComponent(nopStr)}&thn=${thnPajakSppt}`
+  }
+  return `NOP:${nopStr}|THN:${thnPajakSppt}|PBB:${pbbYgHarusDibayar}`
 }
 
 function formatRp(val: number): string {
@@ -72,9 +94,8 @@ export async function generateSpptPdf(data: SpptData): Promise<jsPDF> {
   const margin = 10
   const col2 = pageW / 2
 
-  // Generate QR Code via Google Charts API (no extra dependency)
   const nopStr = formatNop(data.nopParts)
-  const qrContent = `NOP:${nopStr}|THN:${data.thnPajakSppt}|PBB:${data.pbbYgHarusDibayar}`
+  const qrContent = buildSpptQrContent(nopStr, data.thnPajakSppt, data.pbbYgHarusDibayar, data.verifikasiBaseUrl)
   let qrDataUrl: string | null = null
   try {
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(qrContent)}`
@@ -130,6 +151,7 @@ export async function generateSpptPdf(data: SpptData): Promise<jsPDF> {
   y += 4
 
   // Draw NOP cells — format: PP.DD.KKK.LLL.BBB.UUUU.J
+  // cellW=8, sepW=3 → 18×8 + 6×3 = 162mm, fits within ~165mm available (QR at 178mm)
   const nopFormatted = nopStr // "PP.DD.KKK.LLL.BBB.UUUU.J"
   const nopGroups = [
     nopFormatted.slice(0, 2),
@@ -140,14 +162,14 @@ export async function generateSpptPdf(data: SpptData): Promise<jsPDF> {
     nopFormatted.slice(18, 22),
     nopFormatted.slice(23, 24),
   ]
-  const cellW = 10
+  const cellW = 8
   const cellH = 7
   let cx = margin
   doc.setFont('helvetica', 'normal')
   nopGroups.forEach((grp, i) => {
     for (let ci = 0; ci < grp.length; ci++) {
       doc.rect(cx, y, cellW, cellH)
-      doc.setFontSize(11)
+      doc.setFontSize(10)
       doc.setFont('helvetica', 'bold')
       doc.text(grp[ci], cx + cellW / 2, y + cellH * 0.65, { align: 'center' })
       cx += cellW
@@ -155,8 +177,8 @@ export async function generateSpptPdf(data: SpptData): Promise<jsPDF> {
     if (i < nopGroups.length - 1) {
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(10)
-      doc.text('.', cx + 1, y + cellH * 0.65)
-      cx += 4
+      doc.text('.', cx + 0.5, y + cellH * 0.65)
+      cx += 3
     }
   })
 

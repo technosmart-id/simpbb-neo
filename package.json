@@ -16,6 +16,11 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx lib/db/seed",
     "db:seed:prod": "tsx lib/db/seed/prod",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "db:seed:dev": "tsx lib/db/seed/dev",
     "db:reset": "tsx scripts/reset-db.ts && drizzle-kit push && npm run db:seed",
     "auth:generate": "tsx scripts/generate-auth.ts",
@@ -81,12 +86,14 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@ngneat/falso": "^8.0.2",
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/archiver": "^7.0.0",
     "@types/node": "^25.1.0",
     "@types/node-cron": "^3.0.11",
     "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.6",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.2.0",
     "postcss": "^8",
@@ -94,6 +101,8 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.6"
   }
 }
