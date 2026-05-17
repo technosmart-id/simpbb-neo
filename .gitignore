@@ -43,3 +43,8 @@ next-env.d.ts
 !/uploads/.gitkeep
 .worktrees/
 DOKPLOY.md
+
+# local-only assets
+/env.download
+/legay-codes/
+/.agent/
