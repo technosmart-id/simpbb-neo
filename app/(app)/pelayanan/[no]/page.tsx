@@ -34,6 +34,19 @@ const STATUSES = [
   { value: 6, label: 'Ditunda', color: 'bg-red-100 text-red-800' },
 ]
 
+const DOKUMEN_NAMES: Record<number, string> = {
+  1: 'KTP Pemohon',
+  2: 'Sertifikat Tanah / Akta Jual Beli',
+  3: 'SPPT Tahun Terakhir',
+  4: 'IMB (Izin Mendirikan Bangunan)',
+  5: 'Surat Kuasa (bila dikuasakan)',
+  6: 'Denah / Peta Lokasi Objek Pajak',
+  7: 'SPOP yang telah diisi dan ditandatangani',
+  8: 'LSPOP yang telah diisi dan ditandatangani',
+  9: 'Foto Objek Pajak',
+  10: 'Kartu Keluarga',
+}
+
 function AdvanceStatusButton({
   noPelayanan,
   currentStatus,
@@ -319,6 +332,59 @@ export default function PelayananDetailPage() {
                 <span className="text-muted-foreground">Kolektif:</span>{' '}
                 {data?.isKolektif ? 'Ya' : 'Tidak'}
               </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Dokumen Persyaratan */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            Dokumen Persyaratan (Wajib Pajak)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : !data?.dokumen || data.dokumen.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Belum ada dokumen yang diunggah.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {data.dokumen.map((doc: any) => {
+                const name = DOKUMEN_NAMES[doc.dokumenId] || `Dokumen #${doc.dokumenId}`;
+                const alopbbHost = 'http://localhost:8081'; // Host taxpayer portal
+                const downloadUrl = doc.filePath ? `${alopbbHost}${doc.filePath}` : null;
+                
+                return (
+                  <div key={doc.dokumenId} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="p-2 bg-primary/10 rounded text-primary shrink-0">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">{name}</p>
+                        {doc.fileName ? (
+                          <p className="text-xs text-muted-foreground truncate">{doc.fileName}</p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">Checklist Terpenuhi</p>
+                        )}
+                      </div>
+                    </div>
+                    {downloadUrl && (
+                      <Button variant="outline" size="sm" asChild className="shrink-0">
+                        <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download>
+                          Unduh
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </CardContent>

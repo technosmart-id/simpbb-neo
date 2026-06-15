@@ -119,6 +119,10 @@ export const pelayananDokumen = mysqlTable(
   {
     noPelayanan: varchar("NO_PELAYANAN", { length: 30 }).notNull(),
     dokumenId: tinyint("DOKUMEN_ID").notNull(),
+    fileName: varchar("file_name", { length: 255 }),
+    filePath: varchar("file_path", { length: 500 }),
+    fileSize: int("file_size"),
+    uploadedAt: datetime("uploaded_at").default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => [
     primaryKey({ columns: [table.noPelayanan, table.dokumenId] }),
