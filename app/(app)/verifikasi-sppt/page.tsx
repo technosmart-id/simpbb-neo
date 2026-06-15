@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator'
 import { CheckCircle, XCircle, Loader2, ShieldCheck } from 'lucide-react'
 import { formatRupiah } from '@/components/data-table/column-helpers'
 
-export default function VerifikasiSpptPage() {
+function VerifikasiSpptContent() {
   const searchParams = useSearchParams()
   const nopRaw = searchParams.get('nop') ?? ''
   const thnStr = searchParams.get('thn') ?? ''
@@ -139,5 +139,20 @@ export default function VerifikasiSpptPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function VerifikasiSpptPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center gap-4 py-20">
+          <Loader2 className="w-10 h-10 animate-spin text-muted-foreground" />
+          <p className="text-muted-foreground">Memverifikasi...</p>
+        </div>
+      }
+    >
+      <VerifikasiSpptContent />
+    </React.Suspense>
   )
 }

@@ -47,6 +47,8 @@ interface DataTableProps<TData, TValue> {
   emptyIcon?: React.ReactNode
   /** Action buttons (top-right) */
   actions?: React.ReactNode
+  /** Row click handler */
+  onRowClick?: (row: TData) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -62,6 +64,7 @@ export function DataTable<TData, TValue>({
   emptyMessage = "Tidak ada data.",
   emptyIcon,
   actions,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -157,7 +160,12 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow 
+                  key={row.id} 
+                  data-state={row.getIsSelected() && "selected"}
+                  className={onRowClick ? "cursor-pointer hover:bg-muted/50 transition-colors" : ""}
+                  onClick={() => onRowClick?.(row.original)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

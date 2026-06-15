@@ -19,6 +19,7 @@ import {
 import { Plus, Search, ClipboardList } from 'lucide-react'
 import { formatTanggal } from '@/components/data-table/column-helpers'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 type PelayananRow = {
   noPelayanan: string
@@ -34,7 +35,11 @@ const columns: ColumnDef<PelayananRow>[] = [
     accessorKey: 'noPelayanan',
     header: 'No Pelayanan',
     cell: ({ row }) => (
-      <Link href={`/pelayanan/${row.original.noPelayanan}`} className="font-medium hover:underline">
+      <Link 
+        href={`/pelayanan/${row.original.noPelayanan}`} 
+        className="font-medium hover:underline"
+        onClick={(e) => e.stopPropagation()}
+      >
         {row.original.noPelayanan}
       </Link>
     ),
@@ -63,12 +68,24 @@ const columns: ColumnDef<PelayananRow>[] = [
     header: 'Status',
     cell: ({ row }) => <PelayananBadge status={row.original.statusPelayanan} />,
   },
+  {
+    id: 'actions',
+    header: 'Aksi',
+    cell: ({ row }) => (
+      <Button asChild variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
+        <Link href={`/pelayanan/${row.original.noPelayanan}`}>
+          Detail
+        </Link>
+      </Button>
+    ),
+  },
 ]
 
 const PAGE_SIZE = 20
 
 export default function PelayananPage() {
   const orpc = useORPC()
+  const router = useRouter()
   const [page, setPage] = React.useState(1)
   const [search, setSearch] = React.useState('')
   const [statusFilter, setStatusFilter] = React.useState<string>('all')
@@ -149,6 +166,7 @@ export default function PelayananPage() {
         pageSize={PAGE_SIZE}
         onPageChange={setPage}
         isLoading={listQuery.isLoading}
+        onRowClick={(row) => router.push(`/pelayanan/${row.noPelayanan}`)}
         emptyMessage="Tidak ada berkas pelayanan."
         emptyIcon={<ClipboardList size={48} className="opacity-10" />}
       />
