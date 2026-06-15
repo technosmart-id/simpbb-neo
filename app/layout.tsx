@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono, Inter, Roboto } from "next/font/google"
+import type { Metadata } from "next"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme/theme-provider"
@@ -16,6 +17,14 @@ const fontMono = Geist_Mono({
 import { Toaster } from "@/components/ui/sonner"
 
 const robotoHeading = Roboto({subsets:['latin'],variable:'--font-heading'});
+
+export const metadata: Metadata = {
+  title: {
+    default: "SIM-PBB Neo",
+    template: "%s | SIM-PBB Neo",
+  },
+  description: "Sistem Informasi Manajemen Pajak Bumi dan Bangunan",
+}
 
 
 export default function RootLayout({

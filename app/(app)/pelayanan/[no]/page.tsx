@@ -209,6 +209,12 @@ export default function PelayananDetailPage() {
   const orpc = useORPC()
   const qc = useQueryClient()
 
+  React.useEffect(() => {
+    if (params.no) {
+      document.title = `Pelayanan ${params.no} | SIM-PBB Neo`
+    }
+  }, [params.no])
+
   const query = useQuery(
     orpc.pelayanan.getByNo.queryOptions({ input: { noPelayanan: params.no } }),
   )

@@ -87,6 +87,10 @@ export default function PelayananPage() {
   const orpc = useORPC()
   const router = useRouter()
   const [page, setPage] = React.useState(1)
+
+  React.useEffect(() => {
+    document.title = "Daftar Pelayanan | SIM-PBB Neo"
+  }, [])
   const [search, setSearch] = React.useState('')
   const [statusFilter, setStatusFilter] = React.useState<string>('all')
 
