@@ -363,7 +363,7 @@ export default function PelayananDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {data.dokumen.map((doc: any) => {
                 const name = DOKUMEN_NAMES[doc.dokumenId] || `Dokumen #${doc.dokumenId}`;
-                const alopbbHost = 'http://localhost:8081'; // Host taxpayer portal
+                const alopbbHost = process.env.NEXT_PUBLIC_ALOPBB_URL || 'http://localhost:8081';
                 const downloadUrl = doc.filePath ? `${alopbbHost}${doc.filePath}` : null;
                 
                 return (

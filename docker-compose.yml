@@ -25,7 +25,7 @@ services:
     volumes:
       - .:/app
     environment:
-      DATABASE_URL: mysql://simpbb:simpbbpassword@db:3306/simpbb_neo
+      DATABASE_URL: ${DATABASE_URL:-mysql://simpbb:simpbbpassword@db:3306/simpbb_neo}
     command: >
       sh -c "
         npm install --prefer-offline --ignore-scripts 2>/dev/null || npm install --ignore-scripts &&
@@ -48,10 +48,11 @@ services:
     env_file:
       - .env.local
     environment:
-      DATABASE_URL: mysql://simpbb:simpbbpassword@db:3306/simpbb_neo
-      BETTER_AUTH_URL: http://localhost:3000
-      NEXT_PUBLIC_BETTER_AUTH_URL: http://localhost:3000
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      DATABASE_URL: ${DATABASE_URL:-mysql://simpbb:simpbbpassword@db:3306/simpbb_neo}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      NEXT_PUBLIC_BETTER_AUTH_URL: ${NEXT_PUBLIC_BETTER_AUTH_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      NEXT_PUBLIC_ALOPBB_URL: ${NEXT_PUBLIC_ALOPBB_URL:-http://localhost:8081}
     depends_on:
       db:
         condition: service_healthy
