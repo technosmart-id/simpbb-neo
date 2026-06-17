@@ -17,7 +17,7 @@ export function createSubjekPajak(overrides: Partial<typeof datSubjekPajak.$infe
   return {
     subjekPajakId: id,
     nmWp: randIdName().toUpperCase().substring(0, 30),
-    jalanWp: randIdStreetAddress().toUpperCase().substring(0, 200),
+    jalanWp: randIdStreetAddress().toUpperCase().substring(0, 30),
     blokKavNoWp: `BLOK ${String.fromCharCode(65 + randNumber({ min: 0, max: 5 }))} / ${randNumber({ min: 1, max: 100 })}`.substring(0, 15),
     rwWp: randNumber({ min: 1, max: 20 }).toString().padStart(2, "0"),
     rtWp: randNumber({ min: 1, max: 50 }).toString().padStart(3, "0"),

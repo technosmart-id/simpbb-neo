@@ -4,6 +4,7 @@ import {
   int,
   tinyint,
   datetime,
+  index,
 } from "drizzle-orm/mysql-core";
 
 // ─── pemekaran ─────────────────────────────────────────────────
@@ -25,7 +26,7 @@ export const pemekaran = mysqlTable("pemekaran", {
   kdBlokBaru: varchar("KD_BLOK_BARU", { length: 3 }),
   tglEntry: datetime("TGL_ENTRY"),
   userEntry: varchar("USER_ENTRY", { length: 200 }),
-  isCancel: tinyint("IS_CANCEL"),
+  isCancel: tinyint("IS_CANCEL").default(0),
 }, (table) => [
 ]);
 
@@ -48,4 +49,6 @@ export const pemekaranDetail = mysqlTable("pemekaran_detail", {
   noUrutBaru: varchar("NO_URUT_BARU", { length: 4 }).notNull(),
   kdJnsOpBaru: varchar("KD_JNS_OP_BARU", { length: 1 }).notNull(),
 }, (table) => [
+  index("idx_pemekaran_detail_lama").on(table.kdPropinsiLama),
+  index("idx_pemekaran_detail_baru").on(table.kdPropinsiBaru),
 ]);

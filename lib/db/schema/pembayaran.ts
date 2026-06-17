@@ -6,6 +6,7 @@ import {
   datetime,
   primaryKey,
   bigint,
+  index,
 } from "drizzle-orm/mysql-core";
 
 // ─── pembayaran_sppt ──────────────────────────────────────────────
@@ -31,7 +32,7 @@ export const pembayaranSppt = mysqlTable("pembayaran_sppt", {
   tglRekamByrSppt: datetime("TGL_REKAM_BYR_SPPT").notNull(),
   nipRekamByrSppt: varchar("NIP_REKAM_BYR_SPPT", { length: 15 }).notNull(),
   noBukti: varchar("NO_BUKTI", { length: 50 }),
-  dibatalkan: tinyint("DIBATALKAN").default(0),
 }, (table) => [
-  primaryKey({ name: "pk_pembayaran_sppt", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.thnPajakSppt, table.pembayaranSpptKe] }),
+  primaryKey({ name: "pk_pembayaran_sppt", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.thnPajakSppt, table.pembayaranSpptKe, table.kdKanwilBank, table.kdKppbbBank, table.kdBankTunggal, table.kdBankPersepsi, table.kdTp] }),
+  index("idx_pembayaran_sppt_tgl").on(table.tglPembayaranSppt),
 ]);

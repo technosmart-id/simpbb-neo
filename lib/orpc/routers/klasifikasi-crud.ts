@@ -165,7 +165,6 @@ export const klasifikasiCrudRouter = os.router({
       kdFasilitas: z.string().length(2),
       nmFasilitas: z.string().min(1).max(63),
       satuanFasilitas: z.string().min(1).max(10),
-      nilaiFasilitas: z.string().default("0"),
       statusFasilitas: z.string().length(1).default("1"),
       ketergantungan: z.string().length(1).default("0"),
     }))
@@ -179,7 +178,6 @@ export const klasifikasiCrudRouter = os.router({
       kdFasilitas: z.string().length(2),
       nmFasilitas: z.string().min(1).max(63),
       satuanFasilitas: z.string().min(1).max(10),
-      nilaiFasilitas: z.string(),
       statusFasilitas: z.string().length(1),
       ketergantungan: z.string().length(1),
     }))
@@ -188,7 +186,6 @@ export const klasifikasiCrudRouter = os.router({
         .set({
           nmFasilitas: input.nmFasilitas,
           satuanFasilitas: input.satuanFasilitas,
-          nilaiFasilitas: input.nilaiFasilitas,
           statusFasilitas: input.statusFasilitas,
           ketergantungan: input.ketergantungan,
         })

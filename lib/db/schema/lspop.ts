@@ -24,17 +24,17 @@ export const datOpBangunan = mysqlTable("dat_op_bangunan", {
   noBng: int("NO_BNG").notNull(),
   kdJpb: char("KD_JPB", { length: 2 }),
   noFormulirLspop: char("NO_FORMULIR_LSPOP", { length: 11 }),
-  thnDibangunBng: char("THN_DIBANGUN_BNG", { length: 4 }).notNull(),
+  thnDibangunBng: char("THN_DIBANGUN_BNG", { length: 4 }).notNull().default("0"),
   thnRenovasiBng: char("THN_RENOVASI_BNG", { length: 4 }),
-  luasBng: bigint("LUAS_BNG", { mode: "number" }).notNull(),
-  jmlLantaiBng: int("JML_LANTAI_BNG").notNull(),
+  luasBng: bigint("LUAS_BNG", { mode: "number" }).notNull().default(0),
+  jmlLantaiBng: int("JML_LANTAI_BNG").notNull().default(1),
   kondisiBng: char("KONDISI_BNG", { length: 1 }),
   jnsKonstruksiBng: char("JNS_KONSTRUKSI_BNG", { length: 1 }),
   jnsAtapBng: char("JNS_ATAP_BNG", { length: 1 }),
   kdDinding: char("KD_DINDING", { length: 1 }),
   kdLantai: char("KD_LANTAI", { length: 1 }),
   kdLangitLangit: char("KD_LANGIT_LANGIT", { length: 1 }),
-  nilaiSistemBng: bigint("NILAI_SISTEM_BNG", { mode: "number" }).notNull(),
+  nilaiSistemBng: bigint("NILAI_SISTEM_BNG", { mode: "number" }).notNull().default(0),
   jnsTransaksiBng: char("JNS_TRANSAKSI_BNG", { length: 1 }),
   tglPendataanBng: datetime("TGL_PENDATAAN_BNG"),
   nipPendataBng: char("NIP_PENDATA_BNG", { length: 30 }),
@@ -43,8 +43,8 @@ export const datOpBangunan = mysqlTable("dat_op_bangunan", {
   tglPerekamanBng: datetime("TGL_PEREKAMAN_BNG"),
   nipPerekamBng: char("NIP_PEREKAM_BNG", { length: 30 }),
   tglKunjunganKembali: date("TGL_KUNJUNGAN_KEMBALI"),
-  nilaiIndividu: bigint("NILAI_INDIVIDU", { mode: "number" }).notNull(),
-  aktif: tinyint("AKTIF").notNull(),
+  nilaiIndividu: bigint("NILAI_INDIVIDU", { mode: "number" }).notNull().default(0),
+  aktif: tinyint("AKTIF").notNull().default(1),
 }, (table) => [
   primaryKey({ name: "pk_dat_op_bangunan", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.noBng] }),
 ]);
@@ -76,7 +76,7 @@ export const datJpb2 = mysqlTable("dat_jpb2", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  klsJpb2: char("KLS_JPB2", { length: 1 }).notNull(),
+  klsJpb2: char("KLS_JPB2", { length: 1 }).notNull().default("1"),
 }, (table) => [
   primaryKey({ name: "pk_dat_jpb2", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.noBng] }),
 ]);
@@ -90,7 +90,7 @@ export const datJpb3 = mysqlTable("dat_jpb3", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  typeKonstruksi: char("TYPE_KONSTRUKSI", { length: 1 }).notNull(),
+  typeKonstruksi: char("TYPE_KONSTRUKSI", { length: 1 }).notNull().default("1"),
   tingKolomJpb3: decimal("TING_KOLOM_JPB3", { precision: 4, scale: 0 }).notNull(),
   lbrBentJpb3: decimal("LBR_BENT_JPB3", { precision: 4, scale: 0 }).notNull(),
   luasMezzanineJpb3: decimal("LUAS_MEZZANINE_JPB3", { precision: 4, scale: 0 }).notNull(),
@@ -109,7 +109,7 @@ export const datJpb4 = mysqlTable("dat_jpb4", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  klsJpb4: char("KLS_JPB4", { length: 1 }).notNull(),
+  klsJpb4: char("KLS_JPB4", { length: 1 }).notNull().default("1"),
 }, (table) => [
   primaryKey({ name: "pk_dat_jpb4", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.noBng] }),
 ]);
@@ -123,7 +123,7 @@ export const datJpb5 = mysqlTable("dat_jpb5", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  klsJpb5: char("KLS_JPB5", { length: 1 }).notNull(),
+  klsJpb5: char("KLS_JPB5", { length: 1 }).notNull().default("1"),
   luasKmrJpb5DgnAcSent: decimal("LUAS_KMR_JPB5_DGN_AC_SENT", { precision: 12, scale: 0 }).notNull(),
   luasRngLainJpb5DgnAcSent: decimal("LUAS_RNG_LAIN_JPB5_DGN_AC_SENT", { precision: 12, scale: 0 }).notNull(),
 }, (table) => [
@@ -139,7 +139,7 @@ export const datJpb6 = mysqlTable("dat_jpb6", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  klsJpb6: char("KLS_JPB6", { length: 1 }).notNull(),
+  klsJpb6: char("KLS_JPB6", { length: 1 }).notNull().default("1"),
 }, (table) => [
   primaryKey({ name: "pk_dat_jpb6", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.noBng] }),
 ]);
@@ -153,8 +153,8 @@ export const datJpb7 = mysqlTable("dat_jpb7", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  jnsJpb7: char("JNS_JPB7", { length: 1 }).notNull(),
-  bintangJpb7: char("BINTANG_JPB7", { length: 1 }).notNull(),
+  jnsJpb7: char("JNS_JPB7", { length: 1 }).notNull().default("1"),
+  bintangJpb7: char("BINTANG_JPB7", { length: 1 }).notNull().default("5"),
   jmlKmrJpb7: decimal("JML_KMR_JPB7", { precision: 4, scale: 0 }).notNull(),
   luasKmrJpb7DgnAcSent: decimal("LUAS_KMR_JPB7_DGN_AC_SENT", { precision: 12, scale: 0 }).notNull(),
   luasKmrLainJpb7DgnAcSent: decimal("LUAS_KMR_LAIN_JPB7_DGN_AC_SENT", { precision: 12, scale: 0 }).notNull(),
@@ -171,7 +171,7 @@ export const datJpb8 = mysqlTable("dat_jpb8", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  typeKonstruksi: char("TYPE_KONSTRUKSI", { length: 1 }).notNull(),
+  typeKonstruksi: char("TYPE_KONSTRUKSI", { length: 1 }).notNull().default("1"),
   tingKolomJpb8: decimal("TING_KOLOM_JPB8", { precision: 4, scale: 0 }).notNull(),
   lbrBentJpb8: decimal("LBR_BENT_JPB8", { precision: 4, scale: 0 }).notNull(),
   luasMezzanineJpb8: decimal("LUAS_MEZZANINE_JPB8", { precision: 4, scale: 0 }).notNull(),
@@ -190,7 +190,7 @@ export const datJpb9 = mysqlTable("dat_jpb9", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  klsJpb9: char("KLS_JPB9", { length: 1 }).notNull(),
+  klsJpb9: char("KLS_JPB9", { length: 1 }).notNull().default("1"),
 }, (table) => [
   primaryKey({ name: "pk_dat_jpb9", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.noBng] }),
 ]);
@@ -204,7 +204,7 @@ export const datJpb12 = mysqlTable("dat_jpb12", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  typeJpb12: char("TYPE_JPB12", { length: 1 }).notNull(),
+  typeJpb12: char("TYPE_JPB12", { length: 1 }).notNull().default("1"),
 }, (table) => [
   primaryKey({ name: "pk_dat_jpb12", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.noBng] }),
 ]);
@@ -218,7 +218,7 @@ export const datJpb13 = mysqlTable("dat_jpb13", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  klsJpb13: char("KLS_JPB13", { length: 1 }).notNull(),
+  klsJpb13: char("KLS_JPB13", { length: 1 }).notNull().default("1"),
   jmlJpb13: decimal("JML_JPB13", { precision: 4, scale: 0 }).notNull(),
   luasJpb13DgnAcSent: decimal("LUAS_JPB13_DGN_AC_SENT", { precision: 12, scale: 0 }).notNull(),
   luasJpb13LainDgnAcSent: decimal("LUAS_JPB13_LAIN_DGN_AC_SENT", { precision: 12, scale: 0 }).notNull(),
@@ -249,7 +249,7 @@ export const datJpb15 = mysqlTable("dat_jpb15", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  letakTangkiJpb15: char("LETAK_TANGKI_JPB15", { length: 1 }).notNull(),
+  letakTangkiJpb15: char("LETAK_TANGKI_JPB15", { length: 1 }).notNull().default("1"),
   kapasitasTangkiJpb15: decimal("KAPASITAS_TANGKI_JPB15", { precision: 6, scale: 0 }).notNull(),
 }, (table) => [
   primaryKey({ name: "pk_dat_jpb15", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.noBng] }),
@@ -264,7 +264,7 @@ export const datJpb16 = mysqlTable("dat_jpb16", {
   noUrut: char("NO_URUT", { length: 4 }).notNull(),
   kdJnsOp: char("KD_JNS_OP", { length: 1 }).notNull(),
   noBng: int("NO_BNG").notNull(),
-  klsJpb16: char("KLS_JPB16", { length: 1 }).notNull(),
+  klsJpb16: char("KLS_JPB16", { length: 1 }).notNull().default("1"),
 }, (table) => [
   primaryKey({ name: "pk_dat_jpb16", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp, table.noBng] }),
 ]);

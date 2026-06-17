@@ -6,7 +6,7 @@ export const kayuUlin = mysqlTable("kayu_ulin", {
   kdPropinsi: char("KD_PROPINSI", { length: 2 }).notNull(),
   kdDati2: char("KD_DATI2", { length: 2 }).notNull(),
   thnStatusKayuUlin: char("THN_STATUS_KAYU_ULIN", { length: 4 }).notNull(),
-  statusKayuUlin: tinyint("STATUS_KAYU_ULIN"),
+  statusKayuUlin: tinyint("STATUS_KAYU_ULIN").default(0),
 }, (table) => [
   primaryKey({ name: "pk_kayu_ulin", columns: [table.kdPropinsi, table.kdDati2, table.thnStatusKayuUlin] }),
 ]);
@@ -140,7 +140,7 @@ export const tarif = mysqlTable("tarif", {
   njopMin: decimal("NJOP_MIN", { precision: 15, scale: 0 }).notNull(),
   njopMax: decimal("NJOP_MAX", { precision: 15, scale: 0 }),
   nilaiTarif: decimal("NILAI_TARIF", { precision: 3, scale: 3 }),
-  njkp: int("NJKP").notNull(),
+  njkp: int("NJKP").notNull().default(100),
 }, (table) => [
   primaryKey({ name: "pk_tarif", columns: [table.kdPropinsi, table.kdDati2, table.thnAwal, table.thnAkhir, table.njopMin] }),
 ]);

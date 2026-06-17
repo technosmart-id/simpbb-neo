@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "a4571666-85f6-4b62-83f1-75818b794034",
+  "id": "959b908d-5ea3-4263-a336-1f4ca4d0000a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "account": {
@@ -2189,6 +2189,65 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
+    "ref_jalan": {
+      "name": "ref_jalan",
+      "columns": {
+        "ID": {
+          "name": "ID",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_KECAMATAN": {
+          "name": "KD_KECAMATAN",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_KELURAHAN": {
+          "name": "KD_KELURAHAN",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NM_JALAN": {
+          "name": "NM_JALAN",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "ref_jalan_ID": {
+          "name": "ref_jalan_ID",
+          "columns": [
+            "ID"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "ref_dati2": {
       "name": "ref_dati2",
       "columns": {
@@ -2253,6 +2312,52 @@
           "name": "ref_jns_pelayanan_KD_JNS_PELAYANAN",
           "columns": [
             "KD_JNS_PELAYANAN"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "ref_kategori": {
+      "name": "ref_kategori",
+      "columns": {
+        "KATEGORI": {
+          "name": "KATEGORI",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KODE": {
+          "name": "KODE",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NAMA": {
+          "name": "NAMA",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NILAI": {
+          "name": "NILAI",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "ref_kategori_KATEGORI_KODE_pk": {
+          "name": "ref_kategori_KATEGORI_KODE_pk",
+          "columns": [
+            "KATEGORI",
+            "KODE"
           ]
         }
       },
@@ -2428,7 +2533,8 @@
           "type": "tinyint",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -2498,7 +2604,8 @@
           "type": "char(32)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'d41d8cd98f00b204e9800998ecf8427e'"
         },
         "HAK_AKSES": {
           "name": "HAK_AKSES",
@@ -2512,32 +2619,36 @@
           "type": "varchar(30)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'-'"
         },
         "NAMA": {
           "name": "NAMA",
           "type": "varchar(200)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'-'"
         },
         "JABATAN": {
           "name": "JABATAN",
           "type": "varchar(200)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'-'"
         },
         "PENANGGUNG_JAWAB_CETAK": {
           "name": "PENANGGUNG_JAWAB_CETAK",
           "type": "tinyint",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 1
         },
         "TANDA_TANGAN": {
           "name": "TANDA_TANGAN",
-          "type": "text",
+          "type": "LONGBLOB",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -2702,14 +2813,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "NILAI_FASILITAS": {
-          "name": "NILAI_FASILITAS",
-          "type": "decimal(15,2)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'0'"
-        },
         "STATUS_FASILITAS": {
           "name": "STATUS_FASILITAS",
           "type": "char(1)",
@@ -2815,7 +2918,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_kelas_bangunan_minimum": {
+          "name": "idx_kelas_bangunan_minimum",
+          "columns": [
+            "NILAI_MINIMUM"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "kelas_bangunan_KELAS_BANGUNAN": {
@@ -2860,7 +2971,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_kelas_bumi_minimum": {
+          "name": "idx_kelas_bumi_minimum",
+          "columns": [
+            "NILAI_MINIMUM"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "kelas_bumi_KELAS_BUMI": {
@@ -3306,7 +3425,8 @@
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "TGL_PENDATAAN_OP": {
           "name": "TGL_PENDATAAN_OP",
@@ -3358,7 +3478,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_spop_subjek": {
+          "name": "idx_spop_subjek",
+          "columns": [
+            "SUBJEK_PAJAK_ID"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "pk_spop": {
@@ -3778,7 +3906,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         }
       },
       "indexes": {},
@@ -3865,7 +3994,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         },
         "JML_JPB13": {
           "name": "JML_JPB13",
@@ -4060,7 +4190,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         },
         "KAPASITAS_TANGKI_JPB15": {
           "name": "KAPASITAS_TANGKI_JPB15",
@@ -4154,7 +4285,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         }
       },
       "indexes": {},
@@ -4241,7 +4373,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         }
       },
       "indexes": {},
@@ -4328,7 +4461,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         },
         "TING_KOLOM_JPB3": {
           "name": "TING_KOLOM_JPB3",
@@ -4450,7 +4584,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         }
       },
       "indexes": {},
@@ -4537,7 +4672,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         },
         "LUAS_KMR_JPB5_DGN_AC_SENT": {
           "name": "LUAS_KMR_JPB5_DGN_AC_SENT",
@@ -4638,7 +4774,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         }
       },
       "indexes": {},
@@ -4725,14 +4862,16 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         },
         "BINTANG_JPB7": {
           "name": "BINTANG_JPB7",
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'5'"
         },
         "JML_KMR_JPB7": {
           "name": "JML_KMR_JPB7",
@@ -4840,7 +4979,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         },
         "TING_KOLOM_JPB8": {
           "name": "TING_KOLOM_JPB8",
@@ -4962,7 +5102,8 @@
           "type": "char(1)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'1'"
         }
       },
       "indexes": {},
@@ -5063,7 +5204,8 @@
           "type": "char(4)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'0'"
         },
         "THN_RENOVASI_BNG": {
           "name": "THN_RENOVASI_BNG",
@@ -5077,14 +5219,16 @@
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "JML_LANTAI_BNG": {
           "name": "JML_LANTAI_BNG",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 1
         },
         "KONDISI_BNG": {
           "name": "KONDISI_BNG",
@@ -5133,7 +5277,8 @@
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "JNS_TRANSAKSI_BNG": {
           "name": "JNS_TRANSAKSI_BNG",
@@ -5196,14 +5341,16 @@
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "AKTIF": {
           "name": "AKTIF",
           "type": "tinyint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 1
         }
       },
       "indexes": {},
@@ -5220,6 +5367,375 @@
             "NO_URUT",
             "KD_JNS_OP",
             "NO_BNG"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "histori_sppt": {
+      "name": "histori_sppt",
+      "columns": {
+        "KD_PROPINSI": {
+          "name": "KD_PROPINSI",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_DATI2": {
+          "name": "KD_DATI2",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_KECAMATAN": {
+          "name": "KD_KECAMATAN",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_KELURAHAN": {
+          "name": "KD_KELURAHAN",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_BLOK": {
+          "name": "KD_BLOK",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "NO_URUT": {
+          "name": "NO_URUT",
+          "type": "varchar(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_JNS_OP": {
+          "name": "KD_JNS_OP",
+          "type": "varchar(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "THN_PAJAK_SPPT": {
+          "name": "THN_PAJAK_SPPT",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "SIKLUS_SPPT": {
+          "name": "SIKLUS_SPPT",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "KD_KANWIL_BANK": {
+          "name": "KD_KANWIL_BANK",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KD_KPPBB_BANK": {
+          "name": "KD_KPPBB_BANK",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KD_BANK_TUNGGAL": {
+          "name": "KD_BANK_TUNGGAL",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KD_BANK_PERSEPSI": {
+          "name": "KD_BANK_PERSEPSI",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KD_TP": {
+          "name": "KD_TP",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NM_WP_SPPT": {
+          "name": "NM_WP_SPPT",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "JLN_WP_SPPT": {
+          "name": "JLN_WP_SPPT",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "BLOK_KAV_NO_WP_SPPT": {
+          "name": "BLOK_KAV_NO_WP_SPPT",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "RW_WP_SPPT": {
+          "name": "RW_WP_SPPT",
+          "type": "varchar(2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "RT_WP_SPPT": {
+          "name": "RT_WP_SPPT",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KELURAHAN_WP_SPPT": {
+          "name": "KELURAHAN_WP_SPPT",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KOTA_WP_SPPT": {
+          "name": "KOTA_WP_SPPT",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KD_POS_WP_SPPT": {
+          "name": "KD_POS_WP_SPPT",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NPWP_SPPT": {
+          "name": "NPWP_SPPT",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NO_PERSIL_SPPT": {
+          "name": "NO_PERSIL_SPPT",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KD_KLS_TANAH": {
+          "name": "KD_KLS_TANAH",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "THN_AWAL_KLS_TANAH": {
+          "name": "THN_AWAL_KLS_TANAH",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KD_KLS_BNG": {
+          "name": "KD_KLS_BNG",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "THN_AWAL_KLS_BNG": {
+          "name": "THN_AWAL_KLS_BNG",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TGL_JATUH_TEMPO_SPPT": {
+          "name": "TGL_JATUH_TEMPO_SPPT",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "LUAS_BUMI_SPPT": {
+          "name": "LUAS_BUMI_SPPT",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "LUAS_BNG_SPPT": {
+          "name": "LUAS_BNG_SPPT",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NJOP_BUMI_SPPT": {
+          "name": "NJOP_BUMI_SPPT",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NJOP_BNG_SPPT": {
+          "name": "NJOP_BNG_SPPT",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NJOP_SPPT": {
+          "name": "NJOP_SPPT",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NJOPTKP_SPPT": {
+          "name": "NJOPTKP_SPPT",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NJKP_SPPT": {
+          "name": "NJKP_SPPT",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "PBB_TERHUTANG_SPPT": {
+          "name": "PBB_TERHUTANG_SPPT",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "FAKTOR_PENGURANG_SPPT": {
+          "name": "FAKTOR_PENGURANG_SPPT",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "PBB_YG_HARUS_DIBAYAR_SPPT": {
+          "name": "PBB_YG_HARUS_DIBAYAR_SPPT",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "STATUS_PEMBAYARAN_SPPT": {
+          "name": "STATUS_PEMBAYARAN_SPPT",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "STATUS_TAGIHAN_SPPT": {
+          "name": "STATUS_TAGIHAN_SPPT",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "STATUS_CETAK_SPPT": {
+          "name": "STATUS_CETAK_SPPT",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TGL_TERBIT_SPPT": {
+          "name": "TGL_TERBIT_SPPT",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TGL_CETAK_SPPT": {
+          "name": "TGL_CETAK_SPPT",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NIP_PENCETAK_SPPT": {
+          "name": "NIP_PENCETAK_SPPT",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NAMA_PENCETAK_SPPT": {
+          "name": "NAMA_PENCETAK_SPPT",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NIP_PETUGAS": {
+          "name": "NIP_PETUGAS",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KETERANGAN": {
+          "name": "KETERANGAN",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TGL_PERUBAHAN": {
+          "name": "TGL_PERUBAHAN",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pk_histori_sppt": {
+          "name": "pk_histori_sppt",
+          "columns": [
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "KD_KECAMATAN",
+            "KD_KELURAHAN",
+            "KD_BLOK",
+            "NO_URUT",
+            "KD_JNS_OP",
+            "THN_PAJAK_SPPT",
+            "SIKLUS_SPPT"
           ]
         }
       },
@@ -5409,7 +5925,8 @@
           "type": "char(4)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'2000'"
         },
         "KD_KLS_BNG": {
           "name": "KD_KLS_BNG",
@@ -5423,7 +5940,8 @@
           "type": "char(4)",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'2000'"
         },
         "TGL_JATUH_TEMPO_SPPT": {
           "name": "TGL_JATUH_TEMPO_SPPT",
@@ -5437,99 +5955,104 @@
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "LUAS_BNG_SPPT": {
           "name": "LUAS_BNG_SPPT",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "NJOP_BUMI_SPPT": {
           "name": "NJOP_BUMI_SPPT",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "NJOP_BNG_SPPT": {
           "name": "NJOP_BNG_SPPT",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "NJOP_SPPT": {
           "name": "NJOP_SPPT",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "NJOPTKP_SPPT": {
           "name": "NJOPTKP_SPPT",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "NJKP_SPPT": {
           "name": "NJKP_SPPT",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "PBB_TERHUTANG_SPPT": {
           "name": "PBB_TERHUTANG_SPPT",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "FAKTOR_PENGURANG_SPPT": {
           "name": "FAKTOR_PENGURANG_SPPT",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "PBB_YG_HARUS_DIBAYAR_SPPT": {
           "name": "PBB_YG_HARUS_DIBAYAR_SPPT",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "STATUS_PEMBAYARAN_SPPT": {
           "name": "STATUS_PEMBAYARAN_SPPT",
           "type": "tinyint",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "STATUS_TAGIHAN_SPPT": {
           "name": "STATUS_TAGIHAN_SPPT",
           "type": "tinyint",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         },
         "STATUS_CETAK_SPPT": {
           "name": "STATUS_CETAK_SPPT",
           "type": "tinyint",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
-        },
-        "STATUS_PEMBATALAN": {
-          "name": "STATUS_PEMBATALAN",
-          "type": "char(1)",
-          "primaryKey": false,
-          "notNull": true,
           "autoincrement": false,
-          "default": "'0'"
+          "default": 0
         },
         "TGL_TERBIT_SPPT": {
           "name": "TGL_TERBIT_SPPT",
@@ -5553,7 +6076,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_sppt_status_bayar": {
+          "name": "idx_sppt_status_bayar",
+          "columns": [
+            "STATUS_PEMBAYARAN_SPPT"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "pk_sppt": {
@@ -5686,7 +6217,8 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
         },
         "NIP_VERIFIKASI_1": {
           "name": "NIP_VERIFIKASI_1",
@@ -6051,17 +6583,17 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "DIBATALKAN": {
-          "name": "DIBATALKAN",
-          "type": "tinyint",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 0
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_pembayaran_sppt_tgl": {
+          "name": "idx_pembayaran_sppt_tgl",
+          "columns": [
+            "TGL_PEMBAYARAN_SPPT"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "pk_pembayaran_sppt": {
@@ -6075,7 +6607,12 @@
             "NO_URUT",
             "KD_JNS_OP",
             "THN_PAJAK_SPPT",
-            "PEMBAYARAN_SPPT_KE"
+            "PEMBAYARAN_SPPT_KE",
+            "KD_KANWIL_BANK",
+            "KD_KPPBB_BANK",
+            "KD_BANK_TUNGGAL",
+            "KD_BANK_PERSEPSI",
+            "KD_TP"
           ]
         }
       },
@@ -6085,92 +6622,92 @@
     "histori_mutasi": {
       "name": "histori_mutasi",
       "columns": {
-        "no_pelayanan": {
-          "name": "no_pelayanan",
+        "NO_PELAYANAN": {
+          "name": "NO_PELAYANAN",
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "nop_sebelum": {
-          "name": "nop_sebelum",
+        "NOP_SEBELUM": {
+          "name": "NOP_SEBELUM",
           "type": "varchar(20)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "nama_sebelum": {
-          "name": "nama_sebelum",
+        "NAMA_SEBELUM": {
+          "name": "NAMA_SEBELUM",
           "type": "varchar(200)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "lt_sebelum": {
-          "name": "lt_sebelum",
+        "LT_SEBELUM": {
+          "name": "LT_SEBELUM",
           "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "lb_sebelum": {
-          "name": "lb_sebelum",
+        "LB_SEBELUM": {
+          "name": "LB_SEBELUM",
           "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "pbb_sebelum": {
-          "name": "pbb_sebelum",
+        "PBB_SEBELUM": {
+          "name": "PBB_SEBELUM",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "nop_sesudah": {
-          "name": "nop_sesudah",
+        "NOP_SESUDAH": {
+          "name": "NOP_SESUDAH",
           "type": "varchar(18)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "nama_sesudah": {
-          "name": "nama_sesudah",
+        "NAMA_SESUDAH": {
+          "name": "NAMA_SESUDAH",
           "type": "varchar(200)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "lt_sesudah": {
-          "name": "lt_sesudah",
+        "LT_SESUDAH": {
+          "name": "LT_SESUDAH",
           "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "lb_sesudah": {
-          "name": "lb_sesudah",
+        "LB_SESUDAH": {
+          "name": "LB_SESUDAH",
           "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "pbb_sesudah": {
-          "name": "pbb_sesudah",
+        "PBB_SESUDAH": {
+          "name": "PBB_SESUDAH",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "id": {
-          "name": "id",
+        "ID": {
+          "name": "ID",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": true
         },
-        "keterangan": {
-          "name": "keterangan",
+        "KETERANGAN": {
+          "name": "KETERANGAN",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -6179,121 +6716,72 @@
       },
       "indexes": {},
       "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "histori_mutasi_id": {
-          "name": "histori_mutasi_id",
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "histori_mutasi_ID_unique": {
+          "name": "histori_mutasi_ID_unique",
           "columns": [
-            "id"
+            "ID"
           ]
         }
       },
-      "uniqueConstraints": {},
       "checkConstraint": {}
     },
     "pelayanan": {
       "name": "pelayanan",
       "columns": {
-        "ID": {
-          "name": "ID",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "NAMA_PEMOHON": {
-          "name": "NAMA_PEMOHON",
-          "type": "varchar(300)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "ALAMAT_PEMOHON": {
-          "name": "ALAMAT_PEMOHON",
-          "type": "varchar(500)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "LETAK_OP": {
-          "name": "LETAK_OP",
-          "type": "varchar(250)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "KECAMATAN": {
-          "name": "KECAMATAN",
-          "type": "varchar(250)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "KELURAHAN": {
-          "name": "KELURAHAN",
-          "type": "varchar(250)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "NO_PELAYANAN": {
           "name": "NO_PELAYANAN",
-          "type": "varchar(13)",
+          "type": "varchar(30)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "TANGGAL_PELAYANAN": {
-          "name": "TANGGAL_PELAYANAN",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "KD_PROPINSI": {
           "name": "KD_PROPINSI",
-          "type": "varchar(2)",
+          "type": "char(2)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "KD_DATI2": {
           "name": "KD_DATI2",
-          "type": "varchar(2)",
+          "type": "char(2)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "KD_KECAMATAN": {
           "name": "KD_KECAMATAN",
-          "type": "varchar(3)",
+          "type": "char(3)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "KD_KELURAHAN": {
           "name": "KD_KELURAHAN",
-          "type": "varchar(3)",
+          "type": "char(3)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "KD_BLOK": {
           "name": "KD_BLOK",
-          "type": "varchar(3)",
+          "type": "char(3)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "NO_URUT": {
           "name": "NO_URUT",
-          "type": "varchar(4)",
+          "type": "char(4)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "KD_JNS_OP": {
           "name": "KD_JNS_OP",
-          "type": "varchar(1)",
+          "type": "char(1)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -6302,7 +6790,14 @@
           "name": "KD_JNS_PELAYANAN",
           "type": "char(2)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "TANGGAL_PELAYANAN": {
+          "name": "TANGGAL_PELAYANAN",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
           "autoincrement": false
         },
         "TANGGAL_PERKIRAAN_SELESAI": {
@@ -6312,37 +6807,73 @@
           "notNull": false,
           "autoincrement": false
         },
-        "STATUS_PELAYANAN": {
-          "name": "STATUS_PELAYANAN",
-          "type": "smallint",
+        "NAMA_PEMOHON": {
+          "name": "NAMA_PEMOHON",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
+        "ALAMAT_PEMOHON": {
+          "name": "ALAMAT_PEMOHON",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "LETAK_OP": {
+          "name": "LETAK_OP",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KECAMATAN": {
+          "name": "KECAMATAN",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "KELURAHAN": {
+          "name": "KELURAHAN",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "STATUS_PELAYANAN": {
+          "name": "STATUS_PELAYANAN",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
         "NIP_PETUGAS_PENERIMA": {
           "name": "NIP_PETUGAS_PENERIMA",
-          "type": "varchar(300)",
+          "type": "varchar(40)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "NAMA_PETUGAS_PENERIMA": {
           "name": "NAMA_PETUGAS_PENERIMA",
-          "type": "varchar(300)",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "NIP_AR": {
           "name": "NIP_AR",
-          "type": "varchar(300)",
+          "type": "varchar(40)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "NAMA_AR": {
           "name": "NAMA_AR",
-          "type": "varchar(300)",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -6363,138 +6894,174 @@
         },
         "TGL_MASUK_PENILAI": {
           "name": "TGL_MASUK_PENILAI",
-          "type": "datetime",
+          "type": "date",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "NIP_MASUK_PENILAI": {
           "name": "NIP_MASUK_PENILAI",
-          "type": "varchar(300)",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TGL_MASUK_PENETAPAN": {
+          "name": "TGL_MASUK_PENETAPAN",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "NIP_MASUK_PENETAPAN": {
+          "name": "NIP_MASUK_PENETAPAN",
+          "type": "varchar(40)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "TGL_SELESAI": {
           "name": "TGL_SELESAI",
-          "type": "datetime",
+          "type": "date",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "NIP_SELESAI": {
           "name": "NIP_SELESAI",
-          "type": "varchar(300)",
+          "type": "varchar(40)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "TGL_TERKONFIRMASI_WP": {
           "name": "TGL_TERKONFIRMASI_WP",
-          "type": "datetime",
+          "type": "date",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "NIP_TERKONFIRMASI_WP": {
           "name": "NIP_TERKONFIRMASI_WP",
-          "type": "varchar(300)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "TGL_PENETAPAN": {
-          "name": "TGL_PENETAPAN",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "NIP_PENETAPAN": {
-          "name": "NIP_PENETAPAN",
-          "type": "varchar(300)",
+          "type": "varchar(40)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "TGL_BERKAS_DITUNDA": {
           "name": "TGL_BERKAS_DITUNDA",
-          "type": "datetime",
+          "type": "date",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "NIP_BERKAS_DITUNDA": {
-          "name": "NIP_BERKAS_DITUNDA",
-          "type": "varchar(300)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "TTD_JABATAN_KIRI": {
-          "name": "TTD_JABATAN_KIRI",
-          "type": "varchar(500)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "TTD_NAMA_KIRI": {
-          "name": "TTD_NAMA_KIRI",
-          "type": "varchar(500)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "TTD_NIP_KIRI": {
-          "name": "TTD_NIP_KIRI",
-          "type": "varchar(500)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "TTD_JABATAN_KANAN": {
-          "name": "TTD_JABATAN_KANAN",
-          "type": "varchar(500)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "TTD_NAMA_KANAN": {
-          "name": "TTD_NAMA_KANAN",
-          "type": "varchar(500)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "TTD_NIP_KANAN": {
-          "name": "TTD_NIP_KANAN",
-          "type": "varchar(500)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "KETERANGAN_BERKAS": {
-          "name": "KETERANGAN_BERKAS",
+        "ALASAN_DITUNDA": {
+          "name": "ALASAN_DITUNDA",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "EKSTRA": {
-          "name": "EKSTRA",
-          "type": "text",
+        "IS_KOLEKTIF": {
+          "name": "IS_KOLEKTIF",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "TTD_KIRI_JABATAN": {
+          "name": "TTD_KIRI_JABATAN",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TTD_KIRI_NAMA": {
+          "name": "TTD_KIRI_NAMA",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TTD_KIRI_NIP": {
+          "name": "TTD_KIRI_NIP",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TTD_KANAN_JABATAN": {
+          "name": "TTD_KANAN_JABATAN",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TTD_KANAN_NAMA": {
+          "name": "TTD_KANAN_NAMA",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "TTD_KANAN_NIP": {
+          "name": "TTD_KANAN_NIP",
+          "type": "varchar(40)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "pelayanan_ID": {
-          "name": "pelayanan_ID",
+      "indexes": {
+        "idx_pelayanan_nop": {
+          "name": "idx_pelayanan_nop",
           "columns": [
-            "ID"
+            "KD_PROPINSI",
+            "KD_DATI2",
+            "KD_KECAMATAN",
+            "KD_KELURAHAN",
+            "KD_BLOK",
+            "NO_URUT",
+            "KD_JNS_OP"
+          ],
+          "isUnique": false
+        },
+        "idx_pelayanan_status": {
+          "name": "idx_pelayanan_status",
+          "columns": [
+            "STATUS_PELAYANAN"
+          ],
+          "isUnique": false
+        },
+        "idx_pelayanan_tgl": {
+          "name": "idx_pelayanan_tgl",
+          "columns": [
+            "TANGGAL_PELAYANAN"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_pelayanan_jns": {
+          "name": "fk_pelayanan_jns",
+          "tableFrom": "pelayanan",
+          "tableTo": "ref_jns_pelayanan",
+          "columnsFrom": [
+            "KD_JNS_PELAYANAN"
+          ],
+          "columnsTo": [
+            "KD_JNS_PELAYANAN"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pelayanan_NO_PELAYANAN": {
+          "name": "pelayanan_NO_PELAYANAN",
+          "columns": [
+            "NO_PELAYANAN"
           ]
         }
       },
@@ -6504,29 +7071,72 @@
     "pelayanan_dokumen": {
       "name": "pelayanan_dokumen",
       "columns": {
-        "pelayanan_id": {
-          "name": "pelayanan_id",
-          "type": "bigint",
+        "NO_PELAYANAN": {
+          "name": "NO_PELAYANAN",
+          "type": "varchar(30)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "dokumen_id": {
-          "name": "dokumen_id",
-          "type": "smallint",
+        "DOKUMEN_ID": {
+          "name": "DOKUMEN_ID",
+          "type": "tinyint",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "file_path": {
+          "name": "file_path",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "file_size": {
+          "name": "file_size",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "uploaded_at": {
+          "name": "uploaded_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "fk_dok_pelayanan": {
+          "name": "fk_dok_pelayanan",
+          "tableFrom": "pelayanan_dokumen",
+          "tableTo": "pelayanan",
+          "columnsFrom": [
+            "NO_PELAYANAN"
+          ],
+          "columnsTo": [
+            "NO_PELAYANAN"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
-        "pelayanan_dokumen_pelayanan_id_dokumen_id_pk": {
-          "name": "pelayanan_dokumen_pelayanan_id_dokumen_id_pk",
+        "pelayanan_dokumen_NO_PELAYANAN_DOKUMEN_ID_pk": {
+          "name": "pelayanan_dokumen_NO_PELAYANAN_DOKUMEN_ID_pk",
           "columns": [
-            "pelayanan_id",
-            "dokumen_id"
+            "NO_PELAYANAN",
+            "DOKUMEN_ID"
           ]
         }
       },
@@ -6538,7 +7148,7 @@
       "columns": {
         "ID": {
           "name": "ID",
-          "type": "bigint",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": true
@@ -6552,7 +7162,7 @@
         },
         "NOP": {
           "name": "NOP",
-          "type": "varchar(40)",
+          "type": "varchar(18)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -6573,14 +7183,14 @@
         },
         "LT": {
           "name": "LT",
-          "type": "double",
+          "type": "decimal(12,2)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "LB": {
           "name": "LB",
-          "type": "double",
+          "type": "decimal(12,2)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -6593,8 +7203,30 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
+      "indexes": {
+        "idx_lamp_kol_pelayanan": {
+          "name": "idx_lamp_kol_pelayanan",
+          "columns": [
+            "NO_PELAYANAN"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_lamp_kol_pelayanan": {
+          "name": "fk_lamp_kol_pelayanan",
+          "tableFrom": "pelayanan_lampiran_kolektif",
+          "tableTo": "pelayanan",
+          "columnsFrom": [
+            "NO_PELAYANAN"
+          ],
+          "columnsTo": [
+            "NO_PELAYANAN"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
         "pelayanan_lampiran_kolektif_ID": {
           "name": "pelayanan_lampiran_kolektif_ID",
@@ -6733,7 +7365,8 @@
           "type": "tinyint",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -6865,7 +7498,22 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_pemekaran_detail_lama": {
+          "name": "idx_pemekaran_detail_lama",
+          "columns": [
+            "KD_PROPINSI_LAMA"
+          ],
+          "isUnique": false
+        },
+        "idx_pemekaran_detail_baru": {
+          "name": "idx_pemekaran_detail_baru",
+          "columns": [
+            "KD_PROPINSI_BARU"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "pemekaran_detail_ID": {
@@ -8565,7 +9213,8 @@
           "type": "tinyint",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -8725,7 +9374,8 @@
           "type": "int",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 100
         }
       },
       "indexes": {},

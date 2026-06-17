@@ -25,10 +25,7 @@ export const dashboardRouter = os.router({
       const [realisasi] = await db
         .select({ total: sql<string>`COALESCE(SUM(JML_SPPT_YG_DIBAYAR), 0)` })
         .from(pembayaranSppt)
-        .where(and(
-          eq(pembayaranSppt.thnPajakSppt, thnPajakStr),
-          eq(pembayaranSppt.dibatalkan, 0),
-        ))
+        .where(eq(pembayaranSppt.thnPajakSppt, thnPajakStr))
 
       const [lunas] = await db
         .select({ count: sql<number>`count(*)` })

@@ -5,6 +5,7 @@ import {
   bigint,
   date,
   primaryKey,
+  index,
 } from "drizzle-orm/mysql-core";
 
 // ─── dat_subjek_pajak ─────────────────────────────────────────────
@@ -63,7 +64,7 @@ export const spop = mysqlTable("spop", {
   luasBumi: bigint("LUAS_BUMI", { mode: "number" }).notNull(),
   kdZnt: varchar("KD_ZNT", { length: 2 }),
   jnsBumi: varchar("JNS_BUMI", { length: 1 }).notNull(),
-  nilaiSistemBumi: bigint("NILAI_SISTEM_BUMI", { mode: "number" }).notNull(),
+  nilaiSistemBumi: bigint("NILAI_SISTEM_BUMI", { mode: "number" }).notNull().default(0),
   tglPendataanOp: date("TGL_PENDATAAN_OP").notNull(),
   nmPendataanOp: varchar("NM_PENDATAAN_OP", { length: 30 }),
   nipPendata: varchar("NIP_PENDATA", { length: 20 }),
@@ -73,6 +74,7 @@ export const spop = mysqlTable("spop", {
   noPersil: varchar("NO_PERSIL", { length: 5 }),
 }, (table) => [
   primaryKey({ name: "pk_spop", columns: [table.kdPropinsi, table.kdDati2, table.kdKecamatan, table.kdKelurahan, table.kdBlok, table.noUrut, table.kdJnsOp] }),
+  index("idx_spop_subjek").on(table.subjekPajakId),
 ]);
 
 // ─── dat_legalitas_bumi ───────────────────────────────────────────

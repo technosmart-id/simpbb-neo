@@ -9,6 +9,7 @@ import {
   text,
   date,
   datetime,
+  bigint,
   primaryKey,
   foreignKey,
   index,
@@ -163,22 +164,23 @@ export const pelayananLampiranKolektif = mysqlTable(
 export const historiMutasi = mysqlTable(
   "histori_mutasi",
   {
-    id: int("ID").autoincrement().primaryKey(),
-    noPelayanan: varchar("NO_PELAYANAN", { length: 30 }).notNull(),
-    nopSebelum: varchar("NOP_SEBELUM", { length: 18 }),
-    namaSebelum: varchar("NAMA_SEBELUM", { length: 100 }),
-    ltSebelum: decimal("LT_SEBELUM", { precision: 12, scale: 2 }),
-    lbSebelum: decimal("LB_SEBELUM", { precision: 12, scale: 2 }),
-    pbbSebelum: decimal("PBB_SEBELUM", { precision: 15, scale: 2 }),
+    noPelayanan: varchar("NO_PELAYANAN", { length: 50 }).notNull(),
+    nopSebelum: varchar("NOP_SEBELUM", { length: 20 }),
+    namaSebelum: varchar("NAMA_SEBELUM", { length: 200 }),
+    ltSebelum: int("LT_SEBELUM"),
+    lbSebelum: int("LB_SEBELUM"),
+    pbbSebelum: bigint("PBB_SEBELUM", { mode: "number" }),
     nopSesudah: varchar("NOP_SESUDAH", { length: 18 }),
-    namaSesudah: varchar("NAMA_SESUDAH", { length: 100 }),
-    ltSesudah: decimal("LT_SESUDAH", { precision: 12, scale: 2 }),
-    lbSesudah: decimal("LB_SESUDAH", { precision: 12, scale: 2 }),
-    pbbSesudah: decimal("PBB_SESUDAH", { precision: 15, scale: 2 }),
-    tglMutasi: datetime("TGL_MUTASI").notNull().default(sql`CURRENT_TIMESTAMP`),
-    nipPetugas: varchar("NIP_PETUGAS", { length: 40 }),
+    namaSesudah: varchar("NAMA_SESUDAH", { length: 200 }),
+    ltSesudah: int("LT_SESUDAH"),
+    lbSesudah: int("LB_SESUDAH"),
+    pbbSesudah: bigint("PBB_SESUDAH", { mode: "number" }),
+    // Clone has no PK here (id is a non-unique index). Drizzle emits table-level
+    // indexes as separate CREATE INDEX statements, which MySQL rejects for an
+    // AUTO_INCREMENT column at CREATE TABLE time (err 1075). An inline UNIQUE
+    // satisfies the "auto column must be a key" rule while keeping the table
+    // PK-less (id is unique regardless).
+    id: bigint("ID", { mode: "number" }).autoincrement().notNull().unique(),
+    keterangan: text("KETERANGAN"),
   },
-  (table) => [
-    index("idx_histori_mutasi_pelayanan").on(table.noPelayanan),
-  ],
 );

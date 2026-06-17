@@ -5,10 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useORPC } from "@/lib/orpc/react"
 import { type ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "@/components/data-table/data-table"
-import {
-  SortableHeader,
-  formatRupiah,
-} from "@/components/data-table/column-helpers"
+import { SortableHeader } from "@/components/data-table/column-helpers"
 import { Badge } from "@/components/ui/badge"
 
 // ─── Columns ─────────────────────────────────────────────────────
@@ -17,7 +14,6 @@ const columns: ColumnDef<{
   kdFasilitas: string
   nmFasilitas: string | null
   satuanFasilitas: string | null
-  nilaiFasilitas: string
   statusFasilitas: string | null
   ketergantungan: string | null
 }>[] = [
@@ -34,15 +30,6 @@ const columns: ColumnDef<{
     accessorKey: "satuanFasilitas",
     header: "Satuan",
     cell: ({ row }) => row.original.satuanFasilitas ?? "-",
-  },
-  {
-    accessorKey: "nilaiFasilitas",
-    header: ({ column }) => <SortableHeader column={column} label="Nilai" />,
-    cell: ({ row }) => (
-      <span className="font-mono text-sm">
-        {formatRupiah(row.original.nilaiFasilitas)}
-      </span>
-    ),
   },
   {
     accessorKey: "statusFasilitas",

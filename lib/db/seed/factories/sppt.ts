@@ -45,7 +45,6 @@ export function createSppt(
     statusPembayaranSppt: randNumber({ min: 0, max: 1 }),
     statusTagihanSppt: 0,
     statusCetakSppt: 1,
-    statusPembatalan: '0',
     tglTerbitSppt: new Date(`${thnPajak}-01-01`),
     tglCetakSppt: new Date(`${thnPajak}-01-02`),
     ...overrides,

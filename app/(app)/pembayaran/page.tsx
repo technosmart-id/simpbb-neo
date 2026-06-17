@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/select'
 import { Plus, Search, CreditCard } from 'lucide-react'
 import { formatRupiah, formatTanggal } from '@/components/data-table/column-helpers'
-import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 
 type PembayaranRow = {
@@ -33,7 +32,6 @@ type PembayaranRow = {
   tglPembayaranSppt: Date | string | null
   jmlSpptYgDibayar: bigint | number
   dendaSppt: bigint | number | null
-  dibatalkan: number | null
 }
 
 const columns: ColumnDef<PembayaranRow>[] = [
@@ -72,18 +70,6 @@ const columns: ColumnDef<PembayaranRow>[] = [
       const total = Number(row.original.jmlSpptYgDibayar) + Number(row.original.dendaSppt ?? 0)
       return <span className="font-mono text-sm font-medium">{formatRupiah(total)}</span>
     },
-  },
-  {
-    accessorKey: 'dibatalkan',
-    header: 'Status',
-    cell: ({ row }) =>
-      row.original.dibatalkan ? (
-        <Badge variant="destructive">Batal</Badge>
-      ) : (
-        <Badge variant="outline" className="border-green-500/50 text-green-600 bg-green-500/10">
-          Aktif
-        </Badge>
-      ),
   },
 ]
 

@@ -121,7 +121,6 @@ export const pembayaranRouter = os.router({
         tglRekamByrSppt: new Date(),
         nipRekamByrSppt: input.nipRekamByrSppt ?? "SYSTEM",
         noBukti: input.noBukti ?? null,
-        dibatalkan: 0,
       } as any)
 
       // Update SPPT payment status
@@ -137,7 +136,6 @@ export const pembayaranRouter = os.router({
           eq(pembayaranSppt.noUrut, input.noUrut),
           eq(pembayaranSppt.kdJnsOp, input.kdJnsOp),
           eq(pembayaranSppt.thnPajakSppt, thnPajak),
-          eq(pembayaranSppt.dibatalkan, 0),
         ))
 
       const [spptRow] = await db
@@ -176,28 +174,5 @@ export const pembayaranRouter = os.router({
       }
 
       return { success: true, pembayaranKe: pembayaranSpptKe }
-    }),
-
-  // Void payment
-  void: os
-    .input(nopInput.extend({
-      thnPajakSppt: z.string(),
-      pembayaranSpptKe: z.number(),
-    }))
-    .handler(async ({ input }) => {
-      await db.update(pembayaranSppt)
-        .set({ dibatalkan: 1 })
-        .where(and(
-          eq(pembayaranSppt.kdPropinsi, input.kdPropinsi),
-          eq(pembayaranSppt.kdDati2, input.kdDati2),
-          eq(pembayaranSppt.kdKecamatan, input.kdKecamatan),
-          eq(pembayaranSppt.kdKelurahan, input.kdKelurahan),
-          eq(pembayaranSppt.kdBlok, input.kdBlok),
-          eq(pembayaranSppt.noUrut, input.noUrut),
-          eq(pembayaranSppt.kdJnsOp, input.kdJnsOp),
-          eq(pembayaranSppt.thnPajakSppt, input.thnPajakSppt),
-          eq(pembayaranSppt.pembayaranSpptKe, input.pembayaranSpptKe),
-        ))
-      return { success: true }
     }),
 })

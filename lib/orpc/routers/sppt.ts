@@ -157,7 +157,6 @@ export const spptRouter = os.router({
         statusPembayaranSppt: 0,
         statusTagihanSppt: 0,
         statusCetakSppt: 0,
-        statusPembatalan: "0",
         tglTerbitSppt: input.tglTerbitSppt ? new Date(input.tglTerbitSppt) : null,
         nipPencetakSppt: input.nipPencetakSppt ?? null,
       } as any)
