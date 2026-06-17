@@ -459,8 +459,10 @@ export default function PelayananDetailPage() {
                         <span className="font-mono">{m.nopSesudah}</span>
                       </div>
                     )}
-                    {m.keterangan && (
-                      <div className="text-muted-foreground text-xs">{m.keterangan}</div>
+                    {m.namaSebelum && (
+                      <div className="text-muted-foreground text-xs">
+                        {m.namaSesudah ? `${m.namaSebelum} → ${m.namaSesudah}` : m.namaSebelum}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -495,10 +497,10 @@ export default function PelayananDetailPage() {
                   {new Date(data.tglMasukPenilai).toLocaleDateString('id-ID')}
                 </div>
               )}
-              {data?.tglPenetapan && (
+              {data?.tglMasukPenetapan && (
                 <div>
                   <span className="text-muted-foreground">Masuk Penetapan:</span>{' '}
-                  {new Date(data.tglPenetapan).toLocaleDateString('id-ID')}
+                  {new Date(data.tglMasukPenetapan).toLocaleDateString('id-ID')}
                 </div>
               )}
               {data?.tglSelesai && (
@@ -517,7 +519,7 @@ export default function PelayananDetailPage() {
                 <div className="col-span-2">
                   <span className="text-muted-foreground text-destructive">Ditunda:</span>{' '}
                   {new Date(data.tglBerkasDitunda).toLocaleDateString('id-ID')}
-                  {data.keteranganBerkas && ` — ${data.keteranganBerkas}`}
+                  {data.alasanDitunda && ` — ${data.alasanDitunda}`}
                 </div>
               )}
             </div>

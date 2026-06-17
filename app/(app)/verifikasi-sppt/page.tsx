@@ -27,8 +27,8 @@ function VerifikasiSpptContent() {
   const query = useQuery({
     ...orpc.sppt.get.queryOptions({
       input: enabled
-        ? { ...nopParts!, thnPajakSppt: thn }
-        : { kdPropinsi: '', kdDati2: '', kdKecamatan: '', kdKelurahan: '', kdBlok: '', noUrut: '', kdJnsOp: '', thnPajakSppt: 0 },
+        ? { ...nopParts!, thnPajakSppt: String(thn) }
+        : { kdPropinsi: '', kdDati2: '', kdKecamatan: '', kdKelurahan: '', kdBlok: '', noUrut: '', kdJnsOp: '', thnPajakSppt: '' },
     }),
     enabled,
   })
@@ -103,7 +103,7 @@ function VerifikasiSpptContent() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <span className="text-xs text-muted-foreground block">Nama WP</span>
-              <span className="font-medium">{row.nmWp ?? '-'}</span>
+              <span className="font-medium">{row.nmWpSppt ?? '-'}</span>
             </div>
             <div>
               <span className="text-xs text-muted-foreground block">PBB Yang Harus Dibayar</span>
@@ -115,8 +115,8 @@ function VerifikasiSpptContent() {
             <div>
               <span className="text-xs text-muted-foreground block">Batas Jatuh Tempo</span>
               <span className="font-medium">
-                {row.tglJatuhTempo
-                  ? new Date(row.tglJatuhTempo).toLocaleDateString('id-ID', { dateStyle: 'long' })
+                {row.tglJatuhTempoSppt
+                  ? new Date(row.tglJatuhTempoSppt).toLocaleDateString('id-ID', { dateStyle: 'long' })
                   : '-'}
               </span>
             </div>

@@ -58,7 +58,7 @@ export const pelayananRouter = os.router({
       const [row] = await db.select().from(pelayanan).where(eq(pelayanan.noPelayanan, input.noPelayanan))
       if (!row) return null
 
-      const dokumen = await db.select().from(pelayananDokumen).where(eq(pelayananDokumen.pelayananId, row.id))
+      const dokumen = await db.select().from(pelayananDokumen).where(eq(pelayananDokumen.noPelayanan, row.noPelayanan))
       const lampiran = await db.select().from(pelayananLampiranKolektif).where(eq(pelayananLampiranKolektif.noPelayanan, input.noPelayanan))
       const mutasi = await db.select().from(historiMutasi).where(eq(historiMutasi.noPelayanan, input.noPelayanan)).orderBy(desc(historiMutasi.id))
 
@@ -119,7 +119,7 @@ export const pelayananRouter = os.router({
       // Insert dokumen checklist
       if (dokumenIds && dokumenIds.length > 0 && pelayananRow) {
         await db.insert(pelayananDokumen).values(
-          dokumenIds.map((id) => ({ pelayananId: pelayananRow.id, dokumenId: id })),
+          dokumenIds.map((id) => ({ noPelayanan: pelayananRow.noPelayanan, dokumenId: id })),
         )
       }
 
@@ -146,8 +146,8 @@ export const pelayananRouter = os.router({
           updates.nipMasukPenilai = input.nipPetugas ?? null
           break
         case 3: // Masuk Penetapan
-          updates.tglPenetapan = now
-          updates.nipPenetapan = input.nipPetugas ?? null
+          updates.tglMasukPenetapan = now
+          updates.nipMasukPenetapan = input.nipPetugas ?? null
           break
         case 4: // Selesai
           updates.tglSelesai = now
@@ -159,7 +159,7 @@ export const pelayananRouter = os.router({
           break
         case 6: // Ditunda
           updates.tglBerkasDitunda = now
-          updates.keteranganBerkas = input.catatan ?? null
+          updates.alasanDitunda = input.catatan ?? null
           break
       }
 
