@@ -22,7 +22,7 @@ export function createSpop(
     subjekPajakId,
     noFormulirSpop: randNumber({ min: 10000000000, max: 99999999999 }).toString().substring(0, 11),
     jnsTransaksiOp: "1",
-    jalanOp: randIdStreetAddress().toUpperCase().substring(0, 200),
+    jalanOp: randIdStreetAddress().toUpperCase().substring(0, 30),
     blokKavNoOp: `BLOK ${String.fromCharCode(65 + randNumber({ min: 0, max: 5 }))} / ${randNumber({ min: 1, max: 100 })}`.substring(0, 15),
     rwOp: randNumber({ min: 1, max: 20 }).toString().padStart(2, "0"),
     rtOp: randNumber({ min: 1, max: 50 }).toString().padStart(3, "0"),
