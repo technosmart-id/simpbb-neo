@@ -53,7 +53,7 @@ export default function UpdateMasalPage() {
   const previewQuery = useQuery({
     ...orpc.updateMasal.preview.queryOptions({
       input: {
-        thnPajak,
+        thnPajak: String(thnPajak),
         kdPropinsi: wilayah.kdPropinsi || undefined,
         kdDati2: wilayah.kdDati2 || undefined,
         kdKecamatan: wilayah.kdKecamatan || undefined,
@@ -78,7 +78,7 @@ export default function UpdateMasalPage() {
 
   function handleProcess() {
     processMutation.mutate({
-      thnPajak,
+      thnPajak: String(thnPajak),
       kdPropinsi: wilayah.kdPropinsi || undefined,
       kdDati2: wilayah.kdDati2 || undefined,
       kdKecamatan: wilayah.kdKecamatan || undefined,

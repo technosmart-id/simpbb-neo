@@ -6,9 +6,7 @@ import { useORPC } from '@/lib/orpc/react'
 import { DataTable } from '@/components/data-table/data-table'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
@@ -26,9 +24,10 @@ import { formatTanggal } from '@/components/data-table/column-helpers'
 
 type PemekaranRow = {
   id: number
-  namaPemekaran: string
-  tglBerlaku: Date | string
-  keterangan: string | null
+  jenisPemekaran: number | null
+  tglEntry: Date | string | null
+  userEntry: string | null
+  isCancel: number | null
   jumlahDetail: number
 }
 
@@ -37,20 +36,42 @@ const PAGE_SIZE = 20
 function CreatePemekaranDialog({ onSuccess }: { onSuccess: () => void }) {
   const orpc = useORPC()
   const [open, setOpen] = React.useState(false)
-  const [nama, setNama] = React.useState('')
-  const [tgl, setTgl] = React.useState(new Date().toISOString().slice(0, 10))
-  const [ket, setKet] = React.useState('')
+  const [nopAwal, setNopAwal] = React.useState<NopParts | undefined>()
+  const [nopAkhir, setNopAkhir] = React.useState<NopParts | undefined>()
+  const [nopBaru, setNopBaru] = React.useState<NopParts | undefined>()
 
   const mutation = useMutation(
     orpc.pemekaran.create.mutationOptions({
       onSuccess: () => {
         onSuccess()
         setOpen(false)
-        setNama('')
-        setKet('')
+        setNopAwal(undefined)
+        setNopAkhir(undefined)
+        setNopBaru(undefined)
       },
     }),
   )
+
+  function handleCreate() {
+    if (!nopAwal || !nopAkhir || !nopBaru) return
+
+    mutation.mutate({
+      jenisPemekaran: 1,
+      kdPropinsiLama: nopAwal.kdPropinsi,
+      kdDati2Lama: nopAwal.kdDati2,
+      kdKecamatanLama: nopAwal.kdKecamatan,
+      kdKelurahanLama: nopAwal.kdKelurahan,
+      kdBlokAwal: nopAwal.kdBlok,
+      noUrutAwal: nopAwal.noUrut,
+      noUrutAkhir: nopAkhir.noUrut,
+      kdBlokAkhir: nopAkhir.kdBlok,
+      kdPropinsiBaru: nopBaru.kdPropinsi,
+      kdDati2Baru: nopBaru.kdDati2,
+      kdKecamatanBaru: nopBaru.kdKecamatan,
+      kdKelurahanBaru: nopBaru.kdKelurahan,
+      kdBlokBaru: nopBaru.kdBlok,
+    })
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -60,26 +81,29 @@ function CreatePemekaranDialog({ onSuccess }: { onSuccess: () => void }) {
           Tambah Pemekaran
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Tambah Event Pemekaran</DialogTitle>
         </DialogHeader>
-        <div className="space-y-3 pt-2">
-          <div className="space-y-1">
-            <Label>Nama Pemekaran *</Label>
-            <Input value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Contoh: Pemekaran Kelurahan X Tahun 2024" />
+        <div className="space-y-4 pt-2">
+          <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
+            <div className="space-y-1">
+              <Label className="text-xs">NOP Awal</Label>
+              <NopInput value={nopAwal} onChange={(_, parts) => setNopAwal(parts ?? undefined)} />
+            </div>
+            <ArrowRight className="w-5 h-5 text-muted-foreground mb-2" />
+            <div className="space-y-1">
+              <Label className="text-xs">NOP Akhir</Label>
+              <NopInput value={nopAkhir} onChange={(_, parts) => setNopAkhir(parts ?? undefined)} />
+            </div>
           </div>
           <div className="space-y-1">
-            <Label>Tanggal Berlaku *</Label>
-            <Input type="date" value={tgl} onChange={(e) => setTgl(e.target.value)} />
-          </div>
-          <div className="space-y-1">
-            <Label>Keterangan</Label>
-            <Textarea value={ket} onChange={(e) => setKet(e.target.value)} rows={3} />
+            <Label className="text-xs">NOP Baru (Target)</Label>
+            <NopInput value={nopBaru} onChange={(_, parts) => setNopBaru(parts ?? undefined)} />
           </div>
           <Button
-            onClick={() => mutation.mutate({ namaPemekaran: nama, tglBerlaku: tgl, keterangan: ket || undefined })}
-            disabled={!nama || mutation.isPending}
+            onClick={handleCreate}
+            disabled={!nopAwal || !nopAkhir || !nopBaru || mutation.isPending}
             className="w-full"
           >
             {mutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
@@ -151,7 +175,7 @@ function PemekaranDetailPanel({ id }: { id: number }) {
               {(detailQuery.data?.details ?? []).length === 0 ? (
                 <p className="text-sm text-muted-foreground">Belum ada detail NOP terdaftar.</p>
               ) : (
-                (detailQuery.data?.details ?? []).map((d) => {
+                (detailQuery.data?.details ?? []).map((d: any) => {
                   const lama: NopParts = {
                     kdPropinsi: d.kdPropinsiLama, kdDati2: d.kdDati2Lama, kdKecamatan: d.kdKecamatanLama,
                     kdKelurahan: d.kdKelurahanLama, kdBlok: d.kdBlokLama, noUrut: d.noUrutLama, kdJnsOp: d.kdJnsOpLama,
@@ -218,13 +242,23 @@ export default function PemekaranPage() {
 
   const columns: ColumnDef<PemekaranRow>[] = [
     {
-      accessorKey: 'namaPemekaran',
-      header: 'Nama Pemekaran',
+      accessorKey: 'id',
+      header: 'ID',
     },
     {
-      accessorKey: 'tglBerlaku',
-      header: 'Tanggal Berlaku',
-      cell: ({ row }) => formatTanggal(row.original.tglBerlaku),
+      accessorKey: 'jenisPemekaran',
+      header: 'Jenis',
+      cell: ({ row }) => <Badge variant="outline">{row.original.jenisPemekaran ?? '-'}</Badge>,
+    },
+    {
+      accessorKey: 'tglEntry',
+      header: 'Tanggal Entry',
+      cell: ({ row }) => formatTanggal(row.original.tglEntry),
+    },
+    {
+      accessorKey: 'userEntry',
+      header: 'User',
+      cell: ({ row }) => <span className="text-sm">{row.original.userEntry ?? '-'}</span>,
     },
     {
       accessorKey: 'jumlahDetail',
@@ -232,11 +266,6 @@ export default function PemekaranPage() {
       cell: ({ row }) => (
         <Badge variant="outline">{row.original.jumlahDetail} NOP</Badge>
       ),
-    },
-    {
-      accessorKey: 'keterangan',
-      header: 'Keterangan',
-      cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.keterangan ?? '-'}</span>,
     },
     {
       id: 'actions',

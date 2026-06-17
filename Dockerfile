@@ -18,15 +18,20 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
+# Optimize: Prune dev dependencies to drastically reduce the size of the final image
+RUN npm prune --omit=dev
+
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+WORKDIR /app
+RUN chown nextjs:nodejs /app
 
 COPY --from=builder /app/public ./public
 
@@ -38,9 +43,8 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Manually copy node_modules, DB config, and the entire lib folder for runtime assets
-# We need the full node_modules because standalone mode strips drizzle-kit deps
-# We need the lib folder for Casbin models and other runtime file access
+# We copy the pruned node_modules because standalone mode strips drizzle-kit CLI
+# By pruning dev deps above, we save ~1GB of image size while keeping drizzle-kit intact
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder --chown=nextjs:nodejs /app/lib ./lib

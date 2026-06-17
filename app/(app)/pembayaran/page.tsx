@@ -28,14 +28,12 @@ type PembayaranRow = {
   kdBlok: string
   noUrut: string
   kdJnsOp: string
-  thnPajakSppt: number
-  pembayaranKe: number
-  tglPembayaranSppt: Date | string
-  jmlSpptYgDibayar: string
-  dendaSppt: string
-  jmlBayar: string
-  namaBayar: string | null
-  dibatalkan: number
+  thnPajakSppt: string
+  pembayaranSpptKe: number
+  tglPembayaranSppt: Date | string | null
+  jmlSpptYgDibayar: bigint | number
+  dendaSppt: bigint | number | null
+  dibatalkan: number | null
 }
 
 const columns: ColumnDef<PembayaranRow>[] = [
@@ -49,7 +47,7 @@ const columns: ColumnDef<PembayaranRow>[] = [
     header: 'Tahun',
   },
   {
-    accessorKey: 'pembayaranKe',
+    accessorKey: 'pembayaranSpptKe',
     header: 'Ke',
   },
   {
@@ -60,22 +58,20 @@ const columns: ColumnDef<PembayaranRow>[] = [
   {
     accessorKey: 'jmlSpptYgDibayar',
     header: 'Pokok',
-    cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(row.original.jmlSpptYgDibayar)}</span>,
+    cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(Number(row.original.jmlSpptYgDibayar))}</span>,
   },
   {
     accessorKey: 'dendaSppt',
     header: 'Denda',
-    cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(row.original.dendaSppt)}</span>,
+    cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(Number(row.original.dendaSppt ?? 0))}</span>,
   },
   {
-    accessorKey: 'jmlBayar',
+    id: 'total',
     header: 'Total Bayar',
-    cell: ({ row }) => <span className="font-mono text-sm font-medium">{formatRupiah(row.original.jmlBayar)}</span>,
-  },
-  {
-    accessorKey: 'namaBayar',
-    header: 'Nama',
-    cell: ({ row }) => row.original.namaBayar ?? '-',
+    cell: ({ row }) => {
+      const total = Number(row.original.jmlSpptYgDibayar) + Number(row.original.dendaSppt ?? 0)
+      return <span className="font-mono text-sm font-medium">{formatRupiah(total)}</span>
+    },
   },
   {
     accessorKey: 'dibatalkan',

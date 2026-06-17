@@ -32,8 +32,7 @@ type Kecamatan = {
   kdPropinsi: string
   kdDati2: string
   kdKecamatan: string
-  nmKecamatan: string | null
-  nmKecamatanOnly: string
+  nmKecamatan: string
 }
 
 type Kelurahan = {
@@ -42,8 +41,7 @@ type Kelurahan = {
   kdKecamatan: string
   kdKelurahan: string
   kdSektor: string
-  nmKelurahan: string | null
-  nmKelurahanOnly: string
+  nmKelurahan: string
   noKelurahan: number | null
   kdPosKelurahan: string | null
 }
@@ -84,7 +82,6 @@ const kecamatanColumns: ColumnDef<Kecamatan>[] = [
   {
     accessorKey: "nmKecamatan",
     header: ({ column }) => <SortableHeader column={column} label="Nama Kecamatan" />,
-    cell: ({ row }) => row.original.nmKecamatan ?? row.original.nmKecamatanOnly,
   },
 ]
 
@@ -96,7 +93,6 @@ const kelurahanColumns: ColumnDef<Kelurahan>[] = [
   {
     accessorKey: "nmKelurahan",
     header: ({ column }) => <SortableHeader column={column} label="Nama Kelurahan" />,
-    cell: ({ row }) => row.original.nmKelurahan ?? row.original.nmKelurahanOnly,
   },
   {
     accessorKey: "kdSektor",
@@ -328,7 +324,7 @@ export default function ReferensiWilayahPage() {
                   <SelectContent>
                     {(kecamatanQuery.data ?? []).map((k) => (
                       <SelectItem key={k.kdKecamatan} value={k.kdKecamatan}>
-                        {k.kdKecamatan} - {k.nmKecamatan ?? k.nmKecamatanOnly}
+                        {k.kdKecamatan} - {k.nmKecamatan}
                       </SelectItem>
                     ))}
                   </SelectContent>

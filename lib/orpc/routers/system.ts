@@ -24,6 +24,10 @@ export const systemRouter = os.router({
         console.log("[SYSTEM] Resetting database tables...");
         connection = await mysql.createConnection(DATABASE_URL);
         
+        // Log MySQL version for debugging
+        const [versionResult]: any = await connection.query('SELECT VERSION() as version;');
+        console.log(`[SYSTEM] MySQL Version: ${versionResult[0].version}`);
+        
         // 1. DROP ALL TABLES & VIEWS
         await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
         const [rows]: any = await connection.query('SHOW FULL TABLES;');
@@ -45,23 +49,25 @@ export const systemRouter = os.router({
         await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
         await connection.end();
 
-        // 2. APPLY SCHEMA VIA DRIZZLE PUSH
-        console.log("[SYSTEM] Recreating tables via drizzle-kit push...");
-        const { execSync } = await import('child_process');
+        // 2. APPLY SCHEMA VIA MANUAL MIGRATIONS
+        console.log("[SYSTEM] Recreating tables via manual migrations...");
         
         try {
-          execSync('npx drizzle-kit push --force', {
-            env: { 
-              ...process.env, 
-              NODE_ENV: 'development',
-            },
-            stdio: 'pipe', // Capture output
-            encoding: 'utf-8'
-          });
+          const { applyMigrations } = await import('../../db/migrate-helper');
+          // We need a fresh connection to run the migrations if the previous one was closed
+          const migrationConn = await mysql.createConnection(DATABASE_URL);
+          await applyMigrations(migrationConn, console.log);
+          await migrationConn.end();
+
           console.log("[SYSTEM] Tables recreated successfully.");
+
+          // Apply Custom SQL (Views & Procedures)
+          const { applyCustomSql } = await import('../../../scripts/apply-custom-sql');
+          await applyCustomSql(console.log, console.error);
+
         } catch (pushError: any) {
-          console.error("[SYSTEM] Drizzle push failed:", pushError.stdout || pushError.message);
-          throw new Error(`Failed to recreate tables: ${pushError.message}`);
+          console.error("[SYSTEM] Migration or Custom SQL failed:", pushError.message);
+          throw new Error(`Failed to recreate tables/views: ${pushError.message}`);
         }
 
         // 3. SEED DATA
@@ -94,7 +100,7 @@ export const systemRouter = os.router({
           // Restore original logs before throwing
           console.log = originalLog;
           console.error = originalError;
-          throw new Error(`Tables recreated but seeding failed: ${seedError.message}. Logs: ${logs.join("\\n")}`);
+          throw new Error(`Tables recreated but seeding failed: ${seedError.message}. See server logs for details.`);
         } finally {
           // Restore original logs
           console.log = originalLog;

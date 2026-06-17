@@ -31,17 +31,17 @@ type SpptRow = {
   kdBlok: string
   noUrut: string
   kdJnsOp: string
-  thnPajakSppt: number
-  nmWp: string | null
-  luasBumi: string | number | null
-  luasBng: string | number | null
-  njopSppt: string | number | null
-  njoptkpSppt: string | number | null
-  njkpSppt: string | number | null
-  pbbTerhutangSppt: string | number | null
-  faktorPengurangSppt: string | number | null
-  pbbYgHarusDibayarSppt: string | number
-  statusPembayaranSppt: string | number
+  thnPajakSppt: string
+  nmWpSppt: string | null
+  luasBumiSppt: bigint | number
+  luasBngSppt: bigint | number
+  njopSppt: bigint | number
+  njoptkpSppt: number
+  njkpSppt: bigint | number
+  pbbTerhutangSppt: bigint | number
+  faktorPengurangSppt: bigint | number
+  pbbYgHarusDibayarSppt: bigint | number
+  statusPembayaranSppt: number | null
 }
 
 const EXCEL_COLUMNS = [
@@ -62,31 +62,31 @@ const columns: ColumnDef<SpptRow>[] = [
     header: 'NOP',
     cell: ({ row }) => <NopDisplay parts={row.original} copyable={false} />,
   },
-  { accessorKey: 'nmWp', header: 'Nama WP', cell: ({ row }) => row.original.nmWp ?? '-' },
+  { accessorKey: 'nmWpSppt', header: 'Nama WP', cell: ({ row }) => row.original.nmWpSppt ?? '-' },
   {
-    accessorKey: 'luasBumi',
+    accessorKey: 'luasBumiSppt',
     header: 'L.Bumi',
-    cell: ({ row }) => <span className="font-mono text-sm">{Number(row.original.luasBumi ?? 0).toLocaleString('id-ID')} m²</span>,
+    cell: ({ row }) => <span className="font-mono text-sm">{Number(row.original.luasBumiSppt ?? 0).toLocaleString('id-ID')} m²</span>,
   },
   {
-    accessorKey: 'luasBng',
+    accessorKey: 'luasBngSppt',
     header: 'L.Bng',
-    cell: ({ row }) => <span className="font-mono text-sm">{Number(row.original.luasBng ?? 0).toLocaleString('id-ID')} m²</span>,
+    cell: ({ row }) => <span className="font-mono text-sm">{Number(row.original.luasBngSppt ?? 0).toLocaleString('id-ID')} m²</span>,
   },
   {
     accessorKey: 'njopSppt',
     header: 'NJOP',
-    cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(row.original.njopSppt)}</span>,
+    cell: ({ row }) => <span className="font-mono text-sm">{formatRupiah(Number(row.original.njopSppt ?? 0))}</span>,
   },
   {
     accessorKey: 'pbbYgHarusDibayarSppt',
     header: 'PBB',
-    cell: ({ row }) => <span className="font-mono text-sm font-medium">{formatRupiah(row.original.pbbYgHarusDibayarSppt)}</span>,
+    cell: ({ row }) => <span className="font-mono text-sm font-medium">{formatRupiah(Number(row.original.pbbYgHarusDibayarSppt ?? 0))}</span>,
   },
   {
     accessorKey: 'statusPembayaranSppt',
     header: 'Status',
-    cell: ({ row }) => <PembayaranBadge status={row.original.statusPembayaranSppt} />,
+    cell: ({ row }) => <PembayaranBadge status={row.original.statusPembayaranSppt ?? 0} />,
   },
 ]
 
@@ -160,14 +160,14 @@ export default function DhkpPage() {
     const rows = await fetchAllRows()
     return rows.map((r) => ({
       nop: formatNop(r),
-      nmWp: r.nmWp ?? '',
-      luasBumi: Number(r.luasBumi ?? 0),
-      luasBng: Number(r.luasBng ?? 0),
+      nmWp: r.nmWpSppt ?? '',
+      luasBumi: Number(r.luasBumiSppt ?? 0),
+      luasBng: Number(r.luasBngSppt ?? 0),
       njopSppt: Number(r.njopSppt ?? 0),
       njoptkpSppt: Number(r.njoptkpSppt ?? 0),
       njkpSppt: Number(r.njkpSppt ?? 0),
       pbbYgHarusDibayarSppt: Number(r.pbbYgHarusDibayarSppt),
-      statusLabel: r.statusPembayaranSppt === 'L' || r.statusPembayaranSppt === '1' ? 'LUNAS' : 'BELUM',
+      statusLabel: (r.statusPembayaranSppt === 1 || r.statusPembayaranSppt === 2) ? 'LUNAS' : 'BELUM',
     }))
   }
 

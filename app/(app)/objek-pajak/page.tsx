@@ -119,7 +119,7 @@ function ObjekPajakPageContent() {
                     <div className="flex flex-col gap-0.5">
                       <span className="font-bold text-sm text-foreground">{formatNop(item)}</span>
                       <span className="text-[10px] text-muted-foreground leading-none">
-                        {item.nmWp} • {item.jalanOp}
+                        {item.nmWpSppt} • {item.jalanOp}
                       </span>
                     </div>
                   </ComboboxItem>

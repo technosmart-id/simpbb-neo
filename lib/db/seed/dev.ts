@@ -19,6 +19,7 @@ import { eq, and } from "drizzle-orm";
 import { getCasbinSyncService } from "@/lib/services/casbin-sync";
 import { ORG_ROLES } from "@/lib/services/authorization-constants";
 import { seedSampleSpop } from "./sample-spop";
+import { seedLegacyData } from "./legacy";
 
 const ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com";
 const ADMIN_NAME = process.env.DEFAULT_ADMIN_NAME || "Admin User";
@@ -163,12 +164,18 @@ export async function seedDev() {
 
 	console.log("  ✓ Done\n");
 
+	// Legacy data for reference
+	await seedLegacyData();
+
 	// Sample SPOP data for development
 	await seedSampleSpop();
 }
 
 // Allow direct execution
-if (process.argv[1]?.includes("seed/dev")) {
+const isMain = process.argv[1]?.replace(/\\/g, '/').endsWith('lib/db/seed/dev.ts') || 
+               process.argv[1]?.replace(/\\/g, '/').endsWith('lib/db/seed/dev');
+
+if (isMain) {
 	seedDev()
 		.then(() => process.exit(0))
 		.catch((err) => {

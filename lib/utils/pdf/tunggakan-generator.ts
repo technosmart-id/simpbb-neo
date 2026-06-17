@@ -4,7 +4,7 @@ import { formatNop, type NopParts } from '@/lib/utils/nop'
 
 export interface TunggakanItem {
   thnPajakSppt: string | number
-  tglJatuhTempo: string | Date | null
+  tglJatuhTempoSppt: string | Date | null
   pbbHarusDibayar: number
 }
 
@@ -36,7 +36,7 @@ export async function generateTunggakanPdf(data: TunggakanReportData): Promise<j
     const denda = Math.round(item.pbbHarusDibayar * 0.02) // Simplified 2%
     return [
       item.thnPajakSppt,
-      item.tglJatuhTempo ? new Date(item.tglJatuhTempo).toLocaleDateString('id-ID') : '-',
+      item.tglJatuhTempoSppt ? new Date(item.tglJatuhTempoSppt).toLocaleDateString('id-ID') : '-',
       formatRp(item.pbbHarusDibayar),
       formatRp(denda),
       formatRp(item.pbbHarusDibayar + denda)

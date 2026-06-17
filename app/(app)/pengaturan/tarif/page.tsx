@@ -10,24 +10,18 @@ import {
   formatRupiah,
 } from "@/components/data-table/column-helpers"
 
-// ─── Types ───────────────────────────────────────────────────────
-
-type Tarif = {
-  id: number
-  thnAwal: number
-  thnAkhir: number | null
-  njopMin: string
-  njopMax: string
-  nilaiTarif: string
-}
-
 // ─── Columns ─────────────────────────────────────────────────────
 
-const columns: ColumnDef<Tarif>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-  },
+const columns: ColumnDef<{
+  kdPropinsi: string
+  kdDati2: string
+  thnAwal: string
+  thnAkhir: string
+  njopMin: string
+  njopMax: string | null
+  nilaiTarif: string | null
+  njkp: number
+}>[] = [
   {
     accessorKey: "thnAwal",
     header: ({ column }) => <SortableHeader column={column} label="Tahun Awal" />,
@@ -48,17 +42,17 @@ const columns: ColumnDef<Tarif>[] = [
     accessorKey: "njopMax",
     header: ({ column }) => <SortableHeader column={column} label="NJOP Max" />,
     cell: ({ row }) => (
-      <span className="font-mono text-sm">{formatRupiah(row.original.njopMax)}</span>
+      <span className="font-mono text-sm">{formatRupiah(row.original.njopMax ?? "-")}</span>
     ),
   },
   {
     accessorKey: "nilaiTarif",
     header: ({ column }) => <SortableHeader column={column} label="Nilai Tarif (%)" />,
     cell: ({ row }) => {
-      const val = parseFloat(row.original.nilaiTarif)
+      const val = row.original.nilaiTarif ? parseFloat(row.original.nilaiTarif) : null
       return (
         <span className="font-mono text-sm font-semibold">
-          {isNaN(val) ? "-" : `${(val * 100).toFixed(2)}%`}
+          {val == null || isNaN(val) ? "-" : `${(val * 100).toFixed(2)}%`}
         </span>
       )
     },

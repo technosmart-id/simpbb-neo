@@ -8,18 +8,14 @@ import { DataTable } from "@/components/data-table/data-table"
 import { SortableHeader } from "@/components/data-table/column-helpers"
 import { Badge } from "@/components/ui/badge"
 
-// ─── Types ───────────────────────────────────────────────────────
-
-type JenisSppt = {
-  id: number
-  name: string
-  tarifKhusus: string | null
-  njkpKhusus: number | null
-}
-
 // ─── Columns ─────────────────────────────────────────────────────
 
-const columns: ColumnDef<JenisSppt>[] = [
+const columns: ColumnDef<{
+  id: number
+  name: string | null
+  tarifKhusus: string | null
+  njkpKhusus: number | null
+}>[] = [
   {
     accessorKey: "id",
     header: "ID",
@@ -27,6 +23,7 @@ const columns: ColumnDef<JenisSppt>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} label="Nama" />,
+    cell: ({ row }) => row.original.name ?? "-",
   },
   {
     accessorKey: "tarifKhusus",

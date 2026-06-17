@@ -16,7 +16,7 @@ import { db } from "@/lib/db";
 import { orgRoles } from "@/lib/db/schema";
 import { createDrizzleAdapter } from "@/lib/casbin/drizzle-adapter";
 import { join } from "path";
-import type { CrudPermissions } from "@/lib/db/schema/org-roles";
+import type { CrudPermissions } from "@/lib/db/schema";
 
 // Path to the Casbin model config file
 const MODEL_PATH = join(process.cwd(), "lib/casbin/model.conf");

@@ -255,7 +255,7 @@ export function NopSearchDialog({ onSelect, trigger }: NopSearchDialogProps) {
                       <div className="flex flex-col">
                         <div className="flex items-center gap-1.5">
                           <User className="h-3 w-3 text-muted-foreground" />
-                          <span className="font-bold text-xs truncate uppercase">{row.nmWp || "—"}</span>
+                          <span className="font-bold text-xs truncate uppercase">{row.nmWpSppt || "—"}</span>
                         </div>
                         <div className="flex items-start gap-1.5 mt-0.5">
                           <MapPin className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />

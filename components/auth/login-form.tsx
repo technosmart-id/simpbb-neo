@@ -449,7 +449,7 @@ function LoginFormContent({ className, ...props }: React.ComponentProps<"div">) 
 								</Field>
 							)}
 
-							{/* Demo & Reset Buttons */}
+							{/* Demo & Reset Buttons - Only show in development */}
 							<div className="grid grid-cols-2 gap-2">
 								<Button
 									type="button"

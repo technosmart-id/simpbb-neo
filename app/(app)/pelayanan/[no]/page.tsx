@@ -241,7 +241,7 @@ export default function PelayananDetailPage() {
     }
   }, [data])
 
-  const status = STATUSES.find((s) => s.value === data?.statusPelayanan)
+  const status = STATUSES.find((s) => s.value === (data?.statusPelayanan ?? 0))
 
   return (
     <div className="flex flex-col gap-4 max-w-4xl">
@@ -260,8 +260,8 @@ export default function PelayananDetailPage() {
         </div>
         {!isLoading && data && (
           <div className="ml-auto flex items-center gap-2">
-            <PelayananBadge status={data.statusPelayanan} />
-            <AdvanceStatusButton noPelayanan={data.noPelayanan} currentStatus={data.statusPelayanan} />
+            <PelayananBadge status={data.statusPelayanan ?? 0} />
+            <AdvanceStatusButton noPelayanan={data.noPelayanan} currentStatus={data.statusPelayanan ?? 0} />
           </div>
         )}
       </div>
@@ -296,7 +296,7 @@ export default function PelayananDetailPage() {
               </div>
               <div>
                 <span className="text-muted-foreground">Status:</span>{' '}
-                {status && <PelayananBadge status={data!.statusPelayanan} />}
+                {status && <PelayananBadge status={data!.statusPelayanan ?? 0} />}
               </div>
               {nopParts && (
                 <div className="col-span-2">
@@ -336,7 +336,7 @@ export default function PelayananDetailPage() {
               )}
               <div>
                 <span className="text-muted-foreground">Kolektif:</span>{' '}
-                {data?.isKolektif ? 'Ya' : 'Tidak'}
+                {(data?.lampiran?.length ?? 0) > 0 ? 'Ya' : 'Tidak'}
               </div>
             </div>
           )}
@@ -397,14 +397,14 @@ export default function PelayananDetailPage() {
       </Card>
 
       {/* Lampiran Kolektif */}
-      {data?.isKolektif === 1 && (
+      {(data?.lampiran?.length ?? 0) > 0 && (
         <Card>
           <CardHeader className="pb-3 flex-row items-center justify-between">
             <CardTitle className="text-base">Lampiran Kolektif</CardTitle>
             <AddLampiranDialog noPelayanan={params.no} />
           </CardHeader>
           <CardContent>
-            {(data.lampiran?.length ?? 0) === 0 ? (
+            {!data || (data.lampiran?.length ?? 0) === 0 ? (
               <p className="text-sm text-muted-foreground">Belum ada lampiran.</p>
             ) : (
               <div className="space-y-2">
@@ -453,21 +453,14 @@ export default function PelayananDetailPage() {
                 <div key={m.id} className="flex items-start gap-3 text-sm">
                   <div className="w-1 h-1 rounded-full bg-muted-foreground mt-2 shrink-0" />
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">
-                        {new Date(m.tglMutasi).toLocaleDateString('id-ID', { dateStyle: 'medium' })}
-                        {' '}
-                        {new Date(m.tglMutasi).toLocaleTimeString('id-ID', { timeStyle: 'short' })}
-                      </span>
-                      {m.nipPetugas && (
-                        <span className="text-muted-foreground text-xs">NIP {m.nipPetugas}</span>
-                      )}
-                    </div>
                     {m.nopSesudah && (
                       <div className="text-muted-foreground">
                         {m.nopSebelum && <span>NOP {m.nopSebelum} → </span>}
                         <span className="font-mono">{m.nopSesudah}</span>
                       </div>
+                    )}
+                    {m.keterangan && (
+                      <div className="text-muted-foreground text-xs">{m.keterangan}</div>
                     )}
                   </div>
                 </div>
@@ -502,10 +495,10 @@ export default function PelayananDetailPage() {
                   {new Date(data.tglMasukPenilai).toLocaleDateString('id-ID')}
                 </div>
               )}
-              {data?.tglMasukPenetapan && (
+              {data?.tglPenetapan && (
                 <div>
                   <span className="text-muted-foreground">Masuk Penetapan:</span>{' '}
-                  {new Date(data.tglMasukPenetapan).toLocaleDateString('id-ID')}
+                  {new Date(data.tglPenetapan).toLocaleDateString('id-ID')}
                 </div>
               )}
               {data?.tglSelesai && (
@@ -524,7 +517,7 @@ export default function PelayananDetailPage() {
                 <div className="col-span-2">
                   <span className="text-muted-foreground text-destructive">Ditunda:</span>{' '}
                   {new Date(data.tglBerkasDitunda).toLocaleDateString('id-ID')}
-                  {data.alasanDitunda && ` — ${data.alasanDitunda}`}
+                  {data.keteranganBerkas && ` — ${data.keteranganBerkas}`}
                 </div>
               )}
             </div>

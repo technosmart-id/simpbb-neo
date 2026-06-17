@@ -38,7 +38,7 @@ export const spptRouter = os.router({
 
   // Get single SPPT
   get: os
-    .input(nopInput.extend({ thnPajakSppt: z.number() }))
+    .input(nopInput.extend({ thnPajakSppt: z.string() }))
     .handler(async ({ input }) => {
       const [row] = await db.select().from(sppt)
         .where(and(nopWhere(sppt, input), eq(sppt.thnPajakSppt, input.thnPajakSppt)))
@@ -61,7 +61,7 @@ export const spptRouter = os.router({
     }))
     .handler(async ({ input }) => {
       const conditions = []
-      if (input.thnPajak) conditions.push(eq(sppt.thnPajakSppt, input.thnPajak))
+      if (input.thnPajak) conditions.push(eq(sppt.thnPajakSppt, String(input.thnPajak)))
       if (input.kdPropinsi) conditions.push(eq(sppt.kdPropinsi, input.kdPropinsi))
       if (input.kdDati2) conditions.push(eq(sppt.kdDati2, input.kdDati2))
       if (input.kdKecamatan) conditions.push(eq(sppt.kdKecamatan, input.kdKecamatan))
@@ -69,7 +69,7 @@ export const spptRouter = os.router({
       if (input.statusPembayaran) conditions.push(eq(sppt.statusPembayaranSppt, Number(input.statusPembayaran)))
       if (input.statusCetak) conditions.push(eq(sppt.statusCetakSppt, Number(input.statusCetak)))
       if (input.search) {
-        conditions.push(sql`(${sppt.nmWp} LIKE ${`%${input.search}%`} OR ${sppt.noUrut} LIKE ${`%${input.search}%`})`)
+        conditions.push(sql`(${sppt.nmWpSppt} LIKE ${`%${input.search}%`} OR ${sppt.noUrut} LIKE ${`%${input.search}%`})`)
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined
@@ -87,26 +87,33 @@ export const spptRouter = os.router({
   // Create/generate SPPT
   create: os
     .input(nopInput.extend({
-      thnPajakSppt: z.number(),
+      thnPajakSppt: z.string(),
       kdKlsTanah: z.string().optional(),
       kdKlsBng: z.string().optional(),
-      tglJatuhTempo: z.string().optional(),
-      tglTerbit: z.string().optional(),
-      luasBumi: z.string(),
-      luasBng: z.string(),
-      njopBumi: z.string(),
-      njopBng: z.string(),
+      tglJatuhTempoSppt: z.string().optional(),
+      tglTerbitSppt: z.string().optional(),
+      luasBumiSppt: z.string(),
+      luasBngSppt: z.string(),
+      njopBumiSppt: z.string(),
+      njopBngSppt: z.string(),
       njopSppt: z.string(),
       njoptkpSppt: z.string(),
-      njkpSppt: z.string(),
       pbbTerhutangSppt: z.string(),
       faktorPengurangSppt: z.string(),
       pbbYgHarusDibayarSppt: z.string(),
-      nmWp: z.string().optional(),
-      jalanWp: z.string().optional(),
-      kdJnsSppt: z.number().optional(),
+      nipPencetakSppt: z.string().optional(),
     }))
     .handler(async ({ input }) => {
+      const thnPajak = input.thnPajakSppt
+
+      // Check if SPPT already exists
+      const [existing] = await db.select().from(sppt)
+        .where(and(nopWhere(sppt, input), eq(sppt.thnPajakSppt, thnPajak)))
+
+      if (existing) {
+        throw new Error("SPPT already exists for this NOP and year")
+      }
+
       await db.insert(sppt).values({
         kdPropinsi: input.kdPropinsi,
         kdDati2: input.kdDati2,
@@ -115,144 +122,70 @@ export const spptRouter = os.router({
         kdBlok: input.kdBlok,
         noUrut: input.noUrut,
         kdJnsOp: input.kdJnsOp,
-        thnPajakSppt: input.thnPajakSppt,
-        luasBumi: Number(input.luasBumi),
-        luasBng: Number(input.luasBng),
-        njopBumi: Number(input.njopBumi),
-        njopBng: Number(input.njopBng),
-        njopSppt: Number(input.njopSppt),
-        njoptkpSppt: Number(input.njoptkpSppt),
-        njkpSppt: Number(input.njkpSppt),
-        pbbTerhutangSppt: Number(input.pbbTerhutangSppt),
-        faktorPengurangSppt: Number(input.faktorPengurangSppt),
-        pbbYgHarusDibayarSppt: Number(input.pbbYgHarusDibayarSppt),
-        kdKlsTanah: input.kdKlsTanah ?? null,
-        kdKlsBng: input.kdKlsBng ?? null,
-        tglJatuhTempo: input.tglJatuhTempo ? new Date(input.tglJatuhTempo) : null,
-        tglTerbitSppt: input.tglTerbit ? new Date(input.tglTerbit) : null,
-        nmWp: input.nmWp ?? null,
-        jalanWp: input.jalanWp ?? null,
+        thnPajakSppt: thnPajak,
         siklusSppt: 1,
+        kdKanwilBank: "01",
+        kdKppbbBank: "01",
+        kdBankTunggal: "01",
+        kdBankPersepsi: "01",
+        kdTp: "01",
+        nmWpSppt: "",
+        jlnWpSppt: "",
+        blokKavNoWpSppt: "",
+        rwWpSppt: "",
+        rtWpSppt: "",
+        kelurahanWpSppt: "",
+        kotaWpSppt: "",
+        kdPosWpSppt: "",
+        npwpSppt: "",
+        noPersilSppt: "",
+        kdKlsTanah: input.kdKlsTanah ?? "",
+        thnAwalKlsTanah: thnPajak,
+        kdKlsBng: input.kdKlsBng ?? "",
+        thnAwalKlsBng: thnPajak,
+        tglJatuhTempoSppt: input.tglJatuhTempoSppt ? new Date(input.tglJatuhTempoSppt) : null,
+        luasBumiSppt: BigInt(parseInt(input.luasBumiSppt) || 0),
+        luasBngSppt: BigInt(parseInt(input.luasBngSppt) || 0),
+        njopBumiSppt: BigInt(parseInt(input.njopBumiSppt) || 0),
+        njopBngSppt: BigInt(parseInt(input.njopBngSppt) || 0),
+        njopSppt: BigInt(parseInt(input.njopSppt) || 0),
+        njoptkpSppt: parseInt(input.njoptkpSppt) || 0,
+        njkpSppt: BigInt(0),
+        pbbTerhutangSppt: BigInt(parseInt(input.pbbTerhutangSppt) || 0),
+        faktorPengurangSppt: BigInt(parseInt(input.faktorPengurangSppt) || 0),
+        pbbYgHarusDibayarSppt: BigInt(parseInt(input.pbbYgHarusDibayarSppt) || 0),
         statusPembayaranSppt: 0,
         statusTagihanSppt: 0,
         statusCetakSppt: 0,
-      })
+        statusPembatalan: "0",
+        tglTerbitSppt: input.tglTerbitSppt ? new Date(input.tglTerbitSppt) : null,
+        nipPencetakSppt: input.nipPencetakSppt ?? null,
+      } as any)
+
       return { success: true }
     }),
 
-  // Recalculate SPPT (BR-08: increment siklus, save history)
-  recalculate: os
-    .input(nopInput.extend({
-      thnPajakSppt: z.number(),
-      njopBumi: z.string(),
-      njopBng: z.string(),
-      njopSppt: z.string(),
-      njoptkpSppt: z.string(),
-      njkpSppt: z.string(),
-      pbbTerhutangSppt: z.string(),
-      faktorPengurangSppt: z.string(),
-      pbbYgHarusDibayarSppt: z.string(),
-      kdKlsTanah: z.string().optional(),
-      kdKlsBng: z.string().optional(),
-      luasBumi: z.string().optional(),
-      luasBng: z.string().optional(),
-      keterangan: z.string().optional(),
-      nipPetugas: z.string().optional(),
-    }))
+  // Delete SPPT (only if no payments)
+  delete: os
+    .input(nopInput.extend({ thnPajakSppt: z.string() }))
     .handler(async ({ input }) => {
-      // Get current SPPT for history
-      const [current] = await db.select().from(sppt).where(
-        and(nopWhere(sppt, input), eq(sppt.thnPajakSppt, input.thnPajakSppt)),
-      )
-      if (!current) throw new Error("SPPT tidak ditemukan")
+      const thnPajak = input.thnPajakSppt
 
-      // Save to history (BR-08)
-      await db.insert(historiSppt).values({
-        kdPropinsi: current.kdPropinsi,
-        kdDati2: current.kdDati2,
-        kdKecamatan: current.kdKecamatan,
-        kdKelurahan: current.kdKelurahan,
-        kdBlok: current.kdBlok,
-        noUrut: current.noUrut,
-        kdJnsOp: current.kdJnsOp,
-        thnPajakSppt: current.thnPajakSppt,
-        siklusSppt: current.siklusSppt ?? 0,
-        njopBumi: String(current.njopBumi),
-        njopBng: String(current.njopBng),
-        njopSppt: String(current.njopSppt),
-        njoptkpSppt: String(current.njoptkpSppt),
-        njkpSppt: String(current.njkpSppt),
-        pbbTerhutangSppt: String(current.pbbTerhutangSppt),
-        faktorPengurangSppt: String(current.faktorPengurangSppt),
-        pbbYgHarusDibayarSppt: String(current.pbbYgHarusDibayarSppt),
-        nipPetugas: input.nipPetugas ?? null,
-        keterangan: input.keterangan ?? null,
-      })
-
-      // Update SPPT with new values and increment siklus
-      await db.update(sppt).set({
-        njopBumi: Number(input.njopBumi),
-        njopBng: Number(input.njopBng),
-        njopSppt: Number(input.njopSppt),
-        njoptkpSppt: Number(input.njoptkpSppt),
-        njkpSppt: Number(input.njkpSppt),
-        pbbTerhutangSppt: Number(input.pbbTerhutangSppt),
-        faktorPengurangSppt: Number(input.faktorPengurangSppt),
-        pbbYgHarusDibayarSppt: Number(input.pbbYgHarusDibayarSppt),
-        ...(input.kdKlsTanah && { kdKlsTanah: input.kdKlsTanah }),
-        ...(input.kdKlsBng && { kdKlsBng: input.kdKlsBng }),
-        ...(input.luasBumi && { luasBumi: Number(input.luasBumi) }),
-        ...(input.luasBng && { luasBng: Number(input.luasBng) }),
-        siklusSppt: (current.siklusSppt ?? 0) + 1,
-      }).where(and(nopWhere(sppt, input), eq(sppt.thnPajakSppt, input.thnPajakSppt)))
-
-      return { success: true, newSiklus: (current.siklusSppt ?? 0) + 1 }
-    }),
-
-  // Update print status
-  markPrinted: os
-    .input(nopInput.extend({ thnPajakSppt: z.number() }))
-    .handler(async ({ input }) => {
-      await db.update(sppt)
-        .set({ statusCetakSppt: 1, tglCetakSppt: new Date() })
-        .where(and(nopWhere(sppt, input), eq(sppt.thnPajakSppt, input.thnPajakSppt)))
-      return { success: true }
-    }),
-
-  // Check if SPPT has payments (BR-11)
-  hasPayments: os
-    .input(nopInput.extend({ thnPajakSppt: z.number() }))
-    .handler(async ({ input }) => {
-      const [result] = await db.select({ count: sql<number>`count(*)` })
+      // Check for existing payments
+      const [payments] = await db.select({ count: sql<number>`count(*)` })
         .from(pembayaranSppt)
         .where(and(
-          eq(pembayaranSppt.kdPropinsi, input.kdPropinsi),
-          eq(pembayaranSppt.kdDati2, input.kdDati2),
-          eq(pembayaranSppt.kdKecamatan, input.kdKecamatan),
-          eq(pembayaranSppt.kdKelurahan, input.kdKelurahan),
-          eq(pembayaranSppt.kdBlok, input.kdBlok),
-          eq(pembayaranSppt.noUrut, input.noUrut),
-          eq(pembayaranSppt.kdJnsOp, input.kdJnsOp),
-          eq(pembayaranSppt.thnPajakSppt, input.thnPajakSppt),
+          nopWhere(pembayaranSppt as any, input as any),
+          eq(pembayaranSppt.thnPajakSppt, thnPajak),
         ))
-      return { hasPayments: (result?.count ?? 0) > 0 }
-    }),
 
-  // Get SPPT history
-  getHistory: os
-    .input(nopInput.extend({ thnPajakSppt: z.number() }))
-    .handler(async ({ input }) => {
-      return db.select().from(historiSppt)
-        .where(and(
-          eq(historiSppt.kdPropinsi, input.kdPropinsi),
-          eq(historiSppt.kdDati2, input.kdDati2),
-          eq(historiSppt.kdKecamatan, input.kdKecamatan),
-          eq(historiSppt.kdKelurahan, input.kdKelurahan),
-          eq(historiSppt.kdBlok, input.kdBlok),
-          eq(historiSppt.noUrut, input.noUrut),
-          eq(historiSppt.kdJnsOp, input.kdJnsOp),
-          eq(historiSppt.thnPajakSppt, input.thnPajakSppt),
-        ))
-        .orderBy(desc(historiSppt.tglPerubahan))
+      if (payments && payments.count > 0) {
+        throw new Error("Cannot delete SPPT with existing payments")
+      }
+
+      await db.delete(sppt)
+        .where(and(nopWhere(sppt, input), eq(sppt.thnPajakSppt, thnPajak)))
+
+      return { success: true }
     }),
 })

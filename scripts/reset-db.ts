@@ -19,20 +19,27 @@ async function main() {
     // Connect with the full URL (includes database name)
     const connection = await mysql.createConnection(DATABASE_URL!);
     
-    // Get all tables
-    const [rows]: any = await connection.query('SHOW TABLES;');
-    const tables = rows.map((row: any) => Object.values(row)[0]);
+    // Get all tables and views
+    const [rows]: any = await connection.query('SHOW FULL TABLES;');
+    const items = rows.map((row: any) => ({
+      name: Object.values(row)[0] as string,
+      type: Object.values(row)[1] as string
+    }));
     
-    if (tables.length > 0) {
-      console.log(`Dropping ${tables.length} tables: ${tables.join(', ')}`);
+    if (items.length > 0) {
+      console.log(`Dropping ${items.length} items...`);
       await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
-      for (const table of tables) {
-        await connection.query(`DROP TABLE IF EXISTS \`${table}\`;`);
+      for (const item of items) {
+        if (item.type === 'VIEW') {
+          await connection.query(`DROP VIEW IF EXISTS \`${item.name}\`;`);
+        } else {
+          await connection.query(`DROP TABLE IF EXISTS \`${item.name}\`;`);
+        }
       }
       await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
-      console.log('✅ All tables dropped successfully.');
+      console.log('✅ All tables and views dropped successfully.');
     } else {
-      console.log('ℹ️ No tables found to drop.');
+      console.log('ℹ️ No items found to drop.');
     }
     
     await connection.end();

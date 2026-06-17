@@ -71,11 +71,11 @@ export const booksRouter = os.router({
     .input(z.object({
       title: z.string().min(1),
       author: z.string().min(1),
-      publishedAt: z.string().optional().nullable(),
-      coverImage: z.string().optional().nullable(),
-      attachmentFile: z.string().optional().nullable(),
-      galleryImages: z.array(z.string()).optional().nullable(),
-      additionalDocuments: z.array(z.string()).optional().nullable(),
+      publishedAt: z.string().optional(),
+      coverImage: z.string().optional(),
+      attachmentFile: z.string().optional(),
+      galleryImages: z.array(z.string()).default([]),
+      additionalDocuments: z.array(z.string()).default([]),
     }))
     .handler(async ({ input, context }) => {
       const { session, organizationId } = await requireAuth(context, { 
@@ -104,7 +104,7 @@ export const booksRouter = os.router({
       const [result] = await db.insert(books).values({
         title: input.title,
         author: input.author,
-        publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
+        publishedAt: (typeof input.publishedAt === 'string') ? new Date(input.publishedAt) : null,
         coverImage: mapPath(input.coverImage),
         attachmentFile: mapPath(input.attachmentFile),
         galleryImages: (input.galleryImages?.map(mapPath).filter((p): p is string => !!p) ?? []),
@@ -120,11 +120,11 @@ export const booksRouter = os.router({
       id: z.number(),
       title: z.string().min(1),
       author: z.string().min(1),
-      publishedAt: z.string().optional().nullable(),
-      coverImage: z.string().optional().nullable(),
-      attachmentFile: z.string().optional().nullable(),
-      galleryImages: z.array(z.string()).optional().nullable(),
-      additionalDocuments: z.array(z.string()).optional().nullable(),
+      publishedAt: z.string().optional(),
+      coverImage: z.string().optional(),
+      attachmentFile: z.string().optional(),
+      galleryImages: z.array(z.string()).default([]),
+      additionalDocuments: z.array(z.string()).default([]),
     }))
     .handler(async ({ input, context }) => {
       const { organizationId } = await requireAuth(context, { 
@@ -169,7 +169,7 @@ export const booksRouter = os.router({
         .set({
           title: input.title,
           author: input.author,
-          publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
+          publishedAt: (typeof input.publishedAt === 'string') ? new Date(input.publishedAt) : null,
           coverImage: mapPath(input.coverImage),
           attachmentFile: mapPath(input.attachmentFile),
           galleryImages: (input.galleryImages?.map(mapPath).filter((p): p is string => !!p) ?? []),

@@ -91,7 +91,9 @@ export function NotificationBell() {
       // EventSource errors are often transient (reconnection attempts)
       // Only log if it's a real error, not just a reconnection
       if (eventSource.readyState === EventSource.CLOSED) {
-        console.error("SSE connection closed")
+        // Next.js dev server/Turbopack drops idle connections constantly. 
+        // We don't need to spam the console with this since EventSource auto-reconnects.
+        // console.error("SSE connection closed")
       }
       // Note: we don't close on error here - let EventSource handle reconnection
     }

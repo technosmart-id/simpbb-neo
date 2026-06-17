@@ -18,7 +18,7 @@ async function getKonfigValue(nama: string): Promise<string> {
 }
 
 const wilayahFilter = z.object({
-  thnPajak: z.number().int().min(2000).max(2099),
+  thnPajak: z.string().length(4),
   kdPropinsi: z.string().optional(),
   kdDati2: z.string().optional(),
   kdKecamatan: z.string().optional(),
@@ -123,19 +123,22 @@ export const updateMasalRouter = os.router({
           kdBlok: row.kdBlok,
           noUrut: row.noUrut,
           kdJnsOp: row.kdJnsOp,
-          thnPajakSppt: row.thnPajakSppt,
+          thnPajakSppt: Number(row.thnPajakSppt),
           siklusSppt: row.siklusSppt ?? 0,
-          njopBumi: String(row.njopBumi),
-          njopBng: String(row.njopBng),
-          njopSppt: String(row.njopSppt),
-          njoptkpSppt: String(row.njoptkpSppt),
-          njkpSppt: String(row.njkpSppt),
-          pbbTerhutangSppt: String(row.pbbTerhutangSppt),
-          faktorPengurangSppt: String(row.faktorPengurangSppt),
-          pbbYgHarusDibayarSppt: String(row.pbbYgHarusDibayarSppt),
+          njopBumi: row.njopBumiSppt,
+          njopBng: row.njopBngSppt,
+          njopSppt: row.njopSppt,
+          njoptkpSppt: row.njoptkpSppt,
+          njkpSppt: row.njkpSppt,
+          pbbTerhutangSppt: row.pbbTerhutangSppt,
+          faktorPengurangSppt: row.faktorPengurangSppt,
+          pbbYgHarusDibayarSppt: row.pbbYgHarusDibayarSppt,
+          statusPembayaranSppt: row.statusPembayaranSppt ?? 0,
+          statusTagihanSppt: row.statusTagihanSppt ?? 0,
+          statusCetakSppt: row.statusCetakSppt ?? 0,
           nipPetugas: input.nipPetugas ?? null,
           keterangan: input.keterangan ?? `Update Masal Tahun ${input.thnPajak}`,
-        })
+        } as any)
 
         // Update SPPT
         await db.update(sppt)

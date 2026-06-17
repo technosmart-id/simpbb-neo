@@ -216,7 +216,7 @@ export function WilayahCascade({
             <SelectContent>
               {kecamatanQuery.data?.map((k) => (
                 <SelectItem key={k.kdKecamatan} value={k.kdKecamatan}>
-                  {k.kdKecamatan} - {k.nmKecamatanOnly}
+                  {k.kdKecamatan} - {k.nmKecamatan}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -239,7 +239,7 @@ export function WilayahCascade({
             <SelectContent>
               {kelurahanQuery.data?.map((k) => (
                 <SelectItem key={k.kdKelurahan} value={k.kdKelurahan}>
-                  {k.kdKelurahan} - {k.nmKelurahanOnly}
+                  {k.kdKelurahan} - {k.nmKelurahan}
                 </SelectItem>
               ))}
             </SelectContent>

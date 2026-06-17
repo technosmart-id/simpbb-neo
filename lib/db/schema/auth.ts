@@ -1,35 +1,35 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   mysqlTable,
   varchar,
   text,
-  timestamp,
+  datetime,
   boolean,
   index,
   uniqueIndex,
 } from "drizzle-orm/mysql-core";
-import { memberRoles } from "./member-roles";
+import { memberRoles } from "./authorization";
 
 export const user = mysqlTable("user", {
   id: varchar("id", { length: 36 }).primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 191 }).notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
-  createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { fsp: 3 })
-    .defaultNow()
+  createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: datetime("updated_at")
+    .default(sql`CURRENT_TIMESTAMP`)
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   twoFactorEnabled: boolean("two_factor_enabled").default(false),
-  username: varchar("username", { length: 255 }).unique(),
+  username: varchar("username", { length: 191 }).unique(),
   displayUsername: text("display_username"),
-  phoneNumber: varchar("phone_number", { length: 255 }).unique(),
+  phoneNumber: varchar("phone_number", { length: 191 }).unique(),
   phoneNumberVerified: boolean("phone_number_verified"),
   role: text("role"),
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
-  banExpires: timestamp("ban_expires", { fsp: 3 }),
+  banExpires: datetime("ban_expires"),
   isAnonymous: boolean("is_anonymous").default(false),
 });
 
@@ -37,10 +37,10 @@ export const session = mysqlTable(
   "session",
   {
     id: varchar("id", { length: 36 }).primaryKey(),
-    expiresAt: timestamp("expires_at", { fsp: 3 }).notNull(),
-    token: varchar("token", { length: 255 }).notNull().unique(),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 })
+    expiresAt: datetime("expires_at").notNull(),
+    token: varchar("token", { length: 191 }).notNull().unique(),
+    createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+    updatedAt: datetime("updated_at")
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
     ipAddress: text("ip_address"),
@@ -67,12 +67,12 @@ export const account = mysqlTable(
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
-    accessTokenExpiresAt: timestamp("access_token_expires_at", { fsp: 3 }),
-    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { fsp: 3 }),
+    accessTokenExpiresAt: datetime("access_token_expires_at"),
+    refreshTokenExpiresAt: datetime("refresh_token_expires_at"),
     scope: text("scope"),
     password: text("password"),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 })
+    createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+    updatedAt: datetime("updated_at")
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
@@ -85,10 +85,10 @@ export const verification = mysqlTable(
     id: varchar("id", { length: 36 }).primaryKey(),
     identifier: varchar("identifier", { length: 255 }).notNull(),
     value: text("value").notNull(),
-    expiresAt: timestamp("expires_at", { fsp: 3 }).notNull(),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 })
-      .defaultNow()
+    expiresAt: datetime("expires_at").notNull(),
+    createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+    updatedAt: datetime("updated_at")
+      .default(sql`CURRENT_TIMESTAMP`)
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
@@ -118,7 +118,7 @@ export const oauthApplication = mysqlTable(
     name: text("name"),
     icon: text("icon"),
     metadata: text("metadata"),
-    clientId: varchar("client_id", { length: 255 }).unique(),
+    clientId: varchar("client_id", { length: 191 }).unique(),
     clientSecret: text("client_secret"),
     redirectUrls: text("redirect_urls"),
     type: text("type"),
@@ -126,8 +126,8 @@ export const oauthApplication = mysqlTable(
     userId: varchar("user_id", { length: 36 }).references(() => user.id, {
       onDelete: "cascade",
     }),
-    createdAt: timestamp("created_at", { fsp: 3 }),
-    updatedAt: timestamp("updated_at", { fsp: 3 }),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at"),
   },
   (table) => [index("oauthApplication_userId_idx").on(table.userId)],
 );
@@ -136,10 +136,10 @@ export const oauthAccessToken = mysqlTable(
   "oauth_access_token",
   {
     id: varchar("id", { length: 36 }).primaryKey(),
-    accessToken: varchar("access_token", { length: 255 }).unique(),
-    refreshToken: varchar("refresh_token", { length: 255 }).unique(),
-    accessTokenExpiresAt: timestamp("access_token_expires_at", { fsp: 3 }),
-    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { fsp: 3 }),
+    accessToken: varchar("access_token", { length: 191 }).unique(),
+    refreshToken: varchar("refresh_token", { length: 191 }).unique(),
+    accessTokenExpiresAt: datetime("access_token_expires_at"),
+    refreshTokenExpiresAt: datetime("refresh_token_expires_at"),
     clientId: varchar("client_id", { length: 36 }).references(
       () => oauthApplication.clientId,
       { onDelete: "cascade" },
@@ -148,8 +148,8 @@ export const oauthAccessToken = mysqlTable(
       onDelete: "cascade",
     }),
     scopes: text("scopes"),
-    createdAt: timestamp("created_at", { fsp: 3 }),
-    updatedAt: timestamp("updated_at", { fsp: 3 }),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at"),
   },
   (table) => [
     index("oauthAccessToken_clientId_idx").on(table.clientId),
@@ -169,8 +169,8 @@ export const oauthConsent = mysqlTable(
       onDelete: "cascade",
     }),
     scopes: text("scopes"),
-    createdAt: timestamp("created_at", { fsp: 3 }),
-    updatedAt: timestamp("updated_at", { fsp: 3 }),
+    createdAt: datetime("created_at"),
+    updatedAt: datetime("updated_at"),
     consentGiven: boolean("consent_given"),
   },
   (table) => [
@@ -184,9 +184,9 @@ export const organization = mysqlTable(
   {
     id: varchar("id", { length: 36 }).primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
-    slug: varchar("slug", { length: 255 }).notNull().unique(),
+    slug: varchar("slug", { length: 191 }).notNull().unique(),
     logo: text("logo"),
-    createdAt: timestamp("created_at", { fsp: 3 }).notNull(),
+    createdAt: datetime("created_at").notNull(),
     metadata: text("metadata"),
     autoJoin: boolean("auto_join").default(true).notNull(),
   },
@@ -201,8 +201,8 @@ export const team = mysqlTable(
     organizationId: varchar("organization_id", { length: 36 })
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { fsp: 3 }).notNull(),
-    updatedAt: timestamp("updated_at", { fsp: 3 }).$onUpdate(
+    createdAt: datetime("created_at").notNull(),
+    updatedAt: datetime("updated_at").$onUpdate(
       () => /* @__PURE__ */ new Date(),
     ),
   },
@@ -219,7 +219,7 @@ export const teamMember = mysqlTable(
     userId: varchar("user_id", { length: 36 })
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { fsp: 3 }),
+    createdAt: datetime("created_at"),
   },
   (table) => [
     index("teamMember_teamId_idx").on(table.teamId),
@@ -240,7 +240,7 @@ export const member = mysqlTable(
     role: varchar("role", { length: 255 }).default("member").notNull(),
     // References custom org_roles table. If null, falls back to the role enum.
     customRoleId: varchar("custom_role_id", { length: 36 }),
-    createdAt: timestamp("created_at", { fsp: 3 }).notNull(),
+    createdAt: datetime("created_at").notNull(),
   },
   (table) => [
     index("member_organizationId_idx").on(table.organizationId),
@@ -260,8 +260,8 @@ export const invitation = mysqlTable(
     role: varchar("role", { length: 255 }),
     teamId: varchar("team_id", { length: 255 }),
     status: varchar("status", { length: 255 }).default("pending").notNull(),
-    expiresAt: timestamp("expires_at", { fsp: 3 }).notNull(),
-    createdAt: timestamp("created_at", { fsp: 3 }).defaultNow().notNull(),
+    expiresAt: datetime("expires_at").notNull(),
+    createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
     inviterId: varchar("inviter_id", { length: 36 })
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -377,6 +377,13 @@ export const memberRelations = relations(member, ({ one, many }) => ({
     references: [user.id],
   }),
   roleAssignments: many(memberRoles),
+}));
+
+export const memberRolesRelations = relations(memberRoles, ({ one }) => ({
+  member: one(member, {
+    fields: [memberRoles.memberId],
+    references: [member.id],
+  }),
 }));
 
 export const invitationRelations = relations(invitation, ({ one }) => ({

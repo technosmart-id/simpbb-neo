@@ -1,6 +1,6 @@
-import { mysqlTable, varchar, text, timestamp, boolean, index } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, text, datetime, boolean, index } from "drizzle-orm/mysql-core";
 import { user } from "./auth";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 export const notifications = mysqlTable(
   "notifications",
@@ -14,7 +14,7 @@ export const notifications = mysqlTable(
     type: varchar("type", { length: 50 }).default("info").notNull(), // info, success, warning, error
     link: text("link"),
     isRead: boolean("is_read").default(false).notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   },
   (table) => [
     index("notifications_userId_idx").on(table.userId),

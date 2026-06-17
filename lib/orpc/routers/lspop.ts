@@ -160,11 +160,13 @@ export const lspopRouter = os.router({
           kdDinding: input.kdDinding ?? null,
           kdLantai: input.kdLantai ?? null,
           kdLangitLangit: input.kdLangitLangit ?? null,
+          nilaiIndividu: 0,
+          nilaiSistemBng: 0,
           nipPendataBng: nip,
           tglPendataanBng: now,
           tglPerekamanBng: now,
           aktif: 1,
-        })
+        } as any)
 
         if (jpbDetails && input.kdJpb) {
           const table = jpbTableMap[input.kdJpb]
