@@ -107,7 +107,7 @@ export const StorageService = {
 	async listFiles(relativePath: string = ""): Promise<FileMetadata[]> {
 		await this.init()
 		const results: FileMetadata[] = []
-		const targetDir = path.join(UPLOAD_ROOT, relativePath)
+		const targetDir = this.validatePath(relativePath)
 
 		if (this.provider === "local") {
 			try {
@@ -146,7 +146,7 @@ export const StorageService = {
 
 	async createFolder(parentPath: string, folderName: string) {
 		await this.init()
-		const newFolderPath = path.join(UPLOAD_ROOT, parentPath, folderName)
+		const newFolderPath = this.validatePath(path.join(parentPath, folderName))
 		
 		if (this.provider === "local") {
 			try {
@@ -163,7 +163,7 @@ export const StorageService = {
 	async deleteFile(relativePath: string) {
 		await this.init()
 		if (this.provider === "local") {
-			const fullPath = path.join(UPLOAD_ROOT, relativePath)
+			const fullPath = this.validatePath(relativePath)
 			try {
 				const stats = await fs.stat(fullPath)
 				if (stats.isDirectory()) {
@@ -232,8 +232,19 @@ export const StorageService = {
 		}
 	},
 
+	validatePath(relativePath: string): string {
+		const normalizedPath = relativePath.replace(/\\/g, "/")
+		const resolvedPath = path.resolve(UPLOAD_ROOT, normalizedPath)
+		// Ensure the resolved path is within UPLOAD_ROOT and doesn't just start with the same prefix
+		const relative = path.relative(UPLOAD_ROOT, resolvedPath)
+		if (relative.startsWith("..") || path.isAbsolute(relative)) {
+			throw new Error("Invalid path: path traversal detected")
+		}
+		return resolvedPath
+	},
+
 	getDiskPath(relativePath: string) {
-		return path.join(UPLOAD_ROOT, relativePath)
+		return this.validatePath(relativePath)
 	},
 
 	getContentType(fileName: string): string {

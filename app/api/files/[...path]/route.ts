@@ -20,12 +20,12 @@ export async function GET(
 		const { path: pathParts } = await params
 		const relativePath = pathParts.join("/")
 		
-		// Basic security check: don't allow ".." or absolute paths
-		if (relativePath.includes("..") || relativePath.startsWith("/")) {
+		let diskPath: string
+		try {
+			diskPath = StorageService.getDiskPath(relativePath)
+		} catch (e) {
 			return NextResponse.json({ error: "Invalid path" }, { status: 400 })
 		}
-
-		const diskPath = StorageService.getDiskPath(relativePath)
 		
 		try {
 			const fileBuffer = await fs.readFile(diskPath)
